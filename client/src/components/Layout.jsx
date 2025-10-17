@@ -1,0 +1,137 @@
+import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+import { useSocket } from '../hooks/useSocket';
+
+const Layout = () => {
+  const { isAuthenticated, user, logout, isAdmin, isSeller } = useAuth();
+  const { connected, notifications, clearAllNotifications } = useSocket();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Navigation */}
+      <nav className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center space-x-8">
+              <Link to="/" className="flex items-center">
+                <span className="text-2xl font-bold text-primary-600">
+                  Tigray Market
+                </span>
+              </Link>
+              
+              <div className="hidden md:flex space-x-4">
+                <Link to="/search" className="text-gray-700 hover:text-primary-600 px-3 py-2">
+                  Browse
+                </Link>
+                {isSeller && (
+                  <Link to="/seller-dashboard" className="text-gray-700 hover:text-primary-600 px-3 py-2">
+                    My Listings
+                  </Link>
+                )}
+                {isAuthenticated && (
+                  <Link to="/orders" className="text-gray-700 hover:text-primary-600 px-3 py-2">
+                    My Orders
+                  </Link>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              {/* Socket connection indicator */}
+              {isAuthenticated && (
+                <div className="flex items-center space-x-2">
+                  <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500' : 'bg-red-500'}`} />
+                  <span className="text-xs text-gray-500">{connected ? 'Live' : 'Offline'}</span>
+                </div>
+              )}
+
+              {/* Notifications */}
+              {isAuthenticated && notifications.length > 0 && (
+                <div className="relative">
+                  <button
+                    onClick={clearAllNotifications}
+                    className="relative p-2 text-gray-700 hover:text-primary-600"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    <span className="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+                      {notifications.length}
+                    </span>
+                  </button>
+                </div>
+              )}
+
+              {isAuthenticated ? (
+                <>
+                  {isSeller && (
+                    <Link to="/create-listing" className="btn btn-primary">
+                      + Create Listing
+                    </Link>
+                  )}
+                  
+                  {isAdmin && (
+                    <Link to="/admin" className="btn btn-secondary">
+                      Admin Panel
+                    </Link>
+                  )}
+
+                  <div className="flex items-center space-x-3">
+                    <div className="text-sm">
+                      <div className="font-medium text-gray-900">{user?.name}</div>
+                      <div className="text-gray-500 text-xs">
+                        {user?.roles?.join(', ')}
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="text-gray-700 hover:text-primary-600 px-3 py-2"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="text-gray-700 hover:text-primary-600 px-3 py-2">
+                    Login
+                  </Link>
+                  <Link to="/register" className="btn btn-primary">
+                    Sign Up
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main content */}
+      <main>
+        <Outlet />
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-white border-t mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center text-gray-500 text-sm">
+            <p className="mb-2">
+              <strong>⚠️ Payment Disclaimer:</strong> This platform does NOT process payments. 
+              All transactions are between buyer and seller. We are not liable for off-site payment disputes.
+            </p>
+            <p>&copy; 2024 Tigray Marketplace. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default Layout;
+

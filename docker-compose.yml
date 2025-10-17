@@ -1,0 +1,123 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: tigray-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: tigray_marketplace
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - tigray-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: tigray-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass redis123
+    volumes:
+      - redis-data:/data
+    networks:
+      - tigray-network
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: tigray-server
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      MONGO_URI: mongodb://admin:password123@mongo:27017/tigray_marketplace?authSource=admin
+      REDIS_URL: redis://:redis123@redis:6379
+      JWT_SECRET: dev-jwt-secret-change-in-production
+      CLOUDINARY_URL: cloudinary://your_key:your_secret@your_cloud_name
+      FRONTEND_URL: http://localhost:5173
+      BACKEND_URL: http://localhost:3000
+      AWS_S3_BUCKET: optional-bucket-name
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: optional
+      AWS_SECRET_ACCESS_KEY: optional
+      CLOUDFRONT_URL: optional
+      USE_S3: false
+      SMTP_HOST: smtp.mailtrap.io
+      SMTP_PORT: 2525
+      SMTP_USER: your-smtp-user
+      SMTP_PASS: your-smtp-pass
+      SMTP_FROM: noreply@tigraymarket.com
+    depends_on:
+      - mongo
+      - redis
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    networks:
+      - tigray-network
+    command: npm run dev
+
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    container_name: tigray-worker
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      MONGO_URI: mongodb://admin:password123@mongo:27017/tigray_marketplace?authSource=admin
+      REDIS_URL: redis://:redis123@redis:6379
+      JWT_SECRET: dev-jwt-secret-change-in-production
+      CLOUDINARY_URL: cloudinary://your_key:your_secret@your_cloud_name
+      AWS_S3_BUCKET: optional-bucket-name
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: optional
+      AWS_SECRET_ACCESS_KEY: optional
+      USE_S3: false
+      BACKEND_URL: http://server:3000
+    depends_on:
+      - mongo
+      - redis
+      - server
+    volumes:
+      - ./worker:/app
+      - /app/node_modules
+    networks:
+      - tigray-network
+    command: npm run dev
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    container_name: tigray-client
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:3000
+      VITE_SOCKET_URL: http://localhost:3000
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    networks:
+      - tigray-network
+    command: npm run dev
+
+volumes:
+  mongo-data:
+  redis-data:
+
+networks:
+  tigray-network:
+    driver: bridge
+
