@@ -1,16 +1,53 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { listingsAPI } from '../services/api';
+import { listingsAPI, messagesAPI } from '../services/api';
+import { useAuth } from '../hooks/useAuth';
 
 const Home = () => {
+  const { isAuthenticated } = useAuth();
+
   // Fetch recent listings
   const { data: listingsData, isLoading } = useQuery({
     queryKey: ['listings', 'recent'],
     queryFn: () => listingsAPI.getAll({ limit: 6, page: 1 }),
   });
 
+  // Fetch unread message count
+  const { data: unreadData } = useQuery({
+    queryKey: ['messages', 'unread-count'],
+    queryFn: () => messagesAPI.getUnreadCount(),
+    enabled: isAuthenticated,
+    refetchInterval: 30000, // Refetch every 30 seconds
+  });
+
+  const unreadCount = unreadData?.unreadCount || 0;
+
   return (
     <div>
+      {/* New Messages Alert */}
+      {isAuthenticated && unreadCount > 0 && (
+        <div className="bg-blue-600 text-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+                <span className="font-semibold">
+                  You have {unreadCount} new {unreadCount === 1 ? 'message' : 'messages'}
+                </span>
+              </div>
+              <Link 
+                to="/orders" 
+                className="bg-white text-blue-600 px-6 py-2 rounded-lg font-semibold hover:bg-blue-50 transition"
+              >
+                View Messages →
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
