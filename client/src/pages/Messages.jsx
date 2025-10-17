@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { messagesAPI } from '../services/api';
+import { messagesAPI, ordersAPI } from '../services/api';
 import { useSocket } from '../hooks/useSocket';
 import { sendMessage, joinOrderRoom } from '../services/socket';
 import { useAuth } from '../hooks/useAuth';
@@ -15,6 +15,13 @@ const Messages = () => {
   const messagesEndRef = useRef(null);
 
   const [messageText, setMessageText] = useState('');
+
+  // Fetch order details to get buyer and seller IDs
+  const { data: orderData } = useQuery({
+    queryKey: ['order', orderId],
+    queryFn: () => ordersAPI.getById(orderId),
+    enabled: !!orderId,
+  });
 
   const { data: messagesData } = useQuery({
     queryKey: ['messages', orderId],
@@ -31,11 +38,22 @@ const Messages = () => {
         queryClient.invalidateQueries(['messages', orderId]);
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       });
+
+      socket.on('message_sent', (data) => {
+        queryClient.invalidateQueries(['messages', orderId]);
+        toast.success('Message sent');
+      });
+
+      socket.on('error', (data) => {
+        toast.error(data.message || 'An error occurred');
+      });
     }
 
     return () => {
       if (socket) {
         socket.off('new_message');
+        socket.off('message_sent');
+        socket.off('error');
       }
     };
   }, [orderId, socket, queryClient]);
@@ -48,13 +66,28 @@ const Messages = () => {
     e.preventDefault();
     if (!messageText.trim()) return;
 
-    sendMessage({
-      orderId,
-      toUserId: 'recipient-id', // Should be determined from order
-      text: messageText,
-    });
+    if (!orderData?.order) {
+      toast.error('Order data not loaded');
+      return;
+    }
 
-    setMessageText('');
+    // Determine recipient: if current user is buyer, send to seller, and vice versa
+    const order = orderData.order;
+    const isBuyer = order.buyerId._id === user._id;
+    const recipientId = isBuyer ? order.sellerId._id : order.buyerId._id;
+
+    try {
+      sendMessage({
+        orderId,
+        toUserId: recipientId,
+        text: messageText,
+      });
+
+      setMessageText('');
+    } catch (error) {
+      toast.error('Failed to send message');
+      console.error('Message send error:', error);
+    }
   };
 
   return (
