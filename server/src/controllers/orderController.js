@@ -25,7 +25,7 @@ const createOrder = async (req, res) => {
     }
 
     // Prevent self-purchase
-    if (listing.sellerId.toString() === req.userId) {
+    if (listing.sellerId.toString() === req.userId.toString()) {
       return res.status(400).json({
         error: true,
         message: 'You cannot purchase your own listing',
@@ -104,8 +104,8 @@ const getOrderById = async (req, res) => {
     }
 
     // Check authorization
-    const isBuyer = order.buyerId._id.toString() === req.userId;
-    const isSeller = order.sellerId._id.toString() === req.userId;
+    const isBuyer = order.buyerId._id.toString() === req.userId.toString();
+    const isSeller = order.sellerId._id.toString() === req.userId.toString();
     const isAdmin = req.user.roles.includes('admin');
 
     if (!isBuyer && !isSeller && !isAdmin) {
@@ -195,8 +195,8 @@ const updateOrder = async (req, res) => {
     }
 
     // Check authorization (seller, buyer for some fields, or admin)
-    const isBuyer = order.buyerId.toString() === req.userId;
-    const isSeller = order.sellerId.toString() === req.userId;
+    const isBuyer = order.buyerId.toString() === req.userId.toString();
+    const isSeller = order.sellerId.toString() === req.userId.toString();
     const isAdmin = req.user.roles.includes('admin');
 
     if (!isBuyer && !isSeller && !isAdmin) {
@@ -281,7 +281,7 @@ const requestInvoice = async (req, res) => {
     }
 
     // Only seller or admin can generate invoice
-    const isSeller = order.sellerId._id.toString() === req.userId;
+    const isSeller = order.sellerId._id.toString() === req.userId.toString();
     const isAdmin = req.user.roles.includes('admin');
 
     if (!isSeller && !isAdmin) {
@@ -373,8 +373,8 @@ const getInvoice = async (req, res) => {
 
     // Check authorization
     const order = invoice.orderId;
-    const isBuyer = order.buyerId.toString() === req.userId;
-    const isSeller = order.sellerId.toString() === req.userId;
+    const isBuyer = order.buyerId.toString() === req.userId.toString();
+    const isSeller = order.sellerId.toString() === req.userId.toString();
     const isAdmin = req.user.roles.includes('admin');
 
     if (!isBuyer && !isSeller && !isAdmin) {

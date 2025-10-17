@@ -18,8 +18,8 @@ const createMessage = async (req, res) => {
       });
     }
 
-    const isBuyer = order.buyerId.toString() === req.userId;
-    const isSeller = order.sellerId.toString() === req.userId;
+    const isBuyer = order.buyerId.toString() === req.userId.toString();
+    const isSeller = order.sellerId.toString() === req.userId.toString();
 
     if (!isBuyer && !isSeller) {
       return res.status(403).json({
@@ -77,8 +77,8 @@ const getOrderMessages = async (req, res) => {
       });
     }
 
-    const isBuyer = order.buyerId.toString() === req.userId;
-    const isSeller = order.sellerId.toString() === req.userId;
+    const isBuyer = order.buyerId.toString() === req.userId.toString();
+    const isSeller = order.sellerId.toString() === req.userId.toString();
     const isAdmin = req.user.roles.includes('admin');
 
     if (!isBuyer && !isSeller && !isAdmin) {
@@ -101,7 +101,7 @@ const getOrderMessages = async (req, res) => {
 
     // Mark messages as read if user is recipient
     const unreadMessages = messages.filter(
-      msg => msg.recipientId._id.toString() === req.userId && !msg.isRead
+      msg => msg.recipientId._id.toString() === req.userId.toString() && !msg.isRead
     );
     
     if (unreadMessages.length > 0) {

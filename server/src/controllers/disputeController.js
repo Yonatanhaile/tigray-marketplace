@@ -20,8 +20,8 @@ const createDispute = async (req, res) => {
     }
 
     // Verify user is buyer or seller
-    const isBuyer = order.buyerId.toString() === req.userId;
-    const isSeller = order.sellerId.toString() === req.userId;
+    const isBuyer = order.buyerId.toString() === req.userId.toString();
+    const isSeller = order.sellerId.toString() === req.userId.toString();
 
     if (!isBuyer && !isSeller) {
       return res.status(403).json({
@@ -110,9 +110,9 @@ const getDisputeById = async (req, res) => {
 
     // Check authorization
     const order = dispute.orderId;
-    const isBuyer = order.buyerId.toString() === req.userId;
-    const isSeller = order.sellerId.toString() === req.userId;
-    const isReporter = dispute.reporterId._id.toString() === req.userId;
+    const isBuyer = order.buyerId.toString() === req.userId.toString();
+    const isSeller = order.sellerId.toString() === req.userId.toString();
+    const isReporter = dispute.reporterId._id.toString() === req.userId.toString();
     const isAdmin = req.user.roles.includes('admin');
 
     if (!isBuyer && !isSeller && !isReporter && !isAdmin) {
@@ -209,9 +209,9 @@ const addDisputeComment = async (req, res) => {
 
     // Check authorization
     const order = dispute.orderId;
-    const isBuyer = order.buyerId.toString() === req.userId;
-    const isSeller = order.sellerId.toString() === req.userId;
-    const isReporter = dispute.reporterId.toString() === req.userId;
+    const isBuyer = order.buyerId.toString() === req.userId.toString();
+    const isSeller = order.sellerId.toString() === req.userId.toString();
+    const isReporter = dispute.reporterId.toString() === req.userId.toString();
     const isAdmin = req.user.roles.includes('admin');
 
     if (!isBuyer && !isSeller && !isReporter && !isAdmin) {
