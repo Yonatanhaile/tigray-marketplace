@@ -1,16 +1,65 @@
+import { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useSocket } from '../hooks/useSocket';
+import { messagesAPI } from '../services/api';
+import toast from 'react-hot-toast';
 
 const Layout = () => {
   const { isAuthenticated, user, logout, isAdmin, isSeller } = useAuth();
-  const { connected, notifications, clearAllNotifications } = useSocket();
+  const { socket, connected, notifications, clearAllNotifications } = useSocket();
   const navigate = useNavigate();
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
+
+  // Fetch unread message count
+  useEffect(() => {
+    if (isAuthenticated) {
+      const fetchUnreadCount = async () => {
+        try {
+          const data = await messagesAPI.getUnreadCount();
+          setUnreadCount(data.unreadCount || 0);
+        } catch (error) {
+          console.error('Failed to fetch unread count:', error);
+        }
+      };
+      
+      fetchUnreadCount();
+      
+      // Refresh count every 30 seconds
+      const interval = setInterval(fetchUnreadCount, 30000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated]);
+
+  // Listen for new messages via socket
+  useEffect(() => {
+    if (socket && isAuthenticated) {
+      const handleNewMessage = (data) => {
+        // Only show notification if message is for current user
+        if (data.message?.recipientId?._id === user?._id || data.message?.recipientId === user?._id) {
+          setUnreadCount(prev => prev + 1);
+          
+          // Show toast notification
+          toast.success(`New message from ${data.message?.senderId?.name || 'someone'}`, {
+            duration: 4000,
+            icon: '💬',
+          });
+        }
+      };
+
+      socket.on('new_message', handleNewMessage);
+
+      return () => {
+        socket.off('new_message', handleNewMessage);
+      };
+    }
+  }, [socket, isAuthenticated, user]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -49,6 +98,24 @@ const Layout = () => {
                   <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500' : 'bg-red-500'}`} />
                   <span className="text-xs text-gray-500">{connected ? 'Live' : 'Offline'}</span>
                 </div>
+              )}
+
+              {/* Unread Messages */}
+              {isAuthenticated && (
+                <Link
+                  to="/orders"
+                  className="relative p-2 text-gray-700 hover:text-primary-600"
+                  title="Messages"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                  </svg>
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </Link>
               )}
 
               {/* Notifications */}
