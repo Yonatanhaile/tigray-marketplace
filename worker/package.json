@@ -5,7 +5,8 @@
   "main": "src/worker.js",
   "scripts": {
     "dev": "nodemon src/worker.js",
-    "start": "node src/worker.js"
+    "start": "node src/worker.js",
+    "postinstall": "echo Skipping Chromium download"
   },
   "dependencies": {
     "bull": "^4.12.0",
