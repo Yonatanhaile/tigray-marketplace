@@ -108,7 +108,8 @@ const getListings = async (req, res) => {
     }
 
     if (sellerId) {
-      filter.sellerId = sellerId;
+      // Handle 'me' as current user
+      filter.sellerId = sellerId === 'me' ? req.userId : sellerId;
     }
 
     // Execute query
