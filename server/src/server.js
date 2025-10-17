@@ -16,9 +16,9 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
-const { createAdapter } = require('@socket.io/redis-adapter');
+// const { createAdapter } = require('@socket.io/redis-adapter');
 const { Server } = require('socket.io');
-const Redis = require('ioredis');
+// const Redis = require('ioredis');
 
 const logger = require('./services/logger');
 const { errorHandler } = require('./middleware/errorHandler');
