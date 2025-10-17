@@ -21,8 +21,12 @@ const Register = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      const { confirmPassword, ...registerData } = data;
-      await registerUser(registerData);
+      const { confirmPassword, isSeller, ...registerData } = data;
+      
+      // Convert isSeller checkbox to roles array
+      const roles = isSeller ? ['buyer', 'seller'] : ['buyer'];
+      
+      await registerUser({ ...registerData, roles });
       navigate('/');
     } catch (error) {
       toast.error(error.message || 'Registration failed');
