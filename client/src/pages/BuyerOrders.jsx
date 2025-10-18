@@ -24,7 +24,7 @@ const BuyerOrders = () => {
           {data?.orders?.map(order => (
             <Link key={order._id} to={`/orders/${order._id}`} className="card flex items-center space-x-4 hover:shadow-lg">
               {order.listingId?.images?.[0] && (
-                <img src={order.listingId.images[0].url} alt="" className="w-24 h-24 object-cover rounded" />
+                <img src={order.listingId.images[0].url} alt="" className="w-24 h-24 object-contain bg-gray-50 rounded" />
               )}
               <div className="flex-1">
                 <h3 className="font-semibold text-lg">{order.listingId?.title}</h3>

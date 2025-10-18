@@ -143,7 +143,7 @@ const EditListing = () => {
           {uploading && <p className="text-primary-600 mt-2">Uploading...</p>}
           <div className="grid grid-cols-3 gap-2 mt-2">
             {images.map((img, idx) => (
-              <img key={idx} src={img.url} alt="" className="w-full h-24 object-cover rounded" />
+              <img key={idx} src={img.url} alt="" className="w-full h-24 object-contain bg-gray-50 rounded" />
             ))}
           </div>
         </div>

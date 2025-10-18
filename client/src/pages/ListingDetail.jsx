@@ -77,7 +77,7 @@ const ListingDetail = () => {
             <img
               src={listing.listing.images[0].url}
               alt={listing.listing.title}
-              className="w-full h-96 object-cover rounded-lg shadow-lg"
+              className="w-full h-96 object-contain bg-gray-50 rounded-lg shadow-lg"
             />
           ) : (
             <div className="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center">

@@ -68,7 +68,7 @@ const AllMessages = () => {
                     <img 
                       src={order.listingId.images[0].url} 
                       alt="" 
-                      className="w-16 h-16 object-cover rounded-lg" 
+                      className="w-16 h-16 object-contain bg-gray-50 rounded-lg" 
                     />
                   ) : (
                     <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">

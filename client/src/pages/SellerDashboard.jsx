@@ -73,7 +73,7 @@ const SellerDashboard = () => {
             {listingsData?.listings?.map(listing => (
               <div key={listing._id} className="card hover:shadow-lg">
                 <Link to={`/listings/${listing._id}`} className="block">
-                  {listing.images?.[0] && <img src={listing.images[0].url} alt={listing.title} className="w-full h-32 object-cover rounded mb-2" />}
+                  {listing.images?.[0] && <img src={listing.images[0].url} alt={listing.title} className="w-full h-32 object-contain bg-gray-50 rounded mb-2" />}
                   <h3 className="font-semibold truncate">{listing.title}</h3>
                 </Link>
                 <div className="flex items-center justify-between mt-2">

@@ -137,7 +137,7 @@ const Home = () => {
                     <img
                       src={listing.images[0].url}
                       alt={listing.title}
-                      className="w-full h-48 object-cover rounded-lg mb-4"
+                      className="w-full h-48 object-contain bg-gray-50 rounded-lg mb-4"
                     />
                   )}
                   <h3 className="font-semibold text-lg mb-2 truncate">{listing.title}</h3>
