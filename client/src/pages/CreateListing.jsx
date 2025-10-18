@@ -135,8 +135,6 @@ const CreateListing = () => {
               <option value="poor">Poor</option>
             </select>
           </div>
-        </div>
-
         <div>
           <label className="block text-sm font-medium mb-2">{t('paymentMethodsLabel')}</label>
           <input {...register('payment_methods', { required: 'At least one payment method required' })} className="input" placeholder="cash, m-birr, bank-transfer" />
