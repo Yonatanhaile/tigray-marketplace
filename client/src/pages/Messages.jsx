@@ -140,8 +140,8 @@ const Messages = () => {
             messagesData?.messages?.map(msg => {
               const isMyMessage = msg.senderId._id === user?._id;
               return (
-                <div key={msg._id} className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} mb-2`}>
-                  <div className={`flex flex-col ${isMyMessage ? 'items-end' : 'items-start'} max-w-[75%]`}>
+                <div key={msg._id} className={`w-full flex ${isMyMessage ? 'justify-end' : 'justify-start'} mb-4`}>
+                  <div className={`flex flex-col ${isMyMessage ? 'items-end' : 'items-start'} max-w-[70%] min-w-[200px]`}>
                     {/* Sender name - only for received messages */}
                     {!isMyMessage && (
                       <span className="text-xs font-semibold text-gray-600 mb-1 ml-4">
@@ -150,18 +150,19 @@ const Messages = () => {
                     )}
                     
                     {/* Message bubble */}
-                    <div className={`relative px-5 py-3 shadow-md ${
+                    <div className={`relative px-6 py-4 shadow-lg ${
                       isMyMessage 
-                        ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-3xl rounded-tr-md' 
-                        : 'bg-white text-gray-900 rounded-3xl rounded-tl-md border border-gray-100'
+                        ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-3xl rounded-br-md ml-auto' 
+                        : 'bg-white text-gray-900 rounded-3xl rounded-bl-md border border-gray-200 mr-auto'
                     }`}>
                       {/* Tail/pointer */}
-                      <div className={`absolute top-0 w-0 h-0 ${
+                      <div className={`absolute bottom-0 w-0 h-0 ${
                         isMyMessage 
-                          ? 'right-0 border-l-[12px] border-l-transparent border-t-[12px] border-t-blue-600 border-r-0'
-                          : 'left-0 border-r-[12px] border-r-transparent border-t-[12px] border-t-white border-l-0'
+                          ? 'right-0 border-l-[15px] border-l-transparent border-t-[15px] border-t-blue-600 border-r-0'
+                          : 'left-0 border-r-[15px] border-r-transparent border-t-[15px] border-t-white border-l-0'
                       }`} style={{ 
-                        [isMyMessage ? 'right' : 'left']: '-6px' 
+                        [isMyMessage ? 'right' : 'left']: '-7px',
+                        bottom: '0px'
                       }}></div>
                       
                       {/* Message text */}
