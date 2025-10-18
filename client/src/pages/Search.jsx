@@ -8,16 +8,20 @@ const Search = () => {
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
+  const [category, setCategory] = useState(searchParams.get('category') || '');
+  const [subcategory, setSubcategory] = useState(searchParams.get('subcategory') || '');
 
   const page = parseInt(searchParams.get('page')) || 1;
 
   const { data, isLoading } = useQuery({
-    queryKey: ['listings', 'search', query, minPrice, maxPrice, page],
+    queryKey: ['listings', 'search', query, minPrice, maxPrice, category, subcategory, page],
     queryFn: () =>
       listingsAPI.getAll({
         query,
         minPrice,
         maxPrice,
+        category,
+        subcategory,
         page,
         limit: 12,
       }),
@@ -29,6 +33,8 @@ const Search = () => {
     if (query) params.q = query;
     if (minPrice) params.minPrice = minPrice;
     if (maxPrice) params.maxPrice = maxPrice;
+    if (category) params.category = category;
+    if (subcategory) params.subcategory = subcategory;
     params.page = '1';
     setSearchParams(params);
   };
@@ -39,13 +45,42 @@ const Search = () => {
 
       {/* Search & Filters */}
       <form onSubmit={handleSearch} className="card mb-8">
-        <div className="grid md:grid-cols-4 gap-4">
+        <div className="grid md:grid-cols-6 gap-4">
           <div className="md:col-span-2">
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search listings..."
+              className="input"
+            />
+          </div>
+          <div>
+            <select value={category} onChange={(e) => setCategory(e.target.value)} className="input">
+              <option value="">All Categories</option>
+              <option>Vehicles</option>
+              <option>Property</option>
+              <option>Mobile Phones & Tablets</option>
+              <option>Electronics</option>
+              <option>Home, Furniture & Appliances</option>
+              <option>Fashion</option>
+              <option>Beauty & Personal Care</option>
+              <option>Services</option>
+              <option>Repair & Construction</option>
+              <option>Commercial Equipment & Tools</option>
+              <option>Leisure & Activities</option>
+              <option>Babies & Kids</option>
+              <option>Food, Agriculture & Farming</option>
+              <option>Animals & Pets</option>
+              <option>Jobs</option>
+            </select>
+          </div>
+          <div>
+            <input
+              type="text"
+              value={subcategory}
+              onChange={(e) => setSubcategory(e.target.value)}
+              placeholder="Subcategory (e.g., Cars, Laptops, Dogs)"
               className="input"
             />
           </div>

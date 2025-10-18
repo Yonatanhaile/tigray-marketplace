@@ -29,6 +29,9 @@ const EditListing = () => {
     description: listing?.description || '',
     price: listing?.price || '',
     condition: listing?.condition || 'good',
+    category: listing?.category || '',
+    subcategory: listing?.subcategory || '',
+    address: listing?.address || '',
     payment_methods: (listing?.payment_methods || []).join(', '),
     payment_instructions: listing?.payment_instructions || '',
     pickup: listing?.pickup_options?.pickup || false,
@@ -78,6 +81,9 @@ const EditListing = () => {
       payment_methods: form.payment_methods.split(',').map(s => s.trim()).filter(Boolean),
       payment_instructions: form.payment_instructions,
       images,
+      category: form.category,
+      subcategory: form.subcategory,
+      address: form.address,
       pickup_options: {
         pickup: !!form.pickup,
         courier: !!form.courier,
@@ -96,6 +102,38 @@ const EditListing = () => {
       <h1 className="text-3xl font-bold mb-6">{t('editListing')}</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="card space-y-6">
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">Category *</label>
+            <select {...register('category', { required: true })} className="input">
+              <option value="">Select category</option>
+              <option>Vehicles</option>
+              <option>Property</option>
+              <option>Mobile Phones & Tablets</option>
+              <option>Electronics</option>
+              <option>Home, Furniture & Appliances</option>
+              <option>Fashion</option>
+              <option>Beauty & Personal Care</option>
+              <option>Services</option>
+              <option>Repair & Construction</option>
+              <option>Commercial Equipment & Tools</option>
+              <option>Leisure & Activities</option>
+              <option>Babies & Kids</option>
+              <option>Food, Agriculture & Farming</option>
+              <option>Animals & Pets</option>
+              <option>Jobs</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Subcategory *</label>
+            <input {...register('subcategory', { required: true })} className="input" placeholder="e.g., Cars, Apartments for Rent, Laptops, Dogs..." />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">Address *</label>
+          <input {...register('address', { required: true, maxLength: 300 })} className="input" placeholder="City, Area, Landmark" />
+        </div>
         <div>
           <label className="block text-sm font-medium mb-2">{t('titleLabel')}</label>
           <input {...register('title', { required: 'Title is required', maxLength: 200 })} className="input" />

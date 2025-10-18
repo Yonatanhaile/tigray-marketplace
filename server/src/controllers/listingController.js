@@ -18,6 +18,8 @@ const createListing = async (req, res) => {
       payment_instructions,
       pickup_options,
       highValue,
+      subcategory,
+      address,
     } = req.body;
 
     // Check if user is seller or admin
@@ -37,6 +39,11 @@ const createListing = async (req, res) => {
       currency,
       condition,
       category,
+      subcategory,
+      address,
+      category,
+      subcategory,
+      address,
       images: images || [],
       payment_methods,
       payment_instructions,
@@ -75,6 +82,7 @@ const getListings = async (req, res) => {
       minPrice,
       maxPrice,
       category,
+      subcategory,
       condition,
       sellerId,
       status = 'active',
@@ -99,9 +107,8 @@ const getListings = async (req, res) => {
       if (maxPrice) filter.price.$lte = parseFloat(maxPrice);
     }
 
-    if (category) {
-      filter.category = category;
-    }
+    if (category) filter.category = category;
+    if (subcategory) filter.subcategory = subcategory;
 
     if (condition) {
       filter.condition = condition;

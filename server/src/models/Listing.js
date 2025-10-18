@@ -38,6 +38,15 @@ const listingSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  subcategory: {
+    type: String,
+    trim: true,
+  },
+  address: {
+    type: String,
+    trim: true,
+    maxlength: [300, 'Address cannot exceed 300 characters'],
+  },
   images: [{
     url: {
       type: String,
@@ -104,6 +113,7 @@ listingSchema.index({ sellerId: 1, status: 1 });
 listingSchema.index({ price: 1 });
 listingSchema.index({ createdAt: -1 });
 listingSchema.index({ category: 1 });
+listingSchema.index({ subcategory: 1 });
 listingSchema.index({ title: 'text', description: 'text' }); // Text search
 
 // Virtual for seller info (populated)

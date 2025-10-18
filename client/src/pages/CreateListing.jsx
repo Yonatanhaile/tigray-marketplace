@@ -89,6 +89,37 @@ const CreateListing = () => {
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
+            <label className="block text-sm font-medium mb-2">Category *</label>
+            <select {...register('category', { required: true })} className="input">
+              <option value="">Select category</option>
+              <option>Vehicles</option>
+              <option>Property</option>
+              <option>Mobile Phones & Tablets</option>
+              <option>Electronics</option>
+              <option>Home, Furniture & Appliances</option>
+              <option>Fashion</option>
+              <option>Beauty & Personal Care</option>
+              <option>Services</option>
+              <option>Repair & Construction</option>
+              <option>Commercial Equipment & Tools</option>
+              <option>Leisure & Activities</option>
+              <option>Babies & Kids</option>
+              <option>Food, Agriculture & Farming</option>
+              <option>Animals & Pets</option>
+              <option>Jobs</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Subcategory *</label>
+            <input {...register('subcategory', { required: true })} className="input" placeholder="e.g., Cars, Apartments for Rent, Laptops, Dogs..." />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">Address *</label>
+          <input {...register('address', { required: true, maxLength: 300 })} className="input" placeholder="City, Area, Landmark" />
+        </div>
+          <div>
             <label className="block text-sm font-medium mb-2">{t('priceLabel')}</label>
             <input type="number" {...register('price', { required: 'Price is required', min: 0 })} className="input" placeholder="50000" />
             {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
