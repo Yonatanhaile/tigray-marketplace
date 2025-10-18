@@ -331,6 +331,12 @@ const initializeSocketHandlers = (io) => {
 
         await message.markAsRead();
 
+        // Notify recipient to update unread count
+        io.to(`user:${socket.userId}`).emit('messages_read', {
+          messageId: message._id,
+          count: 1,
+        });
+
         // Notify sender
         io.to(`user:${message.senderId}`).emit('message_read', {
           messageId: message._id,

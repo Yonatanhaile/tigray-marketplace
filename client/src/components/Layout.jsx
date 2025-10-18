@@ -42,24 +42,43 @@ const Layout = () => {
 
   // Listen for new messages via socket
   useEffect(() => {
-    if (socket && isAuthenticated) {
+    if (socket && isAuthenticated && user) {
+      const currentUserId = user._id?.toString() || user.id?.toString();
+      
       const handleNewMessage = (data) => {
-        // Only show notification if message is for current user
-        if (data.message?.recipientId?._id === user?._id || data.message?.recipientId === user?._id) {
+        // Normalize recipient ID
+        const recipientId = data.message?.recipientId?._id?.toString() 
+          || data.message?.recipientId?.toString();
+        
+        // Only increment and notify if message is for current user
+        if (recipientId === currentUserId) {
           setUnreadCount(prev => prev + 1);
           
           // Show toast notification
-          toast.success(`New message from ${data.message?.senderId?.name || 'someone'}`, {
+          const senderName = data.message?.senderId?.name || 'someone';
+          toast(`💬 New message from ${senderName}`, {
             duration: 4000,
-            icon: '💬',
+            style: {
+              background: '#2563eb',
+              color: '#fff',
+            },
           });
         }
       };
 
+      const handleMessagesRead = () => {
+        // Refresh unread count when messages are marked as read
+        messagesAPI.getUnreadCount()
+          .then(data => setUnreadCount(data.unreadCount || 0))
+          .catch(err => console.error('Failed to refresh unread count:', err));
+      };
+
       socket.on('new_message', handleNewMessage);
+      socket.on('messages_read', handleMessagesRead);
 
       return () => {
         socket.off('new_message', handleNewMessage);
+        socket.off('messages_read', handleMessagesRead);
       };
     }
   }, [socket, isAuthenticated, user]);

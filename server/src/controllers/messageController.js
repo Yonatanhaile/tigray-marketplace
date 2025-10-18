@@ -106,6 +106,15 @@ const getOrderMessages = async (req, res) => {
     
     if (unreadMessages.length > 0) {
       await Promise.all(unreadMessages.map(msg => msg.markAsRead()));
+      
+      // Notify user via socket to update unread count
+      const io = req.app.get('io');
+      if (io) {
+        io.to(`user:${req.userId}`).emit('messages_read', {
+          orderId,
+          count: unreadMessages.length,
+        });
+      }
     }
 
     res.status(200).json({
