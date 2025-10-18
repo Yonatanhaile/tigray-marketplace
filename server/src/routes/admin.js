@@ -9,6 +9,7 @@ const {
   getStats,
   toggleUserStatus,
 } = require('../controllers/adminController');
+const { getPendingListings, approveListing, rejectListing } = require('../controllers/adminController');
 const { authenticateJWT } = require('../middleware/auth');
 const { requireAdmin } = require('../middleware/rbac');
 const {
@@ -35,6 +36,11 @@ router.patch('/users/:userId/status', toggleUserStatus);
 
 // KYC
 router.patch('/kyc/:userId', updateKYC);
+
+// Listings moderation
+router.get('/listings/pending', paginationValidation, getPendingListings);
+router.patch('/listings/:id/approve', mongoIdValidation, approveListing);
+router.patch('/listings/:id/reject', mongoIdValidation, rejectListing);
 
 module.exports = router;
 

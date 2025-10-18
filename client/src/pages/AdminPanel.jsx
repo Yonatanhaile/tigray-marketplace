@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminAPI } from '../services/api';
+import api from '../services/api';
 import toast from 'react-hot-toast';
 
 const AdminPanel = () => {
@@ -40,13 +41,28 @@ const AdminPanel = () => {
     },
   });
 
+  // Pending listings moderation
+  const { data: pendingListings, isLoading: loadingPending } = useQuery({
+    queryKey: ['admin', 'pending-listings'],
+    queryFn: () => api.get('/admin/listings/pending'),
+    enabled: activeTab === 'moderation',
+  });
+  const approveListing = useMutation({
+    mutationFn: (id) => api.patch(`/admin/listings/${id}/approve`),
+    onSuccess: () => queryClient.invalidateQueries(['admin', 'pending-listings']),
+  });
+  const rejectListing = useMutation({
+    mutationFn: ({ id, reason }) => api.patch(`/admin/listings/${id}/reject`, { reason }),
+    onSuccess: () => queryClient.invalidateQueries(['admin', 'pending-listings']),
+  });
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Admin Panel</h1>
 
       {/* Tabs */}
       <div className="flex space-x-4 mb-6 border-b">
-        {['stats', 'kyc', 'disputes'].map(tab => (
+        {['stats', 'kyc', 'disputes', 'moderation'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -114,6 +130,39 @@ const AdminPanel = () => {
             </div>
           ))}
           {disputes?.disputes?.length === 0 && <p className="text-center text-gray-500">No open disputes</p>}
+        </div>
+      )}
+
+      {activeTab === 'moderation' && (
+        <div className="space-y-4">
+          {loadingPending ? (
+            <div>Loading...</div>
+          ) : (pendingListings?.listings || []).map((l) => (
+            <div key={l._id} className="card">
+              <div className="flex items-start gap-4">
+                {l.images?.[0] && (
+                  <img src={l.images[0].url} alt={l.title} className="w-24 h-24 object-contain bg-gray-50 rounded" />
+                )}
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-semibold">{l.title}</h3>
+                      <p className="text-sm text-gray-600 line-clamp-2">{l.description}</p>
+                      <p className="text-xs text-gray-500 mt-1">Seller: {l.sellerId?.name} ({l.sellerId?.email})</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button className="btn btn-secondary" onClick={() => approveListing.mutate(l._id)}>Approve</button>
+                      <button className="btn btn-danger" onClick={() => {
+                        const reason = prompt('Reason (optional)');
+                        rejectListing.mutate({ id: l._id, reason });
+                      }}>Reject</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+          {pendingListings?.listings?.length === 0 && <p className="text-center text-gray-500">No pending listings.</p>}
         </div>
       )}
     </div>

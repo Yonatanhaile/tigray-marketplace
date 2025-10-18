@@ -30,7 +30,7 @@ const createListing = async (req, res) => {
       });
     }
 
-    // Create listing
+    // Create listing (start as pending moderation)
     const listing = await Listing.create({
       sellerId: req.userId,
       title,
@@ -49,7 +49,7 @@ const createListing = async (req, res) => {
       payment_instructions,
       pickup_options,
       highValue,
-      status: 'active',
+      status: 'pending',
     });
 
     logger.info(`Listing created: ${listing._id} by user ${req.userId}`);

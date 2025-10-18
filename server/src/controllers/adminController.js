@@ -1,3 +1,51 @@
+const { Listing } = require('../models');
+
+exports.getPendingListings = async (req, res) => {
+  try {
+    const { page = 1, limit = 20 } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const [listings, total] = await Promise.all([
+      Listing.find({ status: 'pending' })
+        .populate('sellerId', 'name email')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(parseInt(limit)),
+      Listing.countDocuments({ status: 'pending' }),
+    ]);
+    res.json({ listings, pagination: { page: parseInt(page), limit: parseInt(limit), total } });
+  } catch (e) {
+    res.status(500).json({ error: true, message: 'Failed to fetch pending listings' });
+  }
+};
+
+exports.approveListing = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const listing = await Listing.findById(id);
+    if (!listing) return res.status(404).json({ error: true, message: 'Listing not found' });
+    listing.status = 'active';
+    await listing.save();
+    res.json({ error: false, message: 'Listing approved', listing });
+  } catch (e) {
+    res.status(500).json({ error: true, message: 'Failed to approve listing' });
+  }
+};
+
+exports.rejectListing = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+    const listing = await Listing.findById(id);
+    if (!listing) return res.status(404).json({ error: true, message: 'Listing not found' });
+    listing.status = 'suspended';
+    listing.moderation_reason = reason || 'Rejected by admin';
+    await listing.save();
+    res.json({ error: false, message: 'Listing rejected', listing });
+  } catch (e) {
+    res.status(500).json({ error: true, message: 'Failed to reject listing' });
+  }
+};
+
 const { User, Order, Dispute, Listing } = require('../models');
 const { sendKYCNotification } = require('../services/email');
 const logger = require('../services/logger');
