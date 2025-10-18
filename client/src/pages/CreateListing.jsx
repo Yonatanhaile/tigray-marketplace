@@ -6,6 +6,7 @@ import { listingsAPI } from '../services/api';
 import { uploadFile } from '../services/upload';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { CATEGORIES, PAYMENT_METHODS } from '../constants/categories';
 
 const CreateListing = () => {
   const navigate = useNavigate();
@@ -111,7 +112,12 @@ const CreateListing = () => {
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">Subcategory *</label>
-            <input {...register('subcategory', { required: true })} className="input" placeholder="e.g., Cars, Apartments for Rent, Laptops, Dogs..." />
+            <select {...register('subcategory', { required: true })} className="input">
+              <option value="">Select subcategory</option>
+              {(CATEGORIES[watch('category')] || []).map((sub) => (
+                <option key={sub} value={sub}>{sub}</option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -137,7 +143,12 @@ const CreateListing = () => {
           </div>
         <div>
           <label className="block text-sm font-medium mb-2">{t('paymentMethodsLabel')}</label>
-          <input {...register('payment_methods', { required: 'At least one payment method required' })} className="input" placeholder="cash, m-birr, bank-transfer" />
+          <select {...register('payment_methods', { required: 'At least one payment method required' })} className="input" multiple>
+            {PAYMENT_METHODS.map((m) => (
+              <option key={m} value={m}>{m}</option>
+            ))}
+          </select>
+          <p className="text-xs text-gray-500 mt-1">Hold Ctrl (Cmd on Mac) to select multiple</p>
           {errors.payment_methods && <p className="text-red-500 text-sm mt-1">{errors.payment_methods.message}</p>}
         </div>
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 import { listingsAPI } from '../services/api';
+import { CATEGORIES } from '../constants/categories';
 
 const Search = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -76,13 +77,12 @@ const Search = () => {
             </select>
           </div>
           <div>
-            <input
-              type="text"
-              value={subcategory}
-              onChange={(e) => setSubcategory(e.target.value)}
-              placeholder="Subcategory (e.g., Cars, Laptops, Dogs)"
-              className="input"
-            />
+            <select value={subcategory} onChange={(e) => setSubcategory(e.target.value)} className="input">
+              <option value="">All Subcategories</option>
+              {(CATEGORIES[category] || []).map((sub) => (
+                <option key={sub} value={sub}>{sub}</option>
+              ))}
+            </select>
           </div>
           <div>
             <input
