@@ -52,7 +52,7 @@ const OrderDetail = () => {
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Order Details</h1>
-        <Link to={`/messages/${id}`} className="btn btn-secondary">💬 Messages</Link>
+        <Link to={`/orders/${id}/messages`} className="btn btn-secondary">💬 Messages</Link>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">

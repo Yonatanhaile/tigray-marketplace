@@ -10,6 +10,7 @@ import SellerDashboard from './pages/SellerDashboard';
 import BuyerOrders from './pages/BuyerOrders';
 import OrderDetail from './pages/OrderDetail';
 import Messages from './pages/Messages';
+import AllMessages from './pages/AllMessages';
 import AdminPanel from './pages/AdminPanel';
 import Search from './pages/Search';
 
@@ -81,7 +82,15 @@ function App() {
           }
         />
         <Route
-          path="messages/:orderId"
+          path="messages"
+          element={
+            <ProtectedRoute>
+              <AllMessages />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="orders/:orderId/messages"
           element={
             <ProtectedRoute>
               <Messages />
