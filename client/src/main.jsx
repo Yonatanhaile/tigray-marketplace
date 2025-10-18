@@ -7,6 +7,7 @@ import App from './App.jsx'
 import './index.css'
 import { AuthProvider } from './hooks/useAuth'
 import { SocketProvider } from './hooks/useSocket'
+import './i18n'
 
 // Create React Query client
 const queryClient = new QueryClient({
