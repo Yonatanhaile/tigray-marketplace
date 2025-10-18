@@ -120,10 +120,18 @@ const getListings = async (req, res) => {
     }
 
     // Execute query
+    // Sorting
+    const sortMap = {
+      newest: { createdAt: -1 },
+      price_asc: { price: 1 },
+      price_desc: { price: -1 },
+    };
+    const sortBy = sortMap[req.query.sort] || sortMap.newest;
+
     const [listings, total] = await Promise.all([
       Listing.find(filter)
         .populate('sellerId', 'name email badges kyc.status')
-        .sort({ createdAt: -1 })
+        .sort(sortBy)
         .skip(skip)
         .limit(parseInt(limit)),
       Listing.countDocuments(filter),

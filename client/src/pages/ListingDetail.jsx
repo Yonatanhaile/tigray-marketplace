@@ -120,6 +120,18 @@ const ListingDetail = () => {
             </span>
           </div>
 
+          <nav className="text-sm text-gray-500 mb-4">
+            <button className="hover:underline" onClick={() => navigate('/search')}>Browse</button>
+            <span className="mx-2">/</span>
+            <span>{listing.listing.category}</span>
+            {listing.listing.subcategory && (
+              <>
+                <span className="mx-2">/</span>
+                <span>{listing.listing.subcategory}</span>
+              </>
+            )}
+          </nav>
+
           <div className="mb-6">
             <h3 className="font-semibold mb-2">Description</h3>
             <p className="text-gray-700 whitespace-pre-wrap">{listing.listing.description}</p>

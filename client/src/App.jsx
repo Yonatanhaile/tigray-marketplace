@@ -15,6 +15,7 @@ import AllMessages from './pages/AllMessages';
 import SellerProfile from './pages/SellerProfile';
 import AdminPanel from './pages/AdminPanel';
 import Search from './pages/Search';
+import NotFound from './pages/NotFound';
 
 // Protected route wrapper
 const ProtectedRoute = ({ children, requireAdmin = false, requireSeller = false }) => {
@@ -117,6 +118,7 @@ function App() {
           }
         />
       </Route>
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

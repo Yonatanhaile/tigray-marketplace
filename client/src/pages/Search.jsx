@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 import { listingsAPI } from '../services/api';
 import { CATEGORIES } from '../constants/categories';
+import { formatPrice } from '../utils/format';
 
 const Search = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -11,11 +12,12 @@ const Search = () => {
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
   const [category, setCategory] = useState(searchParams.get('category') || '');
   const [subcategory, setSubcategory] = useState(searchParams.get('subcategory') || '');
+  const [sort, setSort] = useState(searchParams.get('sort') || 'newest');
 
   const page = parseInt(searchParams.get('page')) || 1;
 
   const { data, isLoading } = useQuery({
-    queryKey: ['listings', 'search', query, minPrice, maxPrice, category, subcategory, page],
+    queryKey: ['listings', 'search', query, minPrice, maxPrice, category, subcategory, sort, page],
     queryFn: () =>
       listingsAPI.getAll({
         query,
@@ -23,6 +25,7 @@ const Search = () => {
         maxPrice,
         category,
         subcategory,
+        sort,
         page,
         limit: 12,
       }),
@@ -36,6 +39,7 @@ const Search = () => {
     if (maxPrice) params.maxPrice = maxPrice;
     if (category) params.category = category;
     if (subcategory) params.subcategory = subcategory;
+    if (sort) params.sort = sort;
     params.page = '1';
     setSearchParams(params);
   };
@@ -46,7 +50,7 @@ const Search = () => {
 
       {/* Search & Filters */}
       <form onSubmit={handleSearch} className="card mb-8">
-        <div className="grid md:grid-cols-6 gap-4">
+        <div className="grid md:grid-cols-7 gap-4">
           <div className="md:col-span-2">
             <input
               type="text"
@@ -102,6 +106,13 @@ const Search = () => {
               className="input"
             />
           </div>
+          <div>
+            <select value={sort} onChange={(e) => setSort(e.target.value)} className="input">
+              <option value="newest">Newest</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
+            </select>
+          </div>
         </div>
         <div className="mt-4">
           <button type="submit" className="btn btn-primary">
@@ -138,9 +149,7 @@ const Search = () => {
                   {listing.description}
                 </p>
                 <div className="flex justify-between items-center">
-                  <span className="text-xl font-bold text-primary-600">
-                    {listing.price} {listing.currency}
-                  </span>
+                  <span className="text-xl font-bold text-primary-600">{formatPrice(listing.price, listing.currency)}</span>
                   <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
                     {listing.condition}
                   </span>
