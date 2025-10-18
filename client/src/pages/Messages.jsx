@@ -13,6 +13,8 @@ const Messages = () => {
   const { socket } = useSocket();
   const queryClient = useQueryClient();
   const messagesEndRef = useRef(null);
+  // Normalize current user id (some environments use id, others _id)
+  const currentUserId = String(user?._id || user?.id || '');
   const inputRef = useRef(null);
 
   const [messageText, setMessageText] = useState('');
@@ -79,8 +81,10 @@ const Messages = () => {
 
     // Determine recipient: if current user is buyer, send to seller, and vice versa
     const order = orderData.order;
-    const isBuyer = order.buyerId._id === user._id;
-    const recipientId = isBuyer ? order.sellerId._id : order.buyerId._id;
+    const buyerId = String(order?.buyerId?._id || order?.buyerId || '');
+    const sellerId = String(order?.sellerId?._id || order?.sellerId || '');
+    const isBuyer = buyerId === currentUserId;
+    const recipientId = isBuyer ? sellerId : buyerId;
 
     try {
       sendMessage({
@@ -97,7 +101,7 @@ const Messages = () => {
   };
 
   const order = orderData?.order;
-  const isBuyer = order?.buyerId?._id === user?._id;
+  const isBuyer = String(order?.buyerId?._id || order?.buyerId || '') === currentUserId;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -144,11 +148,14 @@ const Messages = () => {
             </div>
           ) : (
             messagesData?.messages?.map(msg => {
-              const senderId = typeof msg.senderId === 'string' ? msg.senderId : msg.senderId?._id;
-              const isMyMessage = senderId === user?._id;
+              const senderRaw = typeof msg.senderId === 'object' ? (msg.senderId?._id || msg.senderId?.id) : msg.senderId;
+              const senderId = String(senderRaw || '');
+              const isMyMessage = senderId === currentUserId;
+              const buyerId = String(order?.buyerId?._id || order?.buyerId || '');
+              const sellerId = String(order?.sellerId?._id || order?.sellerId || '');
               const senderName = typeof msg.senderId === 'object' && msg.senderId?.name
                 ? msg.senderId.name
-                : (order?.buyerId?._id === senderId ? order?.buyerId?.name : order?.sellerId?.name);
+                : (senderId === buyerId ? order?.buyerId?.name : order?.sellerId?.name);
               return (
                 <div key={msg._id} className={`w-full flex ${isMyMessage ? 'justify-end' : 'justify-start'} mb-4`}>
                   <div className={`flex flex-col ${isMyMessage ? 'items-end' : 'items-start'} max-w-[70%] min-w-[200px]`}>
