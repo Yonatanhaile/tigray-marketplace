@@ -13,6 +13,7 @@ const Messages = () => {
   const { socket } = useSocket();
   const queryClient = useQueryClient();
   const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
 
   const [messageText, setMessageText] = useState('');
 
@@ -61,6 +62,11 @@ const Messages = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messagesData]);
+
+  useEffect(() => {
+    // Focus input when page opens and after sending
+    inputRef.current?.focus();
+  }, []);
 
   const handleSend = (e) => {
     e.preventDefault();
@@ -138,14 +144,18 @@ const Messages = () => {
             </div>
           ) : (
             messagesData?.messages?.map(msg => {
-              const isMyMessage = msg.senderId._id === user?._id;
+              const senderId = typeof msg.senderId === 'string' ? msg.senderId : msg.senderId?._id;
+              const isMyMessage = senderId === user?._id;
+              const senderName = typeof msg.senderId === 'object' && msg.senderId?.name
+                ? msg.senderId.name
+                : (order?.buyerId?._id === senderId ? order?.buyerId?.name : order?.sellerId?.name);
               return (
                 <div key={msg._id} className={`w-full flex ${isMyMessage ? 'justify-end' : 'justify-start'} mb-4`}>
                   <div className={`flex flex-col ${isMyMessage ? 'items-end' : 'items-start'} max-w-[70%] min-w-[200px]`}>
                     {/* Sender name - only for received messages */}
                     {!isMyMessage && (
                       <span className="text-xs font-semibold text-gray-600 mb-1 ml-4">
-                        {msg.senderId.name}
+                        {senderName || 'User'}
                       </span>
                     )}
                     
@@ -206,6 +216,7 @@ const Messages = () => {
               placeholder="Type your message here..." 
               className="flex-1 px-5 py-3 border-2 border-gray-200 rounded-full focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" 
               disabled={!orderData?.order}
+              ref={inputRef}
             />
             <button 
               type="submit" 
