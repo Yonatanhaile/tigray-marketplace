@@ -116,15 +116,20 @@ const Home = () => {
           </div>
 
           {isLoading ? (
-            <div className="text-center py-12">{t('loading')}</div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="card">
+                  <div className="w-full h-48 skeleton mb-4" />
+                  <div className="h-4 skeleton w-3/4 mb-2" />
+                  <div className="h-3 skeleton w-full mb-2" />
+                  <div className="h-3 skeleton w-2/3" />
+                </div>
+              ))}
+            </div>
           ) : (
             <div className="grid md:grid-cols-3 gap-6">
               {listingsData?.listings?.slice(0, 6).map((listing) => (
-                <Link
-                  key={listing._id}
-                  to={`/listings/${listing._id}`}
-                  className="card hover:shadow-lg transition"
-                >
+                <Link key={listing._id} to={`/listings/${listing._id}`} className="card">
                   {listing.images?.[0] && (
                     <img
                       src={listing.images[0].url}

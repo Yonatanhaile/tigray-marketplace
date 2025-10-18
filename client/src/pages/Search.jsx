@@ -123,7 +123,16 @@ const Search = () => {
 
       {/* Results */}
       {isLoading ? (
-        <div className="text-center py-12">Loading...</div>
+        <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} className="card">
+              <div className="w-full h-48 skeleton mb-4" />
+              <div className="h-4 skeleton w-3/4 mb-2" />
+              <div className="h-3 skeleton w-full mb-2" />
+              <div className="h-3 skeleton w-2/3" />
+            </div>
+          ))}
+        </div>
       ) : data?.listings?.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-500">No listings found.</p>
