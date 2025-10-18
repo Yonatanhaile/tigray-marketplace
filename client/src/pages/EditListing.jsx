@@ -5,11 +5,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { listingsAPI } from '../services/api';
 import { uploadFile } from '../services/upload';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 const EditListing = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const { data, isLoading } = useQuery({
     queryKey: ['listing', id],
@@ -91,30 +93,30 @@ const EditListing = () => {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Edit Listing</h1>
+      <h1 className="text-3xl font-bold mb-6">{t('editListing')}</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="card space-y-6">
         <div>
-          <label className="block text-sm font-medium mb-2">Title *</label>
+          <label className="block text-sm font-medium mb-2">{t('titleLabel')}</label>
           <input {...register('title', { required: 'Title is required', maxLength: 200 })} className="input" />
           {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Description *</label>
+          <label className="block text-sm font-medium mb-2">{t('descriptionLabel')}</label>
           <textarea {...register('description', { required: 'Description is required' })} className="input" rows="6" />
           {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Price (ETB) *</label>
+            <label className="block text-sm font-medium mb-2">{t('priceLabel')}</label>
             <input type="number" {...register('price', { required: 'Price is required', min: 0 })} className="input" />
             {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Condition *</label>
+            <label className="block text-sm font-medium mb-2">{t('conditionLabel')}</label>
             <select {...register('condition')} className="input">
               <option value="new">New</option>
               <option value="like-new">Like New</option>
@@ -126,20 +128,20 @@ const EditListing = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Payment Methods * (comma-separated)</label>
+          <label className="block text-sm font-medium mb-2">{t('paymentMethodsLabel')}</label>
           <input {...register('payment_methods', { required: 'At least one payment method required' })} className="input" />
           {errors.payment_methods && <p className="text-red-500 text-sm mt-1">{errors.payment_methods.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Payment Instructions</label>
+          <label className="block text-sm font-medium mb-2">{t('paymentInstructionsLabel')}</label>
           <textarea {...register('payment_instructions')} className="input" rows="3" />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Images</label>
+          <label className="block text-sm font-medium mb-2">{t('addImagesLabel')}</label>
           <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="input" />
-          <p className="text-sm text-gray-500 mt-1">Add more images if needed</p>
+          <p className="text-sm text-gray-500 mt-1">{t('addImagesHelp')}</p>
           {uploading && <p className="text-primary-600 mt-2">Uploading...</p>}
           <div className="grid grid-cols-3 gap-2 mt-2">
             {images.map((img, idx) => (
@@ -149,9 +151,9 @@ const EditListing = () => {
         </div>
 
         <div className="flex space-x-4">
-          <button type="button" onClick={() => navigate(-1)} className="btn btn-secondary">Cancel</button>
+          <button type="button" onClick={() => navigate(-1)} className="btn btn-secondary">{t('cancel')}</button>
           <button type="submit" disabled={updateMutation.isPending || uploading} className="btn btn-primary">
-            {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+            {updateMutation.isPending ? 'Saving...' : t('saveChanges')}
           </button>
         </div>
       </form>

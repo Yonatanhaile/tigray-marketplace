@@ -2,9 +2,11 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { listingsAPI, messagesAPI } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 
 const Home = () => {
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
 
   // Fetch recent listings
   const { data: listingsData, isLoading } = useQuery({
@@ -41,16 +43,16 @@ const Home = () => {
                 </div>
                 <div>
                   <span className="font-bold text-lg">
-                    {unreadCount} New {unreadCount === 1 ? 'Message' : 'Messages'}!
+                    {unreadCount} {unreadCount === 1 ? t('newMessages').slice(0, -1) : t('newMessages')}!
                   </span>
-                  <p className="text-sm text-blue-100">Click to view your conversations</p>
+                  <p className="text-sm text-blue-100">{t('viewMessages')}</p>
                 </div>
               </div>
               <Link 
                 to="/messages" 
                 className="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-blue-50 hover:shadow-xl transition transform hover:scale-105 flex items-center space-x-2"
               >
-                <span>View Messages</span>
+                <span>{t('viewMessages')}</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -64,18 +66,14 @@ const Home = () => {
       <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Buy & Sell Locally with Confidence
-            </h1>
-            <p className="text-xl mb-8 text-primary-100">
-              Regional marketplace with intent-based transactions
-            </p>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">{t('heroTitle')}</h1>
+            <p className="text-xl mb-8 text-primary-100">{t('heroSubtitle')}</p>
             <div className="flex justify-center space-x-4">
               <Link to="/search" className="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
-                Browse Listings
+                {t('browseListings')}
               </Link>
               <Link to="/register" className="bg-primary-700 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-800 transition border-2 border-white">
-                Get Started
+                {t('getStarted')}
               </Link>
             </div>
           </div>
@@ -84,31 +82,25 @@ const Home = () => {
 
       {/* Features */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
+        <h2 className="text-3xl font-bold text-center mb-12">{t('howItWorks')}</h2>
         
         <div className="grid md:grid-cols-3 gap-8">
           <div className="card text-center">
             <div className="text-4xl mb-4">🛍️</div>
-            <h3 className="text-xl font-semibold mb-2">Browse Listings</h3>
-            <p className="text-gray-600">
-              Find items from trusted local sellers with verified payment methods
-            </p>
+            <h3 className="text-xl font-semibold mb-2">{t('featureBrowseTitle')}</h3>
+            <p className="text-gray-600">{t('featureBrowseDesc')}</p>
           </div>
           
           <div className="card text-center">
             <div className="text-4xl mb-4">💬</div>
-            <h3 className="text-xl font-semibold mb-2">Intent to Buy</h3>
-            <p className="text-gray-600">
-              Express interest, agree on meeting details, and payment method
-            </p>
+            <h3 className="text-xl font-semibold mb-2">{t('featureIntentTitle')}</h3>
+            <p className="text-gray-600">{t('featureIntentDesc')}</p>
           </div>
           
           <div className="card text-center">
             <div className="text-4xl mb-4">🤝</div>
-            <h3 className="text-xl font-semibold mb-2">Meet & Complete</h3>
-            <p className="text-gray-600">
-              Meet in person, verify item, complete payment offline
-            </p>
+            <h3 className="text-xl font-semibold mb-2">{t('featureMeetTitle')}</h3>
+            <p className="text-gray-600">{t('featureMeetDesc')}</p>
           </div>
         </div>
       </div>
@@ -117,14 +109,14 @@ const Home = () => {
       <div className="bg-gray-100 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold">Recent Listings</h2>
+            <h2 className="text-3xl font-bold">{t('recentListings')}</h2>
             <Link to="/search" className="text-primary-600 hover:text-primary-700 font-semibold">
-              View All →
+              {t('viewAll')} →
             </Link>
           </div>
 
           {isLoading ? (
-            <div className="text-center py-12">Loading...</div>
+            <div className="text-center py-12">{t('loading')}</div>
           ) : (
             <div className="grid md:grid-cols-3 gap-6">
               {listingsData?.listings?.slice(0, 6).map((listing) => (
@@ -158,13 +150,13 @@ const Home = () => {
       {/* Safety Notice */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded">
-          <h3 className="text-lg font-semibold mb-2">🛡️ Safety Tips</h3>
+          <h3 className="text-lg font-semibold mb-2">🛡️ {t('safetyTips')}</h3>
           <ul className="list-disc list-inside space-y-1 text-gray-700">
-            <li>Always meet in public places</li>
-            <li>Verify payment receipt before handing over items</li>
-            <li>Check seller's verification badge and reviews</li>
-            <li>Never share sensitive personal information</li>
-            <li>Report suspicious activity to administrators</li>
+            <li>{t('safetyPublic')}</li>
+            <li>{t('safetyVerify')}</li>
+            <li>{t('safetyBadge')}</li>
+            <li>{t('safetyPrivacy')}</li>
+            <li>{t('safetyReport')}</li>
           </ul>
         </div>
       </div>

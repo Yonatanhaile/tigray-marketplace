@@ -6,6 +6,7 @@ import { useSocket } from '../hooks/useSocket';
 import { sendMessage, joinOrderRoom } from '../services/socket';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 const Messages = () => {
   const { orderId } = useParams();
@@ -13,6 +14,7 @@ const Messages = () => {
   const { socket } = useSocket();
   const queryClient = useQueryClient();
   const messagesEndRef = useRef(null);
+  const { t } = useTranslation();
   // Normalize current user id (some environments use id, others _id)
   const currentUserId = String(user?._id || user?.id || '');
   const inputRef = useRef(null);
@@ -106,7 +108,7 @@ const Messages = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Order Messages</h1>
+        <h1 className="text-2xl font-bold mb-2">{t('orderMessages')}</h1>
         {order && (
           <div className="flex items-center justify-between bg-gray-100 p-3 rounded-lg">
             <div>

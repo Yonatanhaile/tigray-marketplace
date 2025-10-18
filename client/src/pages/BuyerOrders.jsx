@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ordersAPI } from '../services/api';
+import { useTranslation } from 'react-i18next';
 
 const BuyerOrders = () => {
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery({
     queryKey: ['orders', 'buyer'],
     queryFn: () => ordersAPI.getMyOrders({ role: 'buyer' }),
@@ -10,14 +12,14 @@ const BuyerOrders = () => {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">My Orders</h1>
+      <h1 className="text-3xl font-bold mb-6">{t('myOrders')}</h1>
 
       {isLoading ? (
-        <p>Loading...</p>
+        <p>{t('loading')}</p>
       ) : data?.orders?.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-500 mb-4">No orders yet.</p>
-          <Link to="/search" className="btn btn-primary">Browse Listings</Link>
+          <Link to="/search" className="btn btn-primary">{t('browseListings')}</Link>
         </div>
       ) : (
         <div className="space-y-4">
