@@ -49,10 +49,14 @@ const CreateListing = () => {
       return;
     }
 
+    const paymentMethods = Array.isArray(data.payment_methods)
+      ? data.payment_methods
+      : [data.payment_methods].filter(Boolean);
+
     const listingData = {
       ...data,
       images,
-      payment_methods: data.payment_methods.split(',').map(m => m.trim()),
+      payment_methods: paymentMethods,
       pickup_options: {
         pickup: data.pickup || false,
         courier: data.courier || false,

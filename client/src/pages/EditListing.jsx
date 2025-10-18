@@ -74,12 +74,16 @@ const EditListing = () => {
   };
 
   const onSubmit = (form) => {
+    const paymentMethods = Array.isArray(form.payment_methods)
+      ? form.payment_methods
+      : [form.payment_methods].filter(Boolean);
+
     const payload = {
       title: form.title,
       description: form.description,
       price: Number(form.price),
       condition: form.condition,
-      payment_methods: form.payment_methods.split(',').map(s => s.trim()).filter(Boolean),
+      payment_methods: paymentMethods,
       payment_instructions: form.payment_instructions,
       images,
       category: form.category,
