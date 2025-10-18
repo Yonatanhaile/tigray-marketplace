@@ -159,7 +159,16 @@ const ListingDetail = () => {
                 {listing.listing.sellerId.name.charAt(0).toUpperCase()}
               </div>
               <div>
-                <div className="font-medium">{listing.listing.sellerId.name}</div>
+                <div className="font-medium">
+                  <button
+                    type="button"
+                    className="text-primary-600 hover:underline"
+                    onClick={() => navigate(`/sellers/${listing.listing.sellerId._id}`)}
+                    title="View seller profile"
+                  >
+                    {listing.listing.sellerId.name}
+                  </button>
+                </div>
                 <div className="text-sm text-gray-500">{listing.listing.sellerId.email}</div>
                 {listing.listing.sellerId.badges?.includes('verified-seller') && (
                   <div className="text-xs text-green-600">✓ Verified Seller</div>

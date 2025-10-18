@@ -12,6 +12,7 @@ import BuyerOrders from './pages/BuyerOrders';
 import OrderDetail from './pages/OrderDetail';
 import Messages from './pages/Messages';
 import AllMessages from './pages/AllMessages';
+import SellerProfile from './pages/SellerProfile';
 import AdminPanel from './pages/AdminPanel';
 import Search from './pages/Search';
 
@@ -48,6 +49,7 @@ function App() {
         <Route path="register" element={<Register />} />
         <Route path="search" element={<Search />} />
         <Route path="listings/:id" element={<ListingDetail />} />
+        <Route path="sellers/:sellerId" element={<SellerProfile />} />
 
         {/* Protected routes */}
         <Route
