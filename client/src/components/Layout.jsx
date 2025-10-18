@@ -153,8 +153,14 @@ const Layout = () => {
               {isAuthenticated ? (
                 <>
                   {isSeller && (
-                    <Link to="/create-listing" className="btn btn-primary">
-                      + {t('createListing')}
+                    <Link
+                      to="/create-listing"
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold px-4 py-2 rounded-full shadow-lg hover:shadow-xl hover:from-primary-500 hover:to-primary-600 transform hover:scale-105 transition focus:outline-none focus:ring-2 focus:ring-primary-300"
+                    >
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 5v14M5 12h14" />
+                      </svg>
+                      <span>{t('createListing')}</span>
                     </Link>
                   )}
                   
