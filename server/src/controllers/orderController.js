@@ -157,9 +157,26 @@ const getMyOrders = async (req, res) => {
       Order.countDocuments(filter),
     ]);
 
+    // Add unread message count for each order
+    const { Message } = require('../models');
+    const ordersWithUnread = await Promise.all(
+      orders.map(async (order) => {
+        const unreadCount = await Message.countDocuments({
+          orderId: order._id,
+          recipientId: req.userId,
+          isRead: false,
+        });
+        
+        return {
+          ...order.toObject(),
+          unreadCount,
+        };
+      })
+    );
+
     res.status(200).json({
       error: false,
-      orders,
+      orders: ordersWithUnread,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),

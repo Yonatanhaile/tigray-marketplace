@@ -2,21 +2,47 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ordersAPI } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
+import { useSocket } from '../hooks/useSocket';
+import { useEffect } from 'react';
 
 const AllMessages = () => {
   const { user } = useAuth();
+  const { socket } = useSocket();
 
   // Fetch orders as buyer
-  const { data: buyerOrders, isLoading: buyerLoading } = useQuery({
+  const { data: buyerOrders, isLoading: buyerLoading, refetch: refetchBuyer } = useQuery({
     queryKey: ['orders', 'buyer'],
     queryFn: () => ordersAPI.getMyOrders({ role: 'buyer' }),
   });
 
   // Fetch orders as seller
-  const { data: sellerOrders, isLoading: sellerLoading } = useQuery({
+  const { data: sellerOrders, isLoading: sellerLoading, refetch: refetchSeller } = useQuery({
     queryKey: ['orders', 'seller'],
     queryFn: () => ordersAPI.getMyOrders({ role: 'seller' }),
   });
+
+  // Refresh on new messages
+  useEffect(() => {
+    if (socket) {
+      const handleNewMessage = () => {
+        refetchBuyer();
+        refetchSeller();
+      };
+
+      const handleMessagesRead = () => {
+        refetchBuyer();
+        refetchSeller();
+      };
+
+      socket.on('new_message', handleNewMessage);
+      socket.on('messages_read', handleMessagesRead);
+
+      return () => {
+        socket.off('new_message', handleNewMessage);
+        socket.off('messages_read', handleMessagesRead);
+      };
+    }
+  }, [socket, refetchBuyer, refetchSeller]);
 
   const isLoading = buyerLoading || sellerLoading;
 
