@@ -17,6 +17,7 @@ const ListingDetail = () => {
   const [meetingDate, setMeetingDate] = useState('');
   const [meetingPlace, setMeetingPlace] = useState('');
   const [buyerNote, setBuyerNote] = useState('');
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   const { data: listing, isLoading } = useQuery({
     queryKey: ['listing', id],
@@ -74,11 +75,30 @@ const ListingDetail = () => {
         {/* Images */}
         <div>
           {listing.listing.images?.length > 0 ? (
-            <img
-              src={listing.listing.images[0].url}
-              alt={listing.listing.title}
-              className="w-full h-96 object-contain bg-gray-50 rounded-lg shadow-lg"
-            />
+            <div>
+              <div className="w-full h-96 bg-gray-50 rounded-lg shadow-lg flex items-center justify-center mb-3">
+                <img
+                  src={listing.listing.images[activeImageIndex]?.url}
+                  alt={listing.listing.title}
+                  className="max-h-96 object-contain"
+                />
+              </div>
+              {listing.listing.images.length > 1 && (
+                <div className="grid grid-cols-5 gap-2">
+                  {listing.listing.images.map((img, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setActiveImageIndex(idx)}
+                      className={`relative rounded overflow-hidden ${activeImageIndex === idx ? 'ring-2 ring-primary-500' : ''}`}
+                      title={`Image ${idx + 1}`}
+                    >
+                      <img src={img.url} alt="" className="w-full h-20 object-contain bg-gray-50" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           ) : (
             <div className="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center">
               <span className="text-gray-400">No image</span>
