@@ -1,6 +1,8 @@
-const { Listing } = require('../models');
+const { User, Order, Dispute, Listing } = require('../models');
+const { sendKYCNotification } = require('../services/email');
+const logger = require('../services/logger');
 
-exports.getPendingListings = async (req, res) => {
+const getPendingListings = async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -18,7 +20,7 @@ exports.getPendingListings = async (req, res) => {
   }
 };
 
-exports.approveListing = async (req, res) => {
+const approveListing = async (req, res) => {
   try {
     const { id } = req.params;
     const listing = await Listing.findById(id);
@@ -31,7 +33,7 @@ exports.approveListing = async (req, res) => {
   }
 };
 
-exports.rejectListing = async (req, res) => {
+const rejectListing = async (req, res) => {
   try {
     const { id } = req.params;
     const { reason } = req.body;
@@ -45,10 +47,6 @@ exports.rejectListing = async (req, res) => {
     res.status(500).json({ error: true, message: 'Failed to reject listing' });
   }
 };
-
-const { User, Order, Dispute, Listing } = require('../models');
-const { sendKYCNotification } = require('../services/email');
-const logger = require('../services/logger');
 
 /**
  * Get all orders (admin only)
@@ -386,5 +384,8 @@ module.exports = {
   getAllUsers,
   getStats,
   toggleUserStatus,
+  getPendingListings,
+  approveListing,
+  rejectListing,
 };
 
