@@ -195,8 +195,9 @@ const updateListing = async (req, res) => {
       });
     }
 
-    // Check ownership
-    if (listing.sellerId.toString() !== req.userId && !req.user.roles.includes('admin')) {
+    // Check ownership (normalize to string)
+    const currentUserId = req.userId?.toString();
+    if (listing.sellerId.toString() !== currentUserId && !req.user.roles.includes('admin')) {
       return res.status(403).json({
         error: true,
         message: 'You do not have permission to update this listing',
@@ -260,8 +261,9 @@ const deleteListing = async (req, res) => {
       });
     }
 
-    // Check ownership
-    if (listing.sellerId.toString() !== req.userId && !req.user.roles.includes('admin')) {
+    // Check ownership (normalize to string)
+    const currentUserId = req.userId?.toString();
+    if (listing.sellerId.toString() !== currentUserId && !req.user.roles.includes('admin')) {
       return res.status(403).json({
         error: true,
         message: 'You do not have permission to delete this listing',
