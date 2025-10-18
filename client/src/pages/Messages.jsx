@@ -117,62 +117,112 @@ const Messages = () => {
         )}
       </div>
 
-      <div className="card h-[600px] flex flex-col">
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-          {messagesData?.messages?.map(msg => {
-            const isMyMessage = msg.senderId._id === user?._id;
-            return (
-              <div key={msg._id} className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'}`}>
-                <div className="flex flex-col max-w-md">
-                  {/* Sender name */}
-                  {!isMyMessage && (
-                    <span className="text-xs text-gray-500 mb-1 ml-3">
-                      {msg.senderId.name}
-                    </span>
-                  )}
-                  
-                  {/* Message bubble */}
-                  <div className={`px-4 py-3 rounded-2xl ${
-                    isMyMessage 
-                      ? 'bg-blue-600 text-white rounded-tr-sm' 
-                      : 'bg-white text-gray-800 border border-gray-200 rounded-tl-sm shadow-sm'
-                  }`}>
-                    <p className="text-sm leading-relaxed">{msg.text}</p>
-                    <p className={`text-xs mt-1 ${isMyMessage ? 'text-blue-100' : 'text-gray-500'}`}>
-                      {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                  </div>
-                  
-                  {/* My message label */}
-                  {isMyMessage && (
-                    <span className="text-xs text-gray-500 mt-1 mr-3 text-right">
-                      You
-                    </span>
-                  )}
-                </div>
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden h-[650px] flex flex-col">
+        {/* Messages Container */}
+        <div 
+          className="flex-1 overflow-y-auto p-6 space-y-4" 
+          style={{ 
+            backgroundImage: 'linear-gradient(to bottom, #f3f4f6 0%, #e5e7eb 100%)',
+            backgroundAttachment: 'fixed'
+          }}
+        >
+          {messagesData?.messages?.length === 0 ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <svg className="w-16 h-16 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                <p className="text-gray-500 font-medium">No messages yet</p>
+                <p className="text-sm text-gray-400 mt-1">Start the conversation!</p>
               </div>
-            );
-          })}
+            </div>
+          ) : (
+            messagesData?.messages?.map(msg => {
+              const isMyMessage = msg.senderId._id === user?._id;
+              return (
+                <div key={msg._id} className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} mb-2`}>
+                  <div className={`flex flex-col ${isMyMessage ? 'items-end' : 'items-start'} max-w-[75%]`}>
+                    {/* Sender name - only for received messages */}
+                    {!isMyMessage && (
+                      <span className="text-xs font-semibold text-gray-600 mb-1 ml-4">
+                        {msg.senderId.name}
+                      </span>
+                    )}
+                    
+                    {/* Message bubble */}
+                    <div className={`relative px-5 py-3 shadow-md ${
+                      isMyMessage 
+                        ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-3xl rounded-tr-md' 
+                        : 'bg-white text-gray-900 rounded-3xl rounded-tl-md border border-gray-100'
+                    }`}>
+                      {/* Tail/pointer */}
+                      <div className={`absolute top-0 w-0 h-0 ${
+                        isMyMessage 
+                          ? 'right-0 border-l-[12px] border-l-transparent border-t-[12px] border-t-blue-600 border-r-0'
+                          : 'left-0 border-r-[12px] border-r-transparent border-t-[12px] border-t-white border-l-0'
+                      }`} style={{ 
+                        [isMyMessage ? 'right' : 'left']: '-6px' 
+                      }}></div>
+                      
+                      {/* Message text */}
+                      <p className={`text-[15px] leading-relaxed break-words ${
+                        isMyMessage ? 'text-white' : 'text-gray-800'
+                      }`}>
+                        {msg.text}
+                      </p>
+                      
+                      {/* Timestamp */}
+                      <p className={`text-[11px] mt-2 text-right ${
+                        isMyMessage ? 'text-blue-100' : 'text-gray-500'
+                      }`}>
+                        {new Date(msg.createdAt).toLocaleTimeString([], { 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        })}
+                      </p>
+                    </div>
+                    
+                    {/* "You" label for sent messages */}
+                    {isMyMessage && (
+                      <span className="text-xs text-gray-600 mt-1 mr-4 font-medium">
+                        You
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input */}
-        <form onSubmit={handleSend} className="border-t bg-white p-4 flex space-x-2">
-          <input 
-            value={messageText} 
-            onChange={e => setMessageText(e.target.value)} 
-            placeholder="Type a message..." 
-            className="input flex-1" 
-            disabled={!orderData?.order}
-          />
-          <button 
-            type="submit" 
-            className="btn btn-primary"
-            disabled={!orderData?.order || !messageText.trim()}
-          >
-            Send
-          </button>
+        {/* Input Area */}
+        <form onSubmit={handleSend} className="bg-white border-t border-gray-200 p-4">
+          <div className="flex items-center space-x-3">
+            <input 
+              value={messageText} 
+              onChange={e => setMessageText(e.target.value)} 
+              placeholder="Type your message here..." 
+              className="flex-1 px-5 py-3 border-2 border-gray-200 rounded-full focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" 
+              disabled={!orderData?.order}
+            />
+            <button 
+              type="submit" 
+              className={`px-6 py-3 rounded-full font-semibold transition-all transform hover:scale-105 ${
+                !orderData?.order || !messageText.trim()
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg hover:shadow-xl'
+              }`}
+              disabled={!orderData?.order || !messageText.trim()}
+            >
+              <div className="flex items-center space-x-2">
+                <span>Send</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </div>
+            </button>
+          </div>
         </form>
       </div>
     </div>
