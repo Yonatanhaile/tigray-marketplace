@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ListingDetail from './pages/ListingDetail';
 import CreateListing from './pages/CreateListing';
+import EditListing from './pages/EditListing';
 import SellerDashboard from './pages/SellerDashboard';
 import BuyerOrders from './pages/BuyerOrders';
 import OrderDetail from './pages/OrderDetail';
@@ -54,6 +55,14 @@ function App() {
           element={
             <ProtectedRoute requireSeller>
               <CreateListing />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="listings/:id/edit"
+          element={
+            <ProtectedRoute requireSeller>
+              <EditListing />
             </ProtectedRoute>
           }
         />

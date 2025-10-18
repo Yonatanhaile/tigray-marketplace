@@ -1,8 +1,12 @@
-import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { Link, useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { listingsAPI, ordersAPI } from '../services/api';
+import toast from 'react-hot-toast';
 
 const SellerDashboard = () => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
   const { data: listingsData, isLoading: listingsLoading } = useQuery({
     queryKey: ['listings', 'my-listings'],
     queryFn: () => listingsAPI.getAll({ sellerId: 'me' }),
@@ -12,6 +16,27 @@ const SellerDashboard = () => {
     queryKey: ['orders', 'seller'],
     queryFn: () => ordersAPI.getMyOrders({ role: 'seller' }),
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => listingsAPI.delete(id),
+    onSuccess: () => {
+      toast.success('Listing deleted');
+      queryClient.invalidateQueries(['listings']);
+      queryClient.invalidateQueries(['listings', 'my-listings']);
+    },
+    onError: (e) => {
+      toast.error(e?.message || 'Failed to delete');
+    }
+  });
+
+  const onDelete = (e, id) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (deleteMutation.isPending) return;
+    if (window.confirm('Delete this listing? This cannot be undone.')) {
+      deleteMutation.mutate(id);
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -46,12 +71,22 @@ const SellerDashboard = () => {
         ) : (
           <div className="grid md:grid-cols-3 gap-4">
             {listingsData?.listings?.map(listing => (
-              <Link key={listing._id} to={`/listings/${listing._id}`} className="card hover:shadow-lg">
-                {listing.images?.[0] && <img src={listing.images[0].url} alt={listing.title} className="w-full h-32 object-cover rounded mb-2" />}
-                <h3 className="font-semibold truncate">{listing.title}</h3>
-                <p className="text-primary-600 font-bold">{listing.price} ETB</p>
-                <p className="text-xs text-gray-500">{listing.status}</p>
-              </Link>
+              <div key={listing._id} className="card hover:shadow-lg">
+                <Link to={`/listings/${listing._id}`} className="block">
+                  {listing.images?.[0] && <img src={listing.images[0].url} alt={listing.title} className="w-full h-32 object-cover rounded mb-2" />}
+                  <h3 className="font-semibold truncate">{listing.title}</h3>
+                </Link>
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-primary-600 font-bold">{listing.price} ETB</p>
+                  <span className="text-xs text-gray-500">{listing.status}</span>
+                </div>
+                <div className="flex items-center justify-end space-x-2 mt-3">
+                  <Link to={`/listings/${listing._id}/edit`} className="btn btn-secondary px-3 py-1">Edit</Link>
+                  <button onClick={(e) => onDelete(e, listing._id)} className="btn btn-danger px-3 py-1">
+                    {deleteMutation.isPending ? '...' : 'Delete'}
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
         )}
