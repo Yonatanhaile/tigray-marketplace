@@ -105,8 +105,8 @@ const listingSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['draft', 'active', 'sold', 'suspended', 'deleted'],
-    default: 'active',
+    enum: ['draft', 'pending', 'active', 'sold', 'suspended', 'deleted'],
+    default: 'pending', // New listings start as pending for admin approval
   },
   createdAt: {
     type: Date,
