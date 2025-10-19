@@ -30,7 +30,7 @@ const createListing = async (req, res) => {
       });
     }
 
-    // Create listing (start as pending moderation)
+    // Create listing (start as pending moderation - model default)
     const listing = await Listing.create({
       sellerId: req.userId,
       title,
@@ -46,7 +46,7 @@ const createListing = async (req, res) => {
       payment_instructions,
       pickup_options,
       highValue,
-      status: 'pending',
+      // status will default to 'pending' from model
     });
 
     logger.info(`Listing created: ${listing._id} by user ${req.userId}`);
@@ -58,6 +58,18 @@ const createListing = async (req, res) => {
     });
   } catch (error) {
     logger.error('Create listing error:', error);
+    
+    // Handle Mongoose validation errors more gracefully
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        error: true,
+        message: 'Validation failed',
+        details: validationErrors.join(', '),
+        validationErrors,
+      });
+    }
+    
     res.status(500).json({
       error: true,
       message: 'Failed to create listing',
