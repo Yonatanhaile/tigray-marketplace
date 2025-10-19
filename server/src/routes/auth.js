@@ -6,6 +6,7 @@ const {
   sendOTP,
   verifyOTPHandler,
   getProfile,
+  updateProfile,
 } = require('../controllers/authController');
 const {
   registerValidation,
@@ -24,6 +25,7 @@ router.post('/otp/verify', authLimiter, otpVerifyValidation, verifyOTPHandler);
 
 // Protected routes
 router.get('/profile', authenticateJWT, getProfile);
+router.patch('/profile', authenticateJWT, updateProfile);
 
 module.exports = router;
 

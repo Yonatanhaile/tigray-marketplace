@@ -24,6 +24,11 @@ const listingSchema = new mongoose.Schema({
     required: [true, 'Price is required'],
     min: [0, 'Price must be positive'],
   },
+  priceType: {
+    type: String,
+    enum: ['fixed', 'per-hour', 'per-day', 'per-month', 'contract', 'negotiable'],
+    default: 'fixed',
+  },
   currency: {
     type: String,
     default: 'ETB',

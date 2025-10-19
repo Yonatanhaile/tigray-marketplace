@@ -24,6 +24,10 @@ const CreateListing = () => {
   const selectedCategory = watch('category');
   const selectedRegion = watch('location.region');
   const selectedPaymentMethods = watch('payment_methods') || [];
+  
+  // Categories that don't need condition field
+  const categoriesWithoutCondition = ['Jobs', 'Services', 'Repair & Construction', 'Property'];
+  const shouldShowCondition = !categoriesWithoutCondition.includes(selectedCategory);
 
   // Reset subcategory when category changes
   useEffect(() => {
@@ -77,6 +81,11 @@ const CreateListing = () => {
     }
   };
 
+  const removeImage = (indexToRemove) => {
+    setImages(prev => prev.filter((_, index) => index !== indexToRemove));
+    toast.success('Image removed');
+  };
+
   const onSubmit = async (data) => {
     console.log('Form data submitted:', data);
     
@@ -113,8 +122,9 @@ const CreateListing = () => {
       title: data.title,
       description: data.description,
       price: Number(data.price),
+      priceType: data.priceType || 'fixed',
       currency: 'ETB', // Default currency
-      condition: data.condition || 'good',
+      condition: shouldShowCondition ? (data.condition || 'good') : 'not-applicable',
       category: data.category,
       subcategory: data.subcategory,
       location: data.location,
@@ -266,6 +276,20 @@ const CreateListing = () => {
           </div>
 
           <div>
+            <label className="block text-sm font-medium mb-2">Price Type *</label>
+            <select {...register('priceType')} className="input">
+              <option value="fixed">Fixed Price</option>
+              <option value="per-hour">Per Hour</option>
+              <option value="per-day">Per Day</option>
+              <option value="per-month">Per Month</option>
+              <option value="contract">Contract/Project</option>
+              <option value="negotiable">Negotiable</option>
+            </select>
+          </div>
+        </div>
+
+        {shouldShowCondition && (
+          <div>
             <label className="block text-sm font-medium mb-2">Condition *</label>
             <select {...register('condition')} className="input">
               <option value="new">New</option>
@@ -275,7 +299,7 @@ const CreateListing = () => {
               <option value="poor">Poor</option>
             </select>
           </div>
-        </div>
+        )}
         {/* Payment Methods */}
         <div className="space-y-4">
           <div>
@@ -371,11 +395,29 @@ const CreateListing = () => {
           <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="input" />
           <p className="text-sm text-gray-500 mt-1">Upload at least one image (max 10). Supported formats: JPG, PNG, WebP</p>
           {uploading && <p className="text-primary-600 mt-2">Uploading...</p>}
-          <div className="grid grid-cols-3 gap-2 mt-2">
-            {images.map((img, idx) => (
-              <img key={idx} src={img.url} alt="" className="w-full h-24 object-contain bg-gray-50 rounded" />
-            ))}
-          </div>
+          {images.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
+              {images.map((img, idx) => (
+                <div key={idx} className="relative group">
+                  <img 
+                    src={img.url} 
+                    alt="" 
+                    className="w-full h-32 object-cover bg-gray-50 rounded-lg border-2 border-gray-200" 
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(idx)}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 shadow-lg"
+                    title="Remove image"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex space-x-4">

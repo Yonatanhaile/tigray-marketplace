@@ -13,6 +13,7 @@ import OrderDetail from './pages/OrderDetail';
 import Messages from './pages/Messages';
 import AllMessages from './pages/AllMessages';
 import SellerProfile from './pages/SellerProfile';
+import Profile from './pages/Profile';
 import AdminPanel from './pages/AdminPanel';
 import Search from './pages/Search';
 import NotFound from './pages/NotFound';
@@ -106,6 +107,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Messages />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />

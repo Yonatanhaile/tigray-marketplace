@@ -228,11 +228,51 @@ const getProfile = async (req, res) => {
   }
 };
 
+/**
+ * Update user profile
+ */
+const updateProfile = async (req, res) => {
+  try {
+    const { name, phone } = req.body;
+    const User = require('../models/User');
+    
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({
+        error: true,
+        message: 'User not found',
+      });
+    }
+
+    // Update fields
+    if (name) user.name = name;
+    if (phone) user.phone = phone;
+
+    await user.save();
+
+    logger.info(`Profile updated for user ${req.userId}`);
+
+    res.status(200).json({
+      error: false,
+      message: 'Profile updated successfully',
+      user: user.profile,
+    });
+  } catch (error) {
+    logger.error('Update profile error:', error);
+    res.status(500).json({
+      error: true,
+      message: 'Failed to update profile',
+      details: error.message,
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
   sendOTP,
   verifyOTPHandler,
   getProfile,
+  updateProfile,
 };
 

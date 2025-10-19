@@ -192,15 +192,17 @@ const Layout = () => {
 
                   {/* User Menu - Desktop */}
                   <div className="hidden lg:flex items-center space-x-3 px-4 py-2 bg-white/50 rounded-xl border border-gray-200">
-                    <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                      {user?.name?.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="text-sm">
-                      <div className="font-semibold text-gray-900">{user?.name}</div>
-                      <div className="text-gray-500 text-xs">
-                        {user?.roles?.join(', ')}
+                    <Link to="/profile" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+                      <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        {user?.name?.charAt(0).toUpperCase()}
                       </div>
-                    </div>
+                      <div className="text-sm">
+                        <div className="font-semibold text-gray-900">{user?.name}</div>
+                        <div className="text-gray-500 text-xs">
+                          {user?.roles?.join(', ')}
+                        </div>
+                      </div>
+                    </Link>
                     <button
                       onClick={handleLogout}
                       className="ml-2 p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"

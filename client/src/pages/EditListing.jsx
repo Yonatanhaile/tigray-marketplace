@@ -31,7 +31,9 @@ const EditListing = () => {
       title: listing?.title || '',
       description: listing?.description || '',
       price: listing?.price || '',
+      priceType: listing?.priceType || 'fixed',
       condition: listing?.condition || 'good',
+      status: listing?.status || 'active',
       category: listing?.category || '',
       subcategory: listing?.subcategory || '',
       'location.region': listing?.location?.region || '',
@@ -53,6 +55,10 @@ const EditListing = () => {
   const selectedCategory = watch('category');
   const selectedRegion = watch('location.region');
   const selectedPaymentMethods = watch('payment_methods') || [];
+  
+  // Categories that don't need condition field
+  const categoriesWithoutCondition = ['Jobs', 'Services', 'Repair & Construction', 'Property'];
+  const shouldShowCondition = !categoriesWithoutCondition.includes(selectedCategory);
 
   // Reset subcategory when category changes
   useEffect(() => {
@@ -99,6 +105,11 @@ const EditListing = () => {
     }
   };
 
+  const removeImage = (indexToRemove) => {
+    setImages(prev => prev.filter((_, index) => index !== indexToRemove));
+    toast.success('Image removed');
+  };
+
   const onSubmit = (form) => {
     const paymentMethods = Array.isArray(form.payment_methods)
       ? form.payment_methods
@@ -123,7 +134,9 @@ const EditListing = () => {
       title: form.title,
       description: form.description,
       price: Number(form.price),
-      condition: form.condition,
+      priceType: form.priceType || 'fixed',
+      condition: shouldShowCondition ? (form.condition || 'good') : 'not-applicable',
+      status: form.status || 'active',
       payment_methods: paymentMethods,
       payment_instructions: paymentInstructions,
       images,
@@ -243,6 +256,20 @@ const EditListing = () => {
           </div>
 
           <div>
+            <label className="block text-sm font-medium mb-2">Price Type *</label>
+            <select {...register('priceType')} className="input">
+              <option value="fixed">Fixed Price</option>
+              <option value="per-hour">Per Hour</option>
+              <option value="per-day">Per Day</option>
+              <option value="per-month">Per Month</option>
+              <option value="contract">Contract/Project</option>
+              <option value="negotiable">Negotiable</option>
+            </select>
+          </div>
+        </div>
+
+        {shouldShowCondition && (
+          <div>
             <label className="block text-sm font-medium mb-2">Condition *</label>
             <select {...register('condition')} className="input">
               <option value="new">New</option>
@@ -252,6 +279,17 @@ const EditListing = () => {
               <option value="poor">Poor</option>
             </select>
           </div>
+        )}
+
+        <div>
+          <label className="block text-sm font-medium mb-2">Listing Status *</label>
+          <select {...register('status')} className="input">
+            <option value="active">Active (Available for Sale)</option>
+            <option value="sold">Sold</option>
+            <option value="pending">Pending (Under Review)</option>
+            <option value="suspended">Suspended</option>
+          </select>
+          <p className="text-xs text-gray-500 mt-1">Mark as "Sold" when item is no longer available</p>
         </div>
 
         {/* Payment Methods */}
@@ -347,13 +385,31 @@ const EditListing = () => {
         <div>
           <label className="block text-sm font-medium mb-2">Add/Update Images</label>
           <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="input" />
-          <p className="text-sm text-gray-500 mt-1">Upload up to 5 images (JPG, PNG, or WebP, max 8MB each)</p>
+          <p className="text-sm text-gray-500 mt-1">Upload up to 10 images (JPG, PNG, or WebP, max 8MB each)</p>
           {uploading && <p className="text-primary-600 mt-2">Uploading...</p>}
-          <div className="grid grid-cols-3 gap-2 mt-2">
-            {images.map((img, idx) => (
-              <img key={idx} src={img.url} alt="" className="w-full h-24 object-contain bg-gray-50 rounded" />
-            ))}
-          </div>
+          {images.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
+              {images.map((img, idx) => (
+                <div key={idx} className="relative group">
+                  <img 
+                    src={img.url} 
+                    alt="" 
+                    className="w-full h-32 object-cover bg-gray-50 rounded-lg border-2 border-gray-200" 
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(idx)}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 shadow-lg"
+                    title="Remove image"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex space-x-4">
