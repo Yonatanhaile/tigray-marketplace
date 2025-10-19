@@ -19,7 +19,7 @@ const createListing = async (req, res) => {
       pickup_options,
       highValue,
       subcategory,
-      address,
+      location,
     } = req.body;
 
     // Check if user is seller or admin
@@ -40,10 +40,7 @@ const createListing = async (req, res) => {
       condition,
       category,
       subcategory,
-      address,
-      category,
-      subcategory,
-      address,
+      location,
       images: images || [],
       payment_methods,
       payment_instructions,
@@ -227,6 +224,8 @@ const updateListing = async (req, res) => {
       'currency',
       'condition',
       'category',
+      'subcategory',
+      'location',
       'images',
       'payment_methods',
       'payment_instructions',

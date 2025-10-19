@@ -7,6 +7,7 @@ import { uploadFile } from '../services/upload';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { CATEGORIES, PAYMENT_METHODS } from '../constants/categories';
+import ETHIOPIAN_LOCATIONS from '../constants/locations';
 
 const EditListing = () => {
   const { id } = useParams();
@@ -32,7 +33,9 @@ const EditListing = () => {
     condition: listing?.condition || 'good',
     category: listing?.category || '',
     subcategory: listing?.subcategory || '',
-    address: listing?.address || '',
+    'location.region': listing?.location?.region || '',
+    'location.zone': listing?.location?.zone || '',
+    'location.specificAddress': listing?.location?.specificAddress || '',
     payment_methods: (listing?.payment_methods || []).join(', '),
     payment_instructions: listing?.payment_instructions || '',
     pickup: listing?.pickup_options?.pickup || false,
@@ -40,7 +43,24 @@ const EditListing = () => {
     meeting_spots: (listing?.pickup_options?.meeting_spots || []).join(', '),
   }), [listing]);
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm({ defaultValues });
+  const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm({ defaultValues });
+
+  const selectedCategory = watch('category');
+  const selectedRegion = watch('location.region');
+
+  // Reset subcategory when category changes
+  useEffect(() => {
+    if (selectedCategory && listing?.category !== selectedCategory) {
+      setValue('subcategory', '');
+    }
+  }, [selectedCategory, listing, setValue]);
+
+  // Reset zone when region changes
+  useEffect(() => {
+    if (selectedRegion && listing?.location?.region !== selectedRegion) {
+      setValue('location.zone', '');
+    }
+  }, [selectedRegion, listing, setValue]);
 
   useEffect(() => {
     reset(defaultValues);
@@ -88,7 +108,11 @@ const EditListing = () => {
       images,
       category: form.category,
       subcategory: form.subcategory,
-      address: form.address,
+      location: {
+        region: form.location.region,
+        zone: form.location.zone,
+        specificAddress: form.location.specificAddress,
+      },
       pickup_options: {
         pickup: !!form.pickup,
         courier: !!form.courier,
@@ -140,9 +164,51 @@ const EditListing = () => {
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-2">Address *</label>
-          <input {...register('address', { required: true, maxLength: 300 })} className="input" placeholder="City, Area, Landmark" />
+        {/* Location Selection */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Location *</h3>
+          
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Region *</label>
+              <select {...register('location.region', { required: 'Region is required' })} className="input">
+                <option value="">Select region</option>
+                {Object.keys(ETHIOPIAN_LOCATIONS).map(region => (
+                  <option key={region} value={region}>{region}</option>
+                ))}
+              </select>
+              {errors.location?.region && <p className="text-red-500 text-sm mt-1">{errors.location.region.message}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Zone/Sub-city *</label>
+              <select 
+                {...register('location.zone', { required: 'Zone/Sub-city is required' })} 
+                className="input"
+                disabled={!selectedRegion}
+              >
+                <option value="">Select zone/sub-city</option>
+                {selectedRegion && ETHIOPIAN_LOCATIONS[selectedRegion]?.map(zone => (
+                  <option key={zone} value={zone}>{zone}</option>
+                ))}
+              </select>
+              {errors.location?.zone && <p className="text-red-500 text-sm mt-1">{errors.location.zone.message}</p>}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Specific Address *</label>
+            <input 
+              {...register('location.specificAddress', { 
+                required: 'Specific address is required',
+                maxLength: { value: 300, message: 'Address cannot exceed 300 characters' }
+              })} 
+              className="input" 
+              placeholder="e.g., Near Piazza, Next to Commercial Bank, Building Name, House Number" 
+            />
+            {errors.location?.specificAddress && <p className="text-red-500 text-sm mt-1">{errors.location.specificAddress.message}</p>}
+            <p className="text-xs text-gray-500 mt-1">Enter your exact address (street name, building, landmarks)</p>
+          </div>
         </div>
         <div>
           <label className="block text-sm font-medium mb-2">{t('titleLabel')}</label>

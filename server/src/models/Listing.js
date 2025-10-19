@@ -42,10 +42,23 @@ const listingSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
-  address: {
-    type: String,
-    trim: true,
-    maxlength: [300, 'Address cannot exceed 300 characters'],
+  location: {
+    region: {
+      type: String,
+      trim: true,
+      required: [true, 'Region is required'],
+    },
+    zone: {
+      type: String,
+      trim: true,
+      required: [true, 'Zone/Sub-city is required'],
+    },
+    specificAddress: {
+      type: String,
+      trim: true,
+      required: [true, 'Specific address is required'],
+      maxlength: [300, 'Specific address cannot exceed 300 characters'],
+    },
   },
   images: [{
     url: {
