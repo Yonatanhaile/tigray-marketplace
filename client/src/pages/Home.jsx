@@ -68,12 +68,9 @@ const Home = () => {
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">{t('heroTitle')}</h1>
             <p className="text-xl mb-8 text-primary-100">{t('heroSubtitle')}</p>
-            <div className="flex justify-center space-x-4">
-              <Link to="/search" className="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+            <div className="flex justify-center">
+              <Link to="/search" className="bg-white text-primary-600 px-10 py-4 rounded-lg font-semibold hover:bg-gray-100 transition transform hover:scale-105 shadow-lg hover:shadow-xl text-lg">
                 {t('browseListings')}
-              </Link>
-              <Link to="/register" className="bg-primary-700 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-800 transition border-2 border-white">
-                {t('getStarted')}
               </Link>
             </div>
           </div>
