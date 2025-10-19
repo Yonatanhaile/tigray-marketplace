@@ -414,7 +414,6 @@ const EditListing = () => {
             type="file" 
             accept="image/*,.heic,.heif" 
             multiple 
-            capture="environment"
             onChange={handleImageUpload} 
             className="input"
             id="image-upload-edit"
