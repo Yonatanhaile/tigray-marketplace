@@ -55,6 +55,11 @@ const Messages = () => {
         toast.success('Message sent');
       });
 
+      socket.on('messages_read', (data) => {
+        // When messages are marked as read, update the unread count
+        queryClient.invalidateQueries(['messages', 'unread-count']);
+      });
+
       socket.on('error', (data) => {
         toast.error(data.message || 'An error occurred');
       });
@@ -64,6 +69,7 @@ const Messages = () => {
       if (socket) {
         socket.off('new_message');
         socket.off('message_sent');
+        socket.off('messages_read');
         socket.off('error');
       }
     };
@@ -71,7 +77,9 @@ const Messages = () => {
 
   useEffect(() => {
     setTimeout(scrollToBottom, 100);
-  }, [messagesData]);
+    // Invalidate unread count when messages are loaded (they get marked as read on server)
+    queryClient.invalidateQueries(['messages', 'unread-count']);
+  }, [messagesData, queryClient]);
 
   useEffect(() => {
     // Focus input when page opens and after sending

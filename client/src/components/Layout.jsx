@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../hooks/useAuth';
 import { useSocket } from '../hooks/useSocket';
 import { messagesAPI } from '../services/api';
@@ -9,6 +10,7 @@ const Layout = () => {
   const { isAuthenticated, user, logout, isAdmin, isSeller } = useAuth();
   const { socket, connected, notifications, clearAllNotifications } = useSocket();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [unreadCount, setUnreadCount] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -53,6 +55,9 @@ const Layout = () => {
         if (recipientId === currentUserId) {
           setUnreadCount(prev => prev + 1);
           
+          // Invalidate unread count query to refresh across all components
+          queryClient.invalidateQueries(['messages', 'unread-count']);
+          
           // Show toast notification
           const senderName = data.message?.senderId?.name || 'someone';
           toast(`💬 New message from ${senderName}`, {
@@ -68,7 +73,11 @@ const Layout = () => {
       const handleMessagesRead = () => {
         // Refresh unread count when messages are marked as read
         messagesAPI.getUnreadCount()
-          .then(data => setUnreadCount(data.unreadCount || 0))
+          .then(data => {
+            setUnreadCount(data.unreadCount || 0);
+            // Invalidate unread count query to refresh across all components
+            queryClient.invalidateQueries(['messages', 'unread-count']);
+          })
           .catch(err => console.error('Failed to refresh unread count:', err));
       };
 
@@ -80,7 +89,7 @@ const Layout = () => {
         socket.off('messages_read', handleMessagesRead);
       };
     }
-  }, [socket, isAuthenticated, user]);
+  }, [socket, isAuthenticated, user, queryClient]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
