@@ -104,15 +104,28 @@ const ListingDetail = () => {
         <div>
           <h1 className="text-3xl font-bold mb-4">{listing.listing.title}</h1>
           
-          <div className="text-4xl font-bold text-primary-600 mb-6">
-            {listing.listing.price} {listing.listing.currency}
+          <div className="mb-6">
+            <div className="text-4xl font-bold text-primary-600">
+              {listing.listing.price} {listing.listing.currency}
+            </div>
+            {listing.listing.priceType && listing.listing.priceType !== 'fixed' && (
+              <p className="text-sm text-gray-600 mt-1">
+                {listing.listing.priceType === 'per-hour' && 'Per Hour'}
+                {listing.listing.priceType === 'per-day' && 'Per Day'}
+                {listing.listing.priceType === 'per-month' && 'Per Month'}
+                {listing.listing.priceType === 'contract' && 'Contract/Project Based'}
+                {listing.listing.priceType === 'negotiable' && 'Price Negotiable'}
+              </p>
+            )}
           </div>
 
-          <div className="mb-6">
-            <span className="inline-block bg-gray-100 px-3 py-1 rounded-full text-sm">
-              {listing.listing.condition}
-            </span>
-          </div>
+          {listing.listing.condition && listing.listing.condition !== 'not-applicable' && (
+            <div className="mb-6">
+              <span className="inline-block bg-gray-100 px-3 py-1 rounded-full text-sm">
+                Condition: {listing.listing.condition}
+              </span>
+            </div>
+          )}
 
           <nav className="text-sm text-gray-500 mb-4">
             <button className="hover:underline" onClick={() => navigate('/search')}>Browse</button>

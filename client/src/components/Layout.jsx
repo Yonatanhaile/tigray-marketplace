@@ -282,13 +282,22 @@ const Layout = () => {
                 </>
               )}
               {isAuthenticated && (
-                <Link 
-                  to="/orders" 
-                  className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors font-medium"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  🛒 My Orders
-                </Link>
+                <>
+                  <Link 
+                    to="/orders" 
+                    className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors font-medium"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    🛒 My Orders
+                  </Link>
+                  <Link 
+                    to="/profile" 
+                    className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors font-medium"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    👤 My Profile
+                  </Link>
+                </>
               )}
               {isAdmin && (
                 <Link 
