@@ -187,7 +187,8 @@ export const CATEGORIES = {
 };
 
 export const PAYMENT_METHODS = [
-  'Bank transfer',
+  'Cash',
+  'Bank Transfer',
   'Telebirr',
   'M-Pesa',
 ];

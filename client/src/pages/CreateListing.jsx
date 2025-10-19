@@ -16,10 +16,15 @@ const CreateListing = () => {
   const [uploading, setUploading] = useState(false);
   const [images, setImages] = useState([]);
 
-  const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm();
+  const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm({
+    defaultValues: {
+      payment_methods: [],
+    }
+  });
 
   const selectedCategory = watch('category');
   const selectedRegion = watch('location.region');
+  const selectedPaymentMethods = watch('payment_methods') || [];
 
   // Reset subcategory when category changes
   useEffect(() => {
@@ -67,10 +72,32 @@ const CreateListing = () => {
       ? data.payment_methods
       : [data.payment_methods].filter(Boolean);
 
+    // Build payment instructions object
+    const paymentInstructions = {};
+    if (paymentMethods.includes('Cash')) {
+      paymentInstructions.cash = data.payment_instructions_cash;
+    }
+    if (paymentMethods.includes('Bank Transfer')) {
+      paymentInstructions.bank = data.payment_instructions_bank;
+    }
+    if (paymentMethods.includes('Telebirr')) {
+      paymentInstructions.telebirr = data.payment_instructions_telebirr;
+    }
+    if (paymentMethods.includes('M-Pesa')) {
+      paymentInstructions.mpesa = data.payment_instructions_mpesa;
+    }
+
     const listingData = {
-      ...data,
+      title: data.title,
+      description: data.description,
+      price: data.price,
+      condition: data.condition,
+      category: data.category,
+      subcategory: data.subcategory,
+      location: data.location,
       images,
       payment_methods: paymentMethods,
+      payment_instructions: paymentInstructions,
       pickup_options: {
         pickup: data.pickup || false,
         courier: data.courier || false,
@@ -201,20 +228,94 @@ const CreateListing = () => {
               <option value="poor">Poor</option>
             </select>
           </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">{t('paymentMethodsLabel')}</label>
-          <select {...register('payment_methods', { required: 'At least one payment method required' })} className="input" multiple>
-            {PAYMENT_METHODS.map((m) => (
-              <option key={m} value={m}>{m}</option>
-            ))}
-          </select>
-          <p className="text-xs text-gray-500 mt-1">Hold Ctrl (Cmd on Mac) to select multiple</p>
-          {errors.payment_methods && <p className="text-red-500 text-sm mt-1">{errors.payment_methods.message}</p>}
-        </div>
+        {/* Payment Methods */}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-3">Payment Methods * (Select at least one)</label>
+            <div className="space-y-2">
+              {PAYMENT_METHODS.map(method => (
+                <label key={method} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    value={method}
+                    {...register('payment_methods', { 
+                      required: 'Please select at least one payment method',
+                      validate: value => (Array.isArray(value) && value.length > 0) || 'Please select at least one payment method'
+                    })}
+                    className="w-4 h-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  />
+                  <span className="font-medium">{method}</span>
+                </label>
+              ))}
+            </div>
+            {errors.payment_methods && <p className="text-red-500 text-sm mt-1">{errors.payment_methods.message}</p>}
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-2">{t('paymentInstructionsLabel')}</label>
-          <textarea {...register('payment_instructions')} className="input" rows="3" placeholder="e.g., M-Birr: 0912-345-678" />
+          {/* Dynamic Payment Instructions */}
+          {selectedPaymentMethods.length > 0 && (
+            <div className="space-y-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h4 className="font-semibold text-blue-900">Payment Instructions *</h4>
+              <p className="text-sm text-blue-700">Provide specific details for each selected payment method</p>
+              
+              {selectedPaymentMethods.includes('Cash') && (
+                <div>
+                  <label className="block text-sm font-medium mb-1">Cash Payment Instructions</label>
+                  <textarea 
+                    {...register('payment_instructions_cash', { required: selectedPaymentMethods.includes('Cash') })}
+                    className="input" 
+                    rows="2" 
+                    placeholder="e.g., Cash on delivery, Cash upon meeting, etc."
+                  />
+                  {errors.payment_instructions_cash && <p className="text-red-500 text-xs mt-1">Required</p>}
+                </div>
+              )}
+
+              {selectedPaymentMethods.includes('Bank Transfer') && (
+                <div>
+                  <label className="block text-sm font-medium mb-1">Bank Transfer Details *</label>
+                  <textarea 
+                    {...register('payment_instructions_bank', { required: selectedPaymentMethods.includes('Bank Transfer') })}
+                    className="input" 
+                    rows="3" 
+                    placeholder="Bank Name: Commercial Bank of Ethiopia&#10;Account Name: John Doe&#10;Account Number: 1234567890&#10;Branch: Addis Ababa"
+                  />
+                  {errors.payment_instructions_bank && <p className="text-red-500 text-xs mt-1">Required</p>}
+                </div>
+              )}
+
+              {selectedPaymentMethods.includes('Telebirr') && (
+                <div>
+                  <label className="block text-sm font-medium mb-1">Telebirr Details *</label>
+                  <input 
+                    {...register('payment_instructions_telebirr', { 
+                      required: selectedPaymentMethods.includes('Telebirr'),
+                      pattern: { value: /^[0-9]{10}$/, message: 'Enter valid 10-digit phone number' }
+                    })}
+                    className="input" 
+                    placeholder="0912345678 (10 digits)"
+                    maxLength="10"
+                  />
+                  {errors.payment_instructions_telebirr && <p className="text-red-500 text-xs mt-1">{errors.payment_instructions_telebirr.message || 'Required'}</p>}
+                </div>
+              )}
+
+              {selectedPaymentMethods.includes('M-Pesa') && (
+                <div>
+                  <label className="block text-sm font-medium mb-1">M-Pesa Details *</label>
+                  <input 
+                    {...register('payment_instructions_mpesa', { 
+                      required: selectedPaymentMethods.includes('M-Pesa'),
+                      pattern: { value: /^[0-9]{10}$/, message: 'Enter valid 10-digit phone number' }
+                    })}
+                    className="input" 
+                    placeholder="0912345678 (10 digits)"
+                    maxLength="10"
+                  />
+                  {errors.payment_instructions_mpesa && <p className="text-red-500 text-xs mt-1">{errors.payment_instructions_mpesa.message || 'Required'}</p>}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div>

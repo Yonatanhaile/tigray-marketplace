@@ -77,9 +77,8 @@ const listingSchema = new mongoose.Schema({
     },
   },
   payment_instructions: {
-    type: String,
-    trim: true,
-    maxlength: [1000, 'Payment instructions cannot exceed 1000 characters'],
+    type: mongoose.Schema.Types.Mixed, // Can be String (legacy) or Object (new format)
+    default: {},
   },
   pickup_options: {
     pickup: {
