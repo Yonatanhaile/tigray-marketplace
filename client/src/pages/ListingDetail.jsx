@@ -14,8 +14,6 @@ const ListingDetail = () => {
   const [showIntentModal, setShowIntentModal] = useState(false);
   const [showSafetyModal, setShowSafetyModal] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
-  const [meetingDate, setMeetingDate] = useState('');
-  const [meetingPlace, setMeetingPlace] = useState('');
   const [buyerNote, setBuyerNote] = useState('');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
@@ -51,10 +49,6 @@ const ListingDetail = () => {
     createOrderMutation.mutate({
       listingId: id,
       selected_payment_method: selectedPaymentMethod,
-      meeting_info: {
-        date: meetingDate || undefined,
-        place: meetingPlace || undefined,
-      },
       buyer_note: buyerNote || undefined,
     });
   };
@@ -231,7 +225,7 @@ const ListingDetail = () => {
                 ⚠️ This platform does NOT process payments.
               </p>
               <p className="text-sm text-gray-700 mt-1">
-                Select how you will pay (Cash / M-Birr / Bank transfer / Other) and schedule meeting time.
+                Select your payment method. You can discuss meeting details in the message chat with the seller.
               </p>
             </div>
 
@@ -251,27 +245,9 @@ const ListingDetail = () => {
                     </option>
                   ))}
                 </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Meeting Date</label>
-                <input
-                  type="datetime-local"
-                  value={meetingDate}
-                  onChange={(e) => setMeetingDate(e.target.value)}
-                  className="input"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Meeting Place</label>
-                <input
-                  type="text"
-                  value={meetingPlace}
-                  onChange={(e) => setMeetingPlace(e.target.value)}
-                  placeholder="e.g., City Center Mall"
-                  className="input"
-                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Payment instructions will be shown after creating the order
+                </p>
               </div>
 
               <div>
@@ -279,10 +255,13 @@ const ListingDetail = () => {
                 <textarea
                   value={buyerNote}
                   onChange={(e) => setBuyerNote(e.target.value)}
-                  placeholder="Any additional information..."
+                  placeholder="Any special requests or questions for the seller..."
                   className="input"
                   rows="3"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  💬 You can chat with the seller after creating the order to discuss meeting details
+                </p>
               </div>
 
               <div className="flex space-x-3">

@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 import { listingsAPI } from '../services/api';
 import { CATEGORIES } from '../constants/categories';
+import ETHIOPIAN_LOCATIONS from '../constants/locations';
 import { formatPrice } from '../utils/format';
 
 const Search = () => {
@@ -12,12 +13,14 @@ const Search = () => {
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
   const [category, setCategory] = useState(searchParams.get('category') || '');
   const [subcategory, setSubcategory] = useState(searchParams.get('subcategory') || '');
+  const [region, setRegion] = useState(searchParams.get('region') || '');
+  const [zone, setZone] = useState(searchParams.get('zone') || '');
   const [sort, setSort] = useState(searchParams.get('sort') || 'newest');
 
   const page = parseInt(searchParams.get('page')) || 1;
 
   const { data, isLoading } = useQuery({
-    queryKey: ['listings', 'search', query, minPrice, maxPrice, category, subcategory, sort, page],
+    queryKey: ['listings', 'search', query, minPrice, maxPrice, category, subcategory, region, zone, sort, page],
     queryFn: () =>
       listingsAPI.getAll({
         query,
@@ -25,6 +28,8 @@ const Search = () => {
         maxPrice,
         category,
         subcategory,
+        region,
+        zone,
         sort,
         page,
         limit: 12,
@@ -39,6 +44,8 @@ const Search = () => {
     if (maxPrice) params.maxPrice = maxPrice;
     if (category) params.category = category;
     if (subcategory) params.subcategory = subcategory;
+    if (region) params.region = region;
+    if (zone) params.zone = zone;
     if (sort) params.sort = sort;
     params.page = '1';
     setSearchParams(params);
@@ -50,7 +57,8 @@ const Search = () => {
 
       {/* Search & Filters */}
       <form onSubmit={handleSearch} className="card mb-8">
-        <div className="grid md:grid-cols-7 gap-4">
+        {/* Row 1: Search, Category, Subcategory */}
+        <div className="grid md:grid-cols-4 gap-4 mb-4">
           <div className="md:col-span-2">
             <input
               type="text"
@@ -61,30 +69,38 @@ const Search = () => {
             />
           </div>
           <div>
-            <select value={category} onChange={(e) => setCategory(e.target.value)} className="input">
+            <select value={category} onChange={(e) => { setCategory(e.target.value); setSubcategory(''); }} className="input">
               <option value="">All Categories</option>
-              <option>Vehicles</option>
-              <option>Property</option>
-              <option>Mobile Phones & Tablets</option>
-              <option>Electronics</option>
-              <option>Home, Furniture & Appliances</option>
-              <option>Fashion</option>
-              <option>Beauty & Personal Care</option>
-              <option>Services</option>
-              <option>Repair & Construction</option>
-              <option>Commercial Equipment & Tools</option>
-              <option>Leisure & Activities</option>
-              <option>Babies & Kids</option>
-              <option>Food, Agriculture & Farming</option>
-              <option>Animals & Pets</option>
-              <option>Jobs</option>
+              {Object.keys(CATEGORIES).map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
             </select>
           </div>
           <div>
-            <select value={subcategory} onChange={(e) => setSubcategory(e.target.value)} className="input">
+            <select value={subcategory} onChange={(e) => setSubcategory(e.target.value)} className="input" disabled={!category}>
               <option value="">All Subcategories</option>
               {(CATEGORIES[category] || []).map((sub) => (
                 <option key={sub} value={sub}>{sub}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Row 2: Location, Price, Sort */}
+        <div className="grid md:grid-cols-5 gap-4">
+          <div>
+            <select value={region} onChange={(e) => { setRegion(e.target.value); setZone(''); }} className="input">
+              <option value="">All Regions</option>
+              {Object.keys(ETHIOPIAN_LOCATIONS).map(reg => (
+                <option key={reg} value={reg}>{reg}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <select value={zone} onChange={(e) => setZone(e.target.value)} className="input" disabled={!region}>
+              <option value="">All Zones</option>
+              {(ETHIOPIAN_LOCATIONS[region] || []).map((z) => (
+                <option key={z} value={z}>{z}</option>
               ))}
             </select>
           </div>
@@ -114,10 +130,29 @@ const Search = () => {
             </select>
           </div>
         </div>
-        <div className="mt-4">
+
+        <div className="mt-4 flex items-center space-x-3">
           <button type="submit" className="btn btn-primary">
-            Search
+            🔍 Search
           </button>
+          {(query || category || subcategory || region || zone || minPrice || maxPrice) && (
+            <button
+              type="button"
+              onClick={() => {
+                setQuery('');
+                setCategory('');
+                setSubcategory('');
+                setRegion('');
+                setZone('');
+                setMinPrice('');
+                setMaxPrice('');
+                setSearchParams({});
+              }}
+              className="btn btn-secondary"
+            >
+              Clear Filters
+            </button>
+          )}
         </div>
       </form>
 

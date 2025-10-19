@@ -80,6 +80,8 @@ const getListings = async (req, res) => {
       maxPrice,
       category,
       subcategory,
+      region,
+      zone,
       condition,
       sellerId,
       status = 'active',
@@ -106,6 +108,10 @@ const getListings = async (req, res) => {
 
     if (category) filter.category = category;
     if (subcategory) filter.subcategory = subcategory;
+
+    // Location filters
+    if (region) filter['location.region'] = region;
+    if (zone) filter['location.zone'] = zone;
 
     if (condition) {
       filter.condition = condition;
