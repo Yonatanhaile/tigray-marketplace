@@ -4,15 +4,12 @@ import { useAuth } from '../hooks/useAuth';
 import { useSocket } from '../hooks/useSocket';
 import { messagesAPI } from '../services/api';
 import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
-import { setLanguage } from '../i18n';
 
 const Layout = () => {
   const { isAuthenticated, user, logout, isAdmin, isSeller } = useAuth();
   const { socket, connected, notifications, clearAllNotifications } = useSocket();
   const navigate = useNavigate();
   const [unreadCount, setUnreadCount] = useState(0);
-  const { t, i18n } = useTranslation();
 
   const handleLogout = () => {
     logout();
@@ -92,40 +89,28 @@ const Layout = () => {
             <div className="flex items-center space-x-8">
               <Link to="/" className="flex items-center">
                 <span className="text-2xl font-bold text-primary-600">
-                  {t('appName')}
+                  Tigray Marketplace
                 </span>
               </Link>
               
               <div className="hidden md:flex space-x-4">
                 <Link to="/search" className="text-gray-700 hover:text-primary-600 px-3 py-2">
-                  {t('browse')}
+                  Browse
                 </Link>
                 {isSeller && (
                   <Link to="/seller-dashboard" className="text-gray-700 hover:text-primary-600 px-3 py-2">
-                    {t('myListings')}
+                    My Listings
                   </Link>
                 )}
                 {isAuthenticated && (
                   <Link to="/orders" className="text-gray-700 hover:text-primary-600 px-3 py-2">
-                    {t('myOrders')}
+                    My Orders
                   </Link>
                 )}
               </div>
             </div>
 
             <div className="flex items-center space-x-4">
-              {/* Language switcher */}
-              <select
-                onChange={(e) => setLanguage(e.target.value)}
-                defaultValue={i18n.language}
-                className="input py-1 px-2 text-sm"
-                title="Language"
-              >
-                <option value="en">English</option>
-                <option value="am">አማርኛ</option>
-                <option value="ti">ትግርኛ</option>
-                <option value="om">Afaan Oromo</option>
-              </select>
               {/* Socket connection indicator */}
               {isAuthenticated && (
                 <div className="flex items-center space-x-2">
@@ -179,13 +164,13 @@ const Layout = () => {
                       <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M12 5v14M5 12h14" />
                       </svg>
-                      <span>{t('createListing')}</span>
+                      <span>Create Listing</span>
                     </Link>
                   )}
                   
                   {isAdmin && (
                     <Link to="/admin" className="btn btn-secondary">
-                      {t('adminPanel')}
+                      Admin Panel
                     </Link>
                   )}
 
@@ -207,10 +192,10 @@ const Layout = () => {
               ) : (
                 <>
                   <Link to="/login" className="text-gray-700 hover:text-primary-600 px-3 py-2">
-                    {t('login')}
+                    Login
                   </Link>
                   <Link to="/register" className="btn btn-primary">
-                    {t('signup')}
+                    Sign Up
                   </Link>
                 </>
               )}

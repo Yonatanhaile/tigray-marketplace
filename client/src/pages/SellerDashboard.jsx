@@ -2,10 +2,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { listingsAPI, ordersAPI } from '../services/api';
 import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 
 const SellerDashboard = () => {
-  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -43,33 +41,33 @@ const SellerDashboard = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">{t('sellerDashboard')}</h1>
-        <Link to="/create-listing" className="btn btn-primary">+ {t('createListing')}</Link>
+        <h1 className="text-3xl font-bold">Seller Dashboard</h1>
+        <Link to="/create-listing" className="btn btn-primary">+ Create Listing</Link>
       </div>
 
       {/* Stats */}
       <div className="grid md:grid-cols-3 gap-6 mb-8">
         <div className="card">
-          <h3 className="text-sm text-gray-500 mb-1">{t('activeListings')}</h3>
+          <h3 className="text-sm text-gray-500 mb-1">Active Listings</h3>
           <p className="text-3xl font-bold">{listingsData?.listings?.length || 0}</p>
         </div>
         <div className="card">
-          <h3 className="text-sm text-gray-500 mb-1">{t('pendingOrders')}</h3>
+          <h3 className="text-sm text-gray-500 mb-1">Pending Orders</h3>
           <p className="text-3xl font-bold">{ordersData?.orders?.filter(o => o.status === 'requested').length || 0}</p>
         </div>
         <div className="card">
-          <h3 className="text-sm text-gray-500 mb-1">{t('completed')}</h3>
+          <h3 className="text-sm text-gray-500 mb-1">Completed</h3>
           <p className="text-3xl font-bold">{ordersData?.orders?.filter(o => o.status === 'delivered').length || 0}</p>
         </div>
       </div>
 
       {/* My Listings */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-4">{t('myListings')}</h2>
+        <h2 className="text-2xl font-bold mb-4">My Listings</h2>
         {listingsLoading ? (
-          <p>{t('loading')}</p>
+          <p>Loading...</p>
         ) : listingsData?.listings?.length === 0 ? (
-          <p className="text-gray-500">{t('noListings')}</p>
+          <p className="text-gray-500">No listings yet</p>
         ) : (
           <div className="grid md:grid-cols-3 gap-4">
             {listingsData?.listings?.map(listing => (
@@ -83,9 +81,9 @@ const SellerDashboard = () => {
                   <span className="text-xs text-gray-500">{listing.status}</span>
                 </div>
                 <div className="flex items-center justify-end space-x-2 mt-3">
-                  <Link to={`/listings/${listing._id}/edit`} className="btn btn-secondary px-3 py-1">{t('edit')}</Link>
+                  <Link to={`/listings/${listing._id}/edit`} className="btn btn-secondary px-3 py-1">Edit</Link>
                   <button onClick={(e) => onDelete(e, listing._id)} className="btn btn-danger px-3 py-1">
-                    {deleteMutation.isPending ? '...' : t('delete')}
+                    {deleteMutation.isPending ? '...' : 'Delete'}
                   </button>
                 </div>
               </div>
@@ -96,9 +94,9 @@ const SellerDashboard = () => {
 
       {/* Recent Orders */}
       <div>
-        <h2 className="text-2xl font-bold mb-4">{t('recentOrders')}</h2>
+        <h2 className="text-2xl font-bold mb-4">Recent Orders</h2>
         {ordersLoading ? (
-          <p>{t('loading')}</p>
+          <p>Loading...</p>
         ) : ordersData?.orders?.length === 0 ? (
           <p className="text-gray-500">No orders yet.</p>
         ) : (
@@ -107,7 +105,7 @@ const SellerDashboard = () => {
               <Link key={order._id} to={`/orders/${order._id}`} className="card flex justify-between items-center hover:shadow-lg">
                 <div>
                   <h4 className="font-semibold">{order.listingId?.title}</h4>
-                  <p className="text-sm text-gray-500">{t('buyer')}: {order.buyerId?.name}</p>
+                  <p className="text-sm text-gray-500">Buyer: {order.buyerId?.name}</p>
                 </div>
                 <div className="text-right">
                   <span className={`inline-block px-3 py-1 rounded-full text-xs ${order.status === 'requested' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`}>
@@ -124,4 +122,3 @@ const SellerDashboard = () => {
 };
 
 export default SellerDashboard;
-

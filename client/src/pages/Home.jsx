@@ -2,11 +2,9 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { listingsAPI, messagesAPI } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
-import { useTranslation } from 'react-i18next';
 
 const Home = () => {
   const { isAuthenticated } = useAuth();
-  const { t } = useTranslation();
 
   // Fetch recent listings
   const { data: listingsData, isLoading } = useQuery({
@@ -43,16 +41,16 @@ const Home = () => {
                 </div>
                 <div>
                   <span className="font-bold text-lg">
-                    {unreadCount} {unreadCount === 1 ? t('newMessages').slice(0, -1) : t('newMessages')}!
+                    {unreadCount} {unreadCount === 1 ? 'New Message' : 'New Messages'}!
                   </span>
-                  <p className="text-sm text-blue-100">{t('viewMessages')}</p>
+                  <p className="text-sm text-blue-100">Click to view your conversations</p>
                 </div>
               </div>
-              <Link 
-                to="/messages" 
+              <Link
+                to="/messages"
                 className="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-blue-50 hover:shadow-xl transition transform hover:scale-105 flex items-center space-x-2"
               >
-                <span>{t('viewMessages')}</span>
+                <span>View Messages</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -66,11 +64,11 @@ const Home = () => {
       <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">{t('heroTitle')}</h1>
-            <p className="text-xl mb-8 text-primary-100">{t('heroSubtitle')}</p>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">Welcome to Tigray Marketplace</h1>
+            <p className="text-xl mb-8 text-primary-100">Buy and sell locally with secure intent-based transactions</p>
             <div className="flex justify-center">
               <Link to="/search" className="bg-white text-primary-600 px-10 py-4 rounded-lg font-semibold hover:bg-gray-100 transition transform hover:scale-105 shadow-lg hover:shadow-xl text-lg">
-                {t('browseListings')}
+                Browse Listings
               </Link>
             </div>
           </div>
@@ -79,25 +77,25 @@ const Home = () => {
 
       {/* Features */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">{t('howItWorks')}</h2>
+        <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
         
         <div className="grid md:grid-cols-3 gap-8">
           <div className="card text-center">
             <div className="text-4xl mb-4">🛍️</div>
-            <h3 className="text-xl font-semibold mb-2">{t('featureBrowseTitle')}</h3>
-            <p className="text-gray-600">{t('featureBrowseDesc')}</p>
+            <h3 className="text-xl font-semibold mb-2">Browse Listings</h3>
+            <p className="text-gray-600">Discover items from local sellers in your area</p>
           </div>
           
           <div className="card text-center">
             <div className="text-4xl mb-4">💬</div>
-            <h3 className="text-xl font-semibold mb-2">{t('featureIntentTitle')}</h3>
-            <p className="text-gray-600">{t('featureIntentDesc')}</p>
+            <h3 className="text-xl font-semibold mb-2">Express Intent to Buy</h3>
+            <p className="text-gray-600">Submit your intent with proposed terms and chat with the seller</p>
           </div>
           
           <div className="card text-center">
             <div className="text-4xl mb-4">🤝</div>
-            <h3 className="text-xl font-semibold mb-2">{t('featureMeetTitle')}</h3>
-            <p className="text-gray-600">{t('featureMeetDesc')}</p>
+            <h3 className="text-xl font-semibold mb-2">Meet & Complete</h3>
+            <p className="text-gray-600">Meet safely and complete the transaction off-platform</p>
           </div>
         </div>
       </div>
@@ -106,27 +104,34 @@ const Home = () => {
       <div className="bg-gray-100 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold">{t('recentListings')}</h2>
+            <h2 className="text-3xl font-bold">Recent Listings</h2>
             <Link to="/search" className="text-primary-600 hover:text-primary-700 font-semibold">
-              {t('viewAll')} →
+              View All →
             </Link>
           </div>
 
           {isLoading ? (
             <div className="grid md:grid-cols-3 gap-6">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="card">
-                  <div className="w-full h-48 skeleton mb-4" />
-                  <div className="h-4 skeleton w-3/4 mb-2" />
-                  <div className="h-3 skeleton w-full mb-2" />
-                  <div className="h-3 skeleton w-2/3" />
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="card animate-pulse">
+                  <div className="w-full h-48 bg-gray-200 rounded-lg mb-4"></div>
+                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-3"></div>
+                  <div className="flex justify-between items-center">
+                    <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+                    <div className="h-6 bg-gray-200 rounded w-1/6"></div>
+                  </div>
                 </div>
               ))}
             </div>
           ) : (
             <div className="grid md:grid-cols-3 gap-6">
               {listingsData?.listings?.slice(0, 6).map((listing) => (
-                <Link key={listing._id} to={`/listings/${listing._id}`} className="card">
+                <Link
+                  key={listing._id}
+                  to={`/listings/${listing._id}`}
+                  className="card hover:shadow-2xl transition-all duration-200 transform hover:scale-[1.02]"
+                >
                   {listing.images?.[0] && (
                     <img
                       src={listing.images[0].url}
@@ -134,13 +139,13 @@ const Home = () => {
                       className="w-full h-48 object-contain bg-gray-50 rounded-lg mb-4"
                     />
                   )}
-                  <h3 className="font-semibold text-lg mb-2 truncate">{listing.title}</h3>
+                  <h3 className="font-semibold text-lg mb-2 line-clamp-1">{listing.title}</h3>
                   <p className="text-gray-600 text-sm mb-3 line-clamp-2">{listing.description}</p>
                   <div className="flex justify-between items-center">
                     <span className="text-2xl font-bold text-primary-600">
-                      {listing.price} {listing.currency}
+                      {listing.price} {listing.currency || 'ETB'}
                     </span>
-                    <span className="text-sm text-gray-500">{listing.condition}</span>
+                    <span className="text-sm text-gray-500 capitalize">{listing.condition}</span>
                   </div>
                 </Link>
               ))}
@@ -152,13 +157,13 @@ const Home = () => {
       {/* Safety Notice */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded">
-          <h3 className="text-lg font-semibold mb-2">🛡️ {t('safetyTips')}</h3>
+          <h3 className="text-lg font-semibold mb-2">🛡️ Safety Tips</h3>
           <ul className="list-disc list-inside space-y-1 text-gray-700">
-            <li>{t('safetyPublic')}</li>
-            <li>{t('safetyVerify')}</li>
-            <li>{t('safetyBadge')}</li>
-            <li>{t('safetyPrivacy')}</li>
-            <li>{t('safetyReport')}</li>
+            <li>Meet in public, well-lit places</li>
+            <li>Verify items before payment</li>
+            <li>Look for sellers with verified badges</li>
+            <li>Never share sensitive personal information</li>
+            <li>Report suspicious activity to admins</li>
           </ul>
         </div>
       </div>
@@ -167,4 +172,3 @@ const Home = () => {
 };
 
 export default Home;
-

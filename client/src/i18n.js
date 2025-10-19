@@ -86,7 +86,7 @@ const resources = {
       newMessages: 'አዲስ መልዕክቶች',
       viewMessages: 'መልዕክቶች ይመልከቱ',
       orderMessages: 'የትእዛዝ መልዕክቶች',
-      heroTitle: 'በአመንዝር በአካባቢዎ ይግዙና ይሽጡ',
+      heroTitle: 'በልበሙሉነት በአካባቢዎ ይግዙና ይሽጡ',
       heroSubtitle: 'በአሳብ የተመረተ የክልል ገበያ መድረክ',
       browseListings: 'ሊስቲንጎች ፈልግ',
       getStarted: 'ጀምር',
