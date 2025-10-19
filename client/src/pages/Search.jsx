@@ -5,6 +5,7 @@ import { listingsAPI } from '../services/api';
 import { CATEGORIES } from '../constants/categories';
 import ETHIOPIAN_LOCATIONS from '../constants/locations';
 import { formatPrice } from '../utils/format';
+import { getCategoryIcon, getSubcategoryIcon } from '../constants/categoryIcons';
 
 const Search = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -72,7 +73,7 @@ const Search = () => {
             <select value={category} onChange={(e) => { setCategory(e.target.value); setSubcategory(''); }} className="input">
               <option value="">All Categories</option>
               {Object.keys(CATEGORIES).map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+                <option key={cat} value={cat}>{getCategoryIcon(cat)} {cat}</option>
               ))}
             </select>
           </div>
@@ -80,7 +81,7 @@ const Search = () => {
             <select value={subcategory} onChange={(e) => setSubcategory(e.target.value)} className="input" disabled={!category}>
               <option value="">All Subcategories</option>
               {(CATEGORIES[category] || []).map((sub) => (
-                <option key={sub} value={sub}>{sub}</option>
+                <option key={sub} value={sub}>{getSubcategoryIcon(sub)} {sub}</option>
               ))}
             </select>
           </div>
@@ -179,21 +180,33 @@ const Search = () => {
               <Link
                 key={listing._id}
                 to={`/listings/${listing._id}`}
-                className="card hover:shadow-lg transition"
+                className="card hover:shadow-lg transition group"
               >
                 {listing.images?.[0] && (
                   <img
                     src={listing.images[0].url}
                     alt={listing.title}
-                    className="w-full h-48 object-contain bg-gray-50 rounded-lg mb-4"
+                    className="w-full h-48 object-contain bg-gray-50 rounded-lg mb-4 group-hover:scale-105 transition-transform"
                   />
+                )}
+                {listing.category && (
+                  <div className="flex items-center gap-1 mb-2">
+                    <span className="text-sm bg-purple-50 text-purple-700 px-2 py-1 rounded-lg font-medium">
+                      {getCategoryIcon(listing.category)} {listing.category}
+                    </span>
+                    {listing.subcategory && (
+                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                        {getSubcategoryIcon(listing.subcategory)} {listing.subcategory}
+                      </span>
+                    )}
+                  </div>
                 )}
                 <h3 className="font-semibold text-lg mb-2 truncate">{listing.title}</h3>
                 <p className="text-gray-600 text-sm mb-3 line-clamp-2">
                   {listing.description}
                 </p>
                 <div className="flex justify-between items-center">
-                  <span className="text-xl font-bold text-primary-600">{formatPrice(listing.price, listing.currency)}</span>
+                  <span className="text-xl font-bold text-purple-600">{formatPrice(listing.price, listing.currency)}</span>
                   <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
                     {listing.condition}
                   </span>
