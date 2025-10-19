@@ -5,14 +5,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { listingsAPI } from '../services/api';
 import { uploadFile } from '../services/upload';
 import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { CATEGORIES, PAYMENT_METHODS } from '../constants/categories';
 import ETHIOPIAN_LOCATIONS from '../constants/locations';
 
 const CreateListing = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { t } = useTranslation();
   const [uploading, setUploading] = useState(false);
   const [images, setImages] = useState([]);
 

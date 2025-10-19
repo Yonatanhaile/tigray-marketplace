@@ -6,7 +6,6 @@ import { useSocket } from '../hooks/useSocket';
 import { sendMessage, joinOrderRoom } from '../services/socket';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 
 const Messages = () => {
   const { orderId } = useParams();
@@ -14,7 +13,6 @@ const Messages = () => {
   const { socket } = useSocket();
   const queryClient = useQueryClient();
   const messagesEndRef = useRef(null);
-  const { t } = useTranslation();
   // Normalize current user id (some environments use id, others _id)
   const currentUserId = String(user?._id || user?.id || '');
   const inputRef = useRef(null);
