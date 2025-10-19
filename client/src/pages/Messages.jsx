@@ -106,7 +106,7 @@ const Messages = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">{t('orderMessages')}</h1>
+        <h1 className="text-2xl font-bold mb-2">Order Messages</h1>
         {order && (
           <div className="flex items-center justify-between bg-gray-100 p-3 rounded-lg">
             <div>

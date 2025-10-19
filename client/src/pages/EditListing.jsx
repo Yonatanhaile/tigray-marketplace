@@ -148,7 +148,7 @@ const EditListing = () => {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">{t('editListing')}</h1>
+      <h1 className="text-3xl font-bold mb-6">Edit Listing</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="card space-y-6">
         <div className="grid md:grid-cols-2 gap-4">
@@ -231,26 +231,26 @@ const EditListing = () => {
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium mb-2">{t('titleLabel')}</label>
+          <label className="block text-sm font-medium mb-2">Title *</label>
           <input {...register('title', { required: 'Title is required', maxLength: 200 })} className="input" />
           {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">{t('descriptionLabel')}</label>
+          <label className="block text-sm font-medium mb-2">Description *</label>
           <textarea {...register('description', { required: 'Description is required' })} className="input" rows="6" />
           {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2">{t('priceLabel')}</label>
+            <label className="block text-sm font-medium mb-2">Price *</label>
             <input type="number" {...register('price', { required: 'Price is required', min: 0 })} className="input" />
             {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">{t('conditionLabel')}</label>
+            <label className="block text-sm font-medium mb-2">Condition *</label>
             <select {...register('condition')} className="input">
               <option value="new">New</option>
               <option value="like-new">Like New</option>
@@ -352,9 +352,9 @@ const EditListing = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">{t('addImagesLabel')}</label>
+          <label className="block text-sm font-medium mb-2">Add/Update Images</label>
           <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="input" />
-          <p className="text-sm text-gray-500 mt-1">{t('addImagesHelp')}</p>
+          <p className="text-sm text-gray-500 mt-1">Upload up to 5 images (JPG, PNG, or WebP, max 8MB each)</p>
           {uploading && <p className="text-primary-600 mt-2">Uploading...</p>}
           <div className="grid grid-cols-3 gap-2 mt-2">
             {images.map((img, idx) => (
@@ -364,9 +364,9 @@ const EditListing = () => {
         </div>
 
         <div className="flex space-x-4">
-          <button type="button" onClick={() => navigate(-1)} className="btn btn-secondary">{t('cancel')}</button>
+          <button type="button" onClick={() => navigate(-1)} className="btn btn-secondary">Cancel</button>
           <button type="submit" disabled={updateMutation.isPending || uploading} className="btn btn-primary">
-            {updateMutation.isPending ? 'Saving...' : t('saveChanges')}
+            {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
       </form>
