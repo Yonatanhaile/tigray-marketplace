@@ -142,16 +142,61 @@ const ListingDetail = () => {
               ))}
             </div>
             {listing.listing.payment_instructions && (
-              <p className="text-sm text-gray-700 mt-2">
-                <strong>Instructions:</strong> {listing.listing.payment_instructions}
-              </p>
+              <div className="text-sm text-gray-700 mt-3 space-y-2">
+                <strong className="block mb-1">Payment Instructions:</strong>
+                {typeof listing.listing.payment_instructions === 'object' ? (
+                  // New format: object with keys (cash, bank, telebirr, mpesa)
+                  <div className="space-y-2 bg-white p-3 rounded">
+                    {listing.listing.payment_instructions.cash && (
+                      <div>
+                        <span className="font-medium text-gray-900">💵 Cash:</span>
+                        <p className="text-gray-700 ml-5">{listing.listing.payment_instructions.cash}</p>
+                      </div>
+                    )}
+                    {listing.listing.payment_instructions.bank && (
+                      <div>
+                        <span className="font-medium text-gray-900">🏦 Bank Transfer:</span>
+                        <p className="text-gray-700 ml-5 whitespace-pre-wrap">{listing.listing.payment_instructions.bank}</p>
+                      </div>
+                    )}
+                    {listing.listing.payment_instructions.telebirr && (
+                      <div>
+                        <span className="font-medium text-gray-900">📱 Telebirr:</span>
+                        <p className="text-gray-700 ml-5">{listing.listing.payment_instructions.telebirr}</p>
+                      </div>
+                    )}
+                    {listing.listing.payment_instructions.mpesa && (
+                      <div>
+                        <span className="font-medium text-gray-900">📲 M-Pesa:</span>
+                        <p className="text-gray-700 ml-5">{listing.listing.payment_instructions.mpesa}</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  // Old format: plain string (for backward compatibility)
+                  <p className="bg-white p-3 rounded">{listing.listing.payment_instructions}</p>
+                )}
+              </div>
             )}
             <button
               onClick={() => {
-                navigator.clipboard.writeText(listing.listing.payment_instructions || '');
-                toast.success('Copied to clipboard');
+                const instructions = listing.listing.payment_instructions;
+                let textToCopy = '';
+                
+                if (typeof instructions === 'object') {
+                  // Format object as readable text
+                  if (instructions.cash) textToCopy += `Cash: ${instructions.cash}\n\n`;
+                  if (instructions.bank) textToCopy += `Bank Transfer:\n${instructions.bank}\n\n`;
+                  if (instructions.telebirr) textToCopy += `Telebirr: ${instructions.telebirr}\n\n`;
+                  if (instructions.mpesa) textToCopy += `M-Pesa: ${instructions.mpesa}\n\n`;
+                } else {
+                  textToCopy = instructions || '';
+                }
+                
+                navigator.clipboard.writeText(textToCopy.trim());
+                toast.success('Payment details copied to clipboard');
               }}
-              className="text-primary-600 text-sm mt-2 hover:underline"
+              className="text-primary-600 text-sm mt-2 hover:underline inline-flex items-center gap-1"
             >
               📋 Copy payment details
             </button>
