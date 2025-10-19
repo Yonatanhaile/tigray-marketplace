@@ -7,6 +7,7 @@ import { uploadFile } from '../services/upload';
 import toast from 'react-hot-toast';
 import { CATEGORIES, PAYMENT_METHODS } from '../constants/categories';
 import ETHIOPIAN_LOCATIONS from '../constants/locations';
+import { getCategoryIcon, getSubcategoryIcon } from '../constants/categoryIcons';
 
 const CreateListing = () => {
   const navigate = useNavigate();
@@ -190,21 +191,11 @@ const CreateListing = () => {
             <label className="block text-sm font-medium mb-2">Category *</label>
             <select {...register('category', { required: true })} className="input">
               <option value="">Select category</option>
-              <option>Vehicles</option>
-              <option>Property</option>
-              <option>Mobile Phones & Tablets</option>
-              <option>Electronics</option>
-              <option>Home, Furniture & Appliances</option>
-              <option>Fashion</option>
-              <option>Beauty & Personal Care</option>
-              <option>Services</option>
-              <option>Repair & Construction</option>
-              <option>Commercial Equipment & Tools</option>
-              <option>Leisure & Activities</option>
-              <option>Babies & Kids</option>
-              <option>Food, Agriculture & Farming</option>
-              <option>Animals & Pets</option>
-              <option>Jobs</option>
+              {Object.keys(CATEGORIES).map((cat) => (
+                <option key={cat} value={cat}>
+                  {getCategoryIcon(cat)} {cat}
+                </option>
+              ))}
             </select>
           </div>
           <div>
@@ -212,7 +203,9 @@ const CreateListing = () => {
             <select {...register('subcategory', { required: true })} className="input">
               <option value="">Select subcategory</option>
               {(CATEGORIES[watch('category')] || []).map((sub) => (
-                <option key={sub} value={sub}>{sub}</option>
+                <option key={sub} value={sub}>
+                  {getSubcategoryIcon(sub)} {sub}
+                </option>
               ))}
             </select>
           </div>
