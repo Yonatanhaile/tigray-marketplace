@@ -244,7 +244,7 @@ const Layout = () => {
 
           {/* Mobile Menu */}
           {mobileMenuOpen && (
-            <div className="lg:hidden py-4 border-t border-gray-200 space-y-2 animate-in slide-in-from-top">
+            <div className="lg:hidden py-4 border-t border-gray-200 space-y-2 animate-fadeIn">
               <Link 
                 to="/search" 
                 className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors font-medium"

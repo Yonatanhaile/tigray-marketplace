@@ -16,7 +16,15 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('Error caught by boundary:', error, errorInfo);
+    // Always log errors to console with full details
+    console.error('❌ ERROR CAUGHT BY BOUNDARY:', {
+      error,
+      errorInfo,
+      message: error?.message,
+      stack: error?.stack,
+      componentStack: errorInfo?.componentStack
+    });
+    
     this.setState({
       error,
       errorInfo
@@ -56,12 +64,21 @@ class ErrorBoundary extends React.Component {
                 We apologize for the inconvenience. The application encountered an unexpected error.
               </p>
 
-              {process.env.NODE_ENV === 'development' && this.state.error && (
+              {this.state.error && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 text-left">
                   <h3 className="font-semibold text-red-800 mb-2">Error Details:</h3>
-                  <pre className="text-sm text-red-700 overflow-auto max-h-40">
-                    {this.state.error.toString()}
-                    {this.state.errorInfo?.componentStack}
+                  <pre className="text-sm text-red-700 overflow-auto max-h-60 whitespace-pre-wrap break-words">
+                    <strong>Message:</strong> {this.state.error.toString()}
+                    {'\n\n'}
+                    <strong>Stack:</strong>
+                    {'\n'}{this.state.error.stack}
+                    {this.state.errorInfo?.componentStack && (
+                      <>
+                        {'\n\n'}
+                        <strong>Component Stack:</strong>
+                        {'\n'}{this.state.errorInfo.componentStack}
+                      </>
+                    )}
                   </pre>
                 </div>
               )}
