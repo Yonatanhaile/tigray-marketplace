@@ -91,10 +91,10 @@ const Layout = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2 group">
               <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                <span className="text-white text-xl font-bold">T</span>
+                <span className="text-white text-xl font-bold">Y</span>
               </div>
               <span className="text-xl md:text-2xl font-bold text-gradient hidden sm:block">
-                Tigray Marketplace
+                YohaTrade
               </span>
             </Link>
             
@@ -361,7 +361,7 @@ const Layout = () => {
           {/* Copyright */}
           <div className="text-center pt-6 border-t border-gray-200">
             <p className="text-gray-500 text-sm">
-              &copy; {new Date().getFullYear()} Tigray Marketplace. All rights reserved.
+              &copy; {new Date().getFullYear()} YohaTrade. All rights reserved.
             </p>
           </div>
         </div>
