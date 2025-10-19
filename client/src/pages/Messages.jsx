@@ -13,11 +13,19 @@ const Messages = () => {
   const { socket } = useSocket();
   const queryClient = useQueryClient();
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   // Normalize current user id (some environments use id, others _id)
   const currentUserId = String(user?._id || user?.id || '');
   const inputRef = useRef(null);
 
   const [messageText, setMessageText] = useState('');
+
+  // Helper function to scroll messages container to bottom
+  const scrollToBottom = () => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
+  };
 
   // Fetch order details to get buyer and seller IDs
   const { data: orderData } = useQuery({
@@ -39,7 +47,7 @@ const Messages = () => {
     if (socket) {
       socket.on('new_message', (data) => {
         queryClient.invalidateQueries(['messages', orderId]);
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        setTimeout(scrollToBottom, 100);
       });
 
       socket.on('message_sent', (data) => {
@@ -62,7 +70,7 @@ const Messages = () => {
   }, [orderId, socket, queryClient]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(scrollToBottom, 100);
   }, [messagesData]);
 
   useEffect(() => {
@@ -95,10 +103,8 @@ const Messages = () => {
 
       setMessageText('');
       
-      // Scroll to bottom after sending message
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-      }, 100);
+      // Scroll messages container to bottom after sending message
+      setTimeout(scrollToBottom, 100);
     } catch (error) {
       toast.error('Failed to send message');
       console.error('Message send error:', error);
@@ -135,6 +141,7 @@ const Messages = () => {
       <div className="bg-white rounded-xl shadow-lg overflow-hidden h-[500px] sm:h-[600px] lg:h-[650px] flex flex-col">
         {/* Messages Container */}
         <div 
+          ref={messagesContainerRef}
           className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-4" 
           style={{ 
             backgroundImage: 'linear-gradient(to bottom, #f3f4f6 0%, #e5e7eb 100%)',
