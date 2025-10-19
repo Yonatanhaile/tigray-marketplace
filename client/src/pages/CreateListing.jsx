@@ -136,6 +136,34 @@ const CreateListing = () => {
     <div className="max-w-3xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Create New Listing</h1>
 
+      {/* Helpful Tips */}
+      {createMutation.isError && (
+        <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+          <h3 className="font-semibold text-red-800 mb-2">⚠️ Failed to Create Listing</h3>
+          <p className="text-sm text-red-700 mb-3">
+            {createMutation.error?.response?.data?.message || 
+             createMutation.error?.message || 
+             'An error occurred while creating your listing.'}
+          </p>
+          <details className="text-sm">
+            <summary className="cursor-pointer text-red-800 font-medium mb-2">Troubleshooting Steps</summary>
+            <ul className="list-disc list-inside space-y-1 text-red-700 ml-2">
+              <li>Make sure you're registered as a seller (check "I want to sell items" during registration)</li>
+              <li>Ensure all required fields (*) are filled</li>
+              <li>Upload at least one image (JPG, PNG, or WebP, max 8MB)</li>
+              <li>Select at least one payment method</li>
+              <li>Check your internet connection</li>
+              <li>Try refreshing the page and logging in again</li>
+            </ul>
+            <div className="mt-3 pt-3 border-t border-red-300">
+              <p className="font-medium mb-1">Still having issues?</p>
+              <p>Email: <a href="mailto:yonatanhaile06@gmail.com" className="underline">yonatanhaile06@gmail.com</a></p>
+              <p>Phone: <a href="tel:+251914888890" className="underline">+251 914 888 890</a></p>
+            </div>
+          </details>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit(onSubmit)} className="card space-y-6">
         {/* TOS Disclaimer */}
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
