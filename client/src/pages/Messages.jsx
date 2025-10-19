@@ -94,6 +94,11 @@ const Messages = () => {
       });
 
       setMessageText('');
+      
+      // Scroll to bottom after sending message
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 100);
     } catch (error) {
       toast.error('Failed to send message');
       console.error('Message send error:', error);
@@ -104,21 +109,21 @@ const Messages = () => {
   const isBuyer = String(order?.buyerId?._id || order?.buyerId || '') === currentUserId;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Order Messages</h1>
+    <div className="max-w-4xl mx-auto px-2 sm:px-4 py-4 sm:py-8">
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold mb-2">Order Messages</h1>
         {order && (
-          <div className="flex items-center justify-between bg-gray-100 p-3 rounded-lg">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-100 p-3 rounded-lg gap-2 sm:gap-0">
             <div>
-              <p className="text-sm text-gray-600">
+              <p className="text-xs sm:text-sm text-gray-600">
                 <span className="font-semibold">Order:</span> {order.listingId?.title || 'N/A'}
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="text-xs sm:text-sm text-gray-600">
                 <span className="font-semibold">Price:</span> {order.price_agreed} {order.currency}
               </p>
             </div>
-            <div className="text-right">
-              <p className="text-sm font-semibold text-gray-700">
+            <div className="sm:text-right">
+              <p className="text-xs sm:text-sm font-semibold text-gray-700">
                 {isBuyer ? 'Seller' : 'Buyer'}: {isBuyer ? order.sellerId?.name : order.buyerId?.name}
               </p>
               <p className="text-xs text-gray-500">Status: {order.status}</p>
@@ -127,10 +132,10 @@ const Messages = () => {
         )}
       </div>
 
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden h-[650px] flex flex-col">
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden h-[500px] sm:h-[600px] lg:h-[650px] flex flex-col">
         {/* Messages Container */}
         <div 
-          className="flex-1 overflow-y-auto p-6 space-y-4" 
+          className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-4" 
           style={{ 
             backgroundImage: 'linear-gradient(to bottom, #f3f4f6 0%, #e5e7eb 100%)',
             backgroundAttachment: 'fixed'
@@ -158,7 +163,7 @@ const Messages = () => {
                 : (senderId === buyerId ? order?.buyerId?.name : order?.sellerId?.name);
               return (
                 <div key={msg._id} className={`w-full flex ${isMyMessage ? 'justify-end' : 'justify-start'} mb-4`}>
-                  <div className={`flex flex-col ${isMyMessage ? 'items-end' : 'items-start'} max-w-[70%] min-w-[200px]`}>
+                  <div className={`flex flex-col ${isMyMessage ? 'items-end' : 'items-start'} max-w-[85%] sm:max-w-[70%] min-w-[150px] sm:min-w-[200px]`}>
                     {/* Sender name - only for received messages */}
                     {!isMyMessage && (
                       <span className="text-xs font-semibold text-gray-600 mb-1 ml-4">
@@ -167,7 +172,7 @@ const Messages = () => {
                     )}
                     
                     {/* Message bubble */}
-                    <div className={`relative px-6 py-4 shadow-lg ${
+                    <div className={`relative px-4 py-3 sm:px-6 sm:py-4 shadow-lg ${
                       isMyMessage 
                         ? 'bg-gradient-to-br from-purple-600 to-indigo-600 text-white rounded-3xl rounded-br-md ml-auto' 
                         : 'bg-white text-gray-900 rounded-3xl rounded-bl-md border border-gray-200 mr-auto'
@@ -215,27 +220,27 @@ const Messages = () => {
         </div>
 
         {/* Input Area */}
-        <form onSubmit={handleSend} className="bg-white border-t border-gray-200 p-4">
-          <div className="flex items-center space-x-3">
+        <form onSubmit={handleSend} className="bg-white border-t border-gray-200 p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             <input 
               value={messageText} 
               onChange={e => setMessageText(e.target.value)} 
               placeholder="Type your message here..." 
-              className="flex-1 px-5 py-3 border-2 border-gray-200 rounded-full focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all" 
+              className="flex-1 min-w-0 px-3 py-2.5 sm:px-5 sm:py-3 border-2 border-gray-200 rounded-full focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all text-sm sm:text-base" 
               disabled={!orderData?.order}
               ref={inputRef}
             />
             <button 
               type="submit" 
-              className={`px-6 py-3 rounded-full font-semibold transition-all transform hover:scale-105 ${
+              className={`flex-shrink-0 px-3 py-2.5 sm:px-6 sm:py-3 rounded-full font-semibold transition-all transform hover:scale-105 ${
                 !orderData?.order || !messageText.trim()
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/50 hover:shadow-xl'
               }`}
               disabled={!orderData?.order || !messageText.trim()}
             >
-              <div className="flex items-center space-x-2">
-                <span>Send</span>
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="hidden xs:inline sm:inline">Send</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
