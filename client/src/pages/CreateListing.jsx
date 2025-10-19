@@ -68,16 +68,44 @@ const CreateListing = () => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
 
+    // Check if total images would exceed limit
+    if (images.length + files.length > 10) {
+      toast.error(`You can only upload up to 10 images total. Currently have ${images.length}.`);
+      e.target.value = ''; // Reset input
+      return;
+    }
+
     setUploading(true);
+    let successCount = 0;
+    let failCount = 0;
+
     try {
-      const uploadPromises = files.map(file => uploadFile(file));
-      const results = await Promise.all(uploadPromises);
-      setImages(prev => [...prev, ...results]);
-      toast.success(`${files.length} image(s) uploaded`);
+      // Upload files one by one to show progress and handle individual failures
+      for (const file of files) {
+        try {
+          console.log('Uploading:', file.name, 'Type:', file.type, 'Size:', file.size);
+          const result = await uploadFile(file);
+          setImages(prev => [...prev, result]);
+          successCount++;
+        } catch (error) {
+          console.error('Failed to upload:', file.name, error);
+          failCount++;
+          toast.error(`Failed to upload ${file.name}: ${error.message}`);
+        }
+      }
+
+      if (successCount > 0) {
+        toast.success(`✅ ${successCount} image(s) uploaded successfully!`);
+      }
+      if (failCount > 0 && successCount === 0) {
+        toast.error(`❌ Failed to upload ${failCount} image(s). Please try again.`);
+      }
     } catch (error) {
-      toast.error(error.message || 'Upload failed');
+      console.error('Upload error:', error);
+      toast.error(error.message || 'Upload failed. Please try again.');
     } finally {
       setUploading(false);
+      e.target.value = ''; // Reset input so user can retry same files
     }
   };
 
@@ -392,9 +420,25 @@ const CreateListing = () => {
 
         <div>
           <label className="block text-sm font-medium mb-2">Images *</label>
-          <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="input" />
-          <p className="text-sm text-gray-500 mt-1">Upload at least one image (max 10). Supported formats: JPG, PNG, WebP</p>
-          {uploading && <p className="text-primary-600 mt-2">Uploading...</p>}
+          <input 
+            type="file" 
+            accept="image/*,.heic,.heif" 
+            multiple 
+            capture="environment"
+            onChange={handleImageUpload} 
+            className="input"
+            id="image-upload"
+          />
+          <p className="text-sm text-gray-500 mt-1">
+            📸 Upload at least one image (max 10MB each). 
+            <span className="block sm:inline"> Supported: JPG, PNG, WebP, HEIC</span>
+          </p>
+          {uploading && (
+            <div className="flex items-center gap-2 mt-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+              <p className="text-purple-600 font-medium">Uploading images...</p>
+            </div>
+          )}
           {images.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
               {images.map((img, idx) => (

@@ -69,23 +69,40 @@ export const uploadToS3 = async (file) => {
  * Generic upload function (detects provider from backend response)
  */
 export const uploadFile = async (file) => {
-  // Validate file size (8MB max)
-  const maxSize = 8 * 1024 * 1024;
+  // Validate file size (10MB max for mobile compatibility)
+  const maxSize = 10 * 1024 * 1024;
   if (file.size > maxSize) {
-    throw new Error('File size exceeds 8MB limit');
+    throw new Error('File size exceeds 10MB limit. Please compress your image.');
   }
 
-  // Validate file type
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
-  if (!allowedTypes.includes(file.type)) {
-    throw new Error('File type not allowed. Only images (JPEG, PNG, WebP) and PDF are allowed.');
+  // Validate file type - More permissive for mobile devices
+  // Mobile cameras can send various MIME types, so we check the file extension too
+  const fileName = file.name.toLowerCase();
+  const allowedTypes = [
+    'image/jpeg', 
+    'image/jpg', 
+    'image/png', 
+    'image/webp', 
+    'image/heic',  // iOS photos
+    'image/heif',  // iOS photos
+    'application/pdf'
+  ];
+  
+  const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif', '.pdf'];
+  
+  const hasValidType = allowedTypes.includes(file.type) || file.type === '';
+  const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+  
+  // If MIME type is empty (common on mobile), check file extension
+  if (!hasValidType && !hasValidExtension) {
+    throw new Error('Please select an image file (JPG, PNG, WebP, or HEIC)');
   }
 
   try {
     // Get signature/presigned URL
     const signData = await uploadsAPI.getSignature({
       folder: 'marketplace',
-      contentType: file.type,
+      contentType: file.type || 'image/jpeg', // Default to jpeg if type is missing
     });
 
     if (signData.provider === 's3') {
@@ -95,7 +112,17 @@ export const uploadFile = async (file) => {
     }
   } catch (error) {
     console.error('Upload error:', error);
-    throw error;
+    
+    // Better error messages for users
+    if (error.response?.status === 413) {
+      throw new Error('File too large. Please use a smaller image.');
+    } else if (error.response?.status === 415) {
+      throw new Error('Image format not supported. Please use JPG, PNG, or WebP.');
+    } else if (error.message) {
+      throw new Error(error.message);
+    } else {
+      throw new Error('Upload failed. Please check your internet connection and try again.');
+    }
   }
 };
 
