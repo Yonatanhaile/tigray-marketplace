@@ -108,7 +108,7 @@ const CreateListing = () => {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">{t('createNewListing')}</h1>
+      <h1 className="text-3xl font-bold mb-6">Create New Listing</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="card space-y-6">
         {/* TOS Disclaimer */}
@@ -120,13 +120,13 @@ const CreateListing = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">{t('titleLabel')}</label>
+          <label className="block text-sm font-medium mb-2">Title *</label>
           <input {...register('title', { required: 'Title is required', maxLength: 200 })} className="input" placeholder="e.g., iPhone 13 Pro Max" />
           {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">{t('descriptionLabel')}</label>
+          <label className="block text-sm font-medium mb-2">Description *</label>
           <textarea {...register('description', { required: 'Description is required' })} className="input" rows="6" placeholder="Describe your item..." />
           {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
         </div>
@@ -210,14 +210,16 @@ const CreateListing = () => {
             <p className="text-xs text-gray-500 mt-1">Enter your exact address (street name, building, landmarks)</p>
           </div>
         </div>
+        
+        <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2">{t('priceLabel')}</label>
+            <label className="block text-sm font-medium mb-2">Price (ETB) *</label>
             <input type="number" {...register('price', { required: 'Price is required', min: 0 })} className="input" placeholder="50000" />
             {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">{t('conditionLabel')}</label>
+            <label className="block text-sm font-medium mb-2">Condition *</label>
             <select {...register('condition')} className="input">
               <option value="new">New</option>
               <option value="like-new">Like New</option>
@@ -226,6 +228,7 @@ const CreateListing = () => {
               <option value="poor">Poor</option>
             </select>
           </div>
+        </div>
         {/* Payment Methods */}
         <div className="space-y-4">
           <div>
@@ -317,9 +320,9 @@ const CreateListing = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">{t('imagesLabel')}</label>
+          <label className="block text-sm font-medium mb-2">Images *</label>
           <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="input" />
-          <p className="text-sm text-gray-500 mt-1">{t('uploadHint')}</p>
+          <p className="text-sm text-gray-500 mt-1">Upload at least one image (max 10). Supported formats: JPG, PNG, WebP</p>
           {uploading && <p className="text-primary-600 mt-2">Uploading...</p>}
           <div className="grid grid-cols-3 gap-2 mt-2">
             {images.map((img, idx) => (
@@ -329,9 +332,9 @@ const CreateListing = () => {
         </div>
 
         <div className="flex space-x-4">
-          <button type="button" onClick={() => navigate(-1)} className="btn btn-secondary">{t('cancel')}</button>
+          <button type="button" onClick={() => navigate(-1)} className="btn btn-secondary">Cancel</button>
           <button type="submit" disabled={createMutation.isPending || uploading} className="btn btn-primary">
-            {createMutation.isPending ? t('creating') : t('create')}
+            {createMutation.isPending ? 'Creating...' : 'Create Listing'}
           </button>
         </div>
       </form>
