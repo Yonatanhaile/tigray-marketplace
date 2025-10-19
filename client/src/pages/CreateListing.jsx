@@ -37,10 +37,26 @@ const CreateListing = () => {
   const createMutation = useMutation({
     mutationFn: listingsAPI.create,
     onSuccess: () => {
-      toast.success('Listing created successfully!');
+      toast.success('Listing created successfully! It will be reviewed by admin before going live.');
       queryClient.invalidateQueries(['listings']);
       navigate('/seller-dashboard');
     },
+    onError: (error) => {
+      console.error('Create listing error:', error);
+      const errorMessage = error?.response?.data?.message 
+        || error?.message 
+        || 'Failed to create listing. Please try again.';
+      toast.error(errorMessage);
+      
+      // Show detailed error in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Full error details:', {
+          response: error?.response?.data,
+          message: error?.message,
+          stack: error?.stack
+        });
+      }
+    }
   });
 
   const handleImageUpload = async (e) => {
@@ -61,6 +77,8 @@ const CreateListing = () => {
   };
 
   const onSubmit = async (data) => {
+    console.log('Form data submitted:', data);
+    
     if (images.length === 0) {
       toast.error('Please upload at least one image');
       return;
@@ -70,10 +88,15 @@ const CreateListing = () => {
       ? data.payment_methods
       : [data.payment_methods].filter(Boolean);
 
+    if (paymentMethods.length === 0) {
+      toast.error('Please select at least one payment method');
+      return;
+    }
+
     // Build payment instructions object
     const paymentInstructions = {};
     if (paymentMethods.includes('Cash')) {
-      paymentInstructions.cash = data.payment_instructions_cash;
+      paymentInstructions.cash = data.payment_instructions_cash || 'Cash payment accepted';
     }
     if (paymentMethods.includes('Bank Transfer')) {
       paymentInstructions.bank = data.payment_instructions_bank;
@@ -88,8 +111,9 @@ const CreateListing = () => {
     const listingData = {
       title: data.title,
       description: data.description,
-      price: data.price,
-      condition: data.condition,
+      price: Number(data.price),
+      currency: 'ETB', // Default currency
+      condition: data.condition || 'good',
       category: data.category,
       subcategory: data.subcategory,
       location: data.location,
@@ -99,10 +123,12 @@ const CreateListing = () => {
       pickup_options: {
         pickup: data.pickup || false,
         courier: data.courier || false,
-        meeting_spots: data.meeting_spots ? data.meeting_spots.split(',').map(s => s.trim()) : [],
+        meeting_spots: data.meeting_spots ? data.meeting_spots.split(',').map(s => s.trim()).filter(Boolean) : [],
       },
+      highValue: false, // Default to false
     };
 
+    console.log('Listing data to send:', listingData);
     createMutation.mutate(listingData);
   };
 
