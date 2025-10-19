@@ -227,12 +227,45 @@ const Layout = () => {
       {/* Footer */}
       <footer className="bg-white border-t mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-gray-500 text-sm">
-            <p className="mb-2">
-              <strong>⚠️ Payment Disclaimer:</strong> This platform does NOT process payments. 
-              All transactions are between buyer and seller. We are not liable for off-site payment disputes.
+          <div className="grid md:grid-cols-2 gap-8 mb-6">
+            {/* Disclaimer */}
+            <div className="text-center md:text-left">
+              <h3 className="font-semibold text-gray-900 mb-2">⚠️ Payment Disclaimer</h3>
+              <p className="text-gray-600 text-sm">
+                This platform does NOT process payments. All transactions are between buyer and seller. 
+                We are not liable for off-site payment disputes.
+              </p>
+            </div>
+
+            {/* Contact Developer */}
+            <div className="text-center md:text-right">
+              <h3 className="font-semibold text-gray-900 mb-2">💻 Contact Developer</h3>
+              <div className="text-sm text-gray-600 space-y-1">
+                <p className="flex items-center justify-center md:justify-end space-x-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <a href="mailto:yonatanhaile06@gmail.com" className="hover:text-primary-600 transition">
+                    yonatanhaile06@gmail.com
+                  </a>
+                </p>
+                <p className="flex items-center justify-center md:justify-end space-x-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                  <a href="tel:+251914888890" className="hover:text-primary-600 transition">
+                    +251 914 888 890
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div className="text-center pt-6 border-t border-gray-200">
+            <p className="text-gray-500 text-sm">
+              &copy; 2024 Tigray Marketplace. All rights reserved.
             </p>
-            <p>&copy; 2024 Tigray Marketplace. All rights reserved.</p>
           </div>
         </div>
       </footer>
