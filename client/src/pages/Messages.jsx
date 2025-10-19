@@ -169,13 +169,13 @@ const Messages = () => {
                     {/* Message bubble */}
                     <div className={`relative px-6 py-4 shadow-lg ${
                       isMyMessage 
-                        ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-3xl rounded-br-md ml-auto' 
+                        ? 'bg-gradient-to-br from-purple-600 to-indigo-600 text-white rounded-3xl rounded-br-md ml-auto' 
                         : 'bg-white text-gray-900 rounded-3xl rounded-bl-md border border-gray-200 mr-auto'
                     }`}>
                       {/* Tail/pointer */}
                       <div className={`absolute bottom-0 w-0 h-0 ${
                         isMyMessage 
-                          ? 'right-0 border-l-[15px] border-l-transparent border-t-[15px] border-t-blue-600 border-r-0'
+                          ? 'right-0 border-l-[15px] border-l-transparent border-t-[15px] border-t-indigo-600 border-r-0'
                           : 'left-0 border-r-[15px] border-r-transparent border-t-[15px] border-t-white border-l-0'
                       }`} style={{ 
                         [isMyMessage ? 'right' : 'left']: '-7px',
@@ -191,7 +191,7 @@ const Messages = () => {
                       
                       {/* Timestamp */}
                       <p className={`text-[11px] mt-2 text-right ${
-                        isMyMessage ? 'text-blue-100' : 'text-gray-500'
+                        isMyMessage ? 'text-purple-100' : 'text-gray-500'
                       }`}>
                         {new Date(msg.createdAt).toLocaleTimeString([], { 
                           hour: '2-digit', 
@@ -221,7 +221,7 @@ const Messages = () => {
               value={messageText} 
               onChange={e => setMessageText(e.target.value)} 
               placeholder="Type your message here..." 
-              className="flex-1 px-5 py-3 border-2 border-gray-200 rounded-full focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" 
+              className="flex-1 px-5 py-3 border-2 border-gray-200 rounded-full focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all" 
               disabled={!orderData?.order}
               ref={inputRef}
             />
@@ -230,7 +230,7 @@ const Messages = () => {
               className={`px-6 py-3 rounded-full font-semibold transition-all transform hover:scale-105 ${
                 !orderData?.order || !messageText.trim()
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg hover:shadow-xl'
+                  : 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/50 hover:shadow-xl'
               }`}
               disabled={!orderData?.order || !messageText.trim()}
             >

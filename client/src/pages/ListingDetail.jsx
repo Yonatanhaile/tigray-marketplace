@@ -229,13 +229,13 @@ const ListingDetail = () => {
           </div>
 
           {/* Safety Notice */}
-          <div className="mb-6 bg-blue-50 p-4 rounded">
+          <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 border-l-4 border-purple-500 p-4 rounded-lg">
             <p className="text-sm text-gray-700">
               <strong>🛡️ Safety:</strong> Meet in public; confirm mobile-money receipt before handing the item.
             </p>
             <button
               onClick={() => setShowSafetyModal(true)}
-              className="text-primary-600 text-sm mt-1 hover:underline"
+              className="text-purple-600 text-sm mt-1 hover:underline font-medium"
             >
               Read full safety guidelines →
             </button>

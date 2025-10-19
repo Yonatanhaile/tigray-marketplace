@@ -26,29 +26,29 @@ const Home = () => {
     <div>
       {/* New Messages Alert */}
       {isAuthenticated && unreadCount > 0 && (
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg">
+        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center space-x-3">
                 <div className="relative">
                   <svg className="w-8 h-8 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                   </svg>
                   <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-pink-500"></span>
                   </span>
                 </div>
                 <div>
                   <span className="font-bold text-lg">
                     {unreadCount} {unreadCount === 1 ? 'New Message' : 'New Messages'}!
                   </span>
-                  <p className="text-sm text-blue-100">Click to view your conversations</p>
+                  <p className="text-sm text-purple-100">Click to view your conversations</p>
                 </div>
               </div>
               <Link
                 to="/messages"
-                className="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-blue-50 hover:shadow-xl transition transform hover:scale-105 flex items-center space-x-2"
+                className="bg-white text-purple-600 px-6 md:px-8 py-3 rounded-xl font-bold hover:bg-purple-50 hover:shadow-xl transition-all transform hover:scale-105 flex items-center space-x-2 shadow-lg"
               >
                 <span>View Messages</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
