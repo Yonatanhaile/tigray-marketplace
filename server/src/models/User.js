@@ -23,7 +23,8 @@ const userSchema = new mongoose.Schema({
     unique: true,
     trim: true,
     index: true,
-    match: [/^\+?[1-9]\d{1,14}$/, 'Please provide a valid phone number'],
+    // Accept E.164 (international) or 10-digit local numbers (e.g., 0912345678)
+    match: [/^(\+?[1-9]\d{1,14}|\d{10})$/, 'Please provide a valid phone number'],
   },
   profileImage: {
     url: String,
