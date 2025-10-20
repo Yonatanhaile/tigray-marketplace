@@ -21,12 +21,10 @@ const Register = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      const { confirmPassword, isSeller, ...registerData } = data;
+      const { confirmPassword, ...registerData } = data;
       
-      // Convert isSeller checkbox to roles array
-      const roles = isSeller ? ['buyer', 'seller'] : ['buyer'];
-      
-      await registerUser({ ...registerData, roles });
+      // All users are both buyers and sellers by default
+      await registerUser(registerData);
       navigate('/');
     } catch (error) {
       toast.error(error.message || 'Registration failed');
@@ -136,19 +134,6 @@ const Register = () => {
               {errors.confirmPassword && (
                 <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
               )}
-            </div>
-
-            <div>
-              <label className="flex items-start">
-                <input
-                  type="checkbox"
-                  {...register('isSeller')}
-                  className="mt-1 mr-2"
-                />
-                <span className="text-sm text-gray-700">
-                  I want to sell items (requires KYC approval)
-                </span>
-              </label>
             </div>
 
             <div className="bg-yellow-50 p-3 rounded text-xs text-gray-700">
