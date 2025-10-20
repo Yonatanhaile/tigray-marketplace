@@ -54,11 +54,15 @@ const createListing = async (req, res) => {
     // Emit real-time event to seller
     const io = req.app.get('io');
     if (io) {
-      io.to(`user:${req.userId}`).emit('listing_created', {
+      const userRoom = `user:${req.userId.toString()}`;
+      logger.info(`📡 Emitting listing_created to room: ${userRoom}`);
+      io.to(userRoom).emit('listing_created', {
         listingId: listing._id,
         status: listing.status,
         listing,
       });
+    } else {
+      logger.warn('⚠️ Socket.io instance not available for listing_created event');
     }
 
     res.status(201).json({
@@ -288,8 +292,12 @@ const updateListing = async (req, res) => {
     // Emit real-time event if status changed
     const io = req.app.get('io');
     if (io && oldStatus !== listing.status) {
+      const sellerRoom = `user:${listing.sellerId.toString()}`;
+      logger.info(`📡 Emitting listing_status_changed to room: ${sellerRoom}`);
+      logger.info(`   Status changed: ${oldStatus} -> ${listing.status}`);
+      
       // Notify the seller
-      io.to(`user:${listing.sellerId}`).emit('listing_status_changed', {
+      io.to(sellerRoom).emit('listing_status_changed', {
         listingId: listing._id,
         oldStatus,
         newStatus: listing.status,
@@ -298,11 +306,16 @@ const updateListing = async (req, res) => {
 
       // Broadcast to all users if listing is now active
       if (listing.status === 'active') {
+        logger.info(`📡 Broadcasting new_active_listing to all users`);
         io.emit('new_active_listing', {
           listingId: listing._id,
           listing,
         });
       }
+    } else if (io) {
+      logger.info(`ℹ️ Listing updated but status unchanged (${listing.status})`);
+    } else {
+      logger.warn('⚠️ Socket.io instance not available for listing_status_changed event');
     }
 
     res.status(200).json({

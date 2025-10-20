@@ -81,12 +81,30 @@ const Layout = () => {
           .catch(err => console.error('Failed to refresh unread count:', err));
       };
 
+      const handleListingStatusChanged = (data) => {
+        console.log('🔄 [Layout] Listing status changed:', data);
+        queryClient.invalidateQueries(['listings']);
+        
+        if (data.newStatus === 'active') {
+          toast.success('🎉 Your listing has been approved and is now active!');
+        }
+      };
+
+      const handleNewActiveListing = (data) => {
+        console.log('✨ [Layout] New active listing:', data);
+        queryClient.invalidateQueries(['listings']);
+      };
+
       socket.on('new_message', handleNewMessage);
       socket.on('messages_read', handleMessagesRead);
+      socket.on('listing_status_changed', handleListingStatusChanged);
+      socket.on('new_active_listing', handleNewActiveListing);
 
       return () => {
         socket.off('new_message', handleNewMessage);
         socket.off('messages_read', handleMessagesRead);
+        socket.off('listing_status_changed', handleListingStatusChanged);
+        socket.off('new_active_listing', handleNewActiveListing);
       };
     }
   }, [socket, isAuthenticated, user, queryClient]);

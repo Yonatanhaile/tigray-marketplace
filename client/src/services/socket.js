@@ -22,16 +22,24 @@ export const initializeSocket = (token) => {
     console.log('✅ Socket connected:', socket.id);
   });
 
+  socket.on('auth_success', (data) => {
+    console.log('✅ Socket authenticated for user:', data.userId);
+  });
+
   socket.on('disconnect', (reason) => {
     console.log('❌ Socket disconnected:', reason);
   });
 
   socket.on('connect_error', (error) => {
-    console.error('Socket connection error:', error);
+    console.error('❌ Socket connection error:', error);
   });
 
   socket.on('auth_error', (data) => {
-    console.error('Socket auth error:', data);
+    console.error('❌ Socket auth error:', data);
+  });
+
+  socket.on('error', (error) => {
+    console.error('❌ Socket error:', error);
   });
 
   return socket;

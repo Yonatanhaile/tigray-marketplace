@@ -53,6 +53,18 @@ export const SocketProvider = ({ children }) => {
         console.log('Invoice ready:', data);
       });
 
+      socketInstance.on('listing_created', (data) => {
+        console.log('📦 [useSocket] Listing created:', data);
+      });
+
+      socketInstance.on('listing_status_changed', (data) => {
+        console.log('🔄 [useSocket] Listing status changed:', data);
+      });
+
+      socketInstance.on('new_active_listing', (data) => {
+        console.log('✨ [useSocket] New active listing:', data);
+      });
+
       socketInstance.on('error', (error) => {
         console.error('Socket error:', error);
         toast.error(error.message || 'Socket error occurred');
@@ -66,6 +78,9 @@ export const SocketProvider = ({ children }) => {
         socketInstance.off('order_update');
         socketInstance.off('new_message');
         socketInstance.off('invoice_ready');
+        socketInstance.off('listing_created');
+        socketInstance.off('listing_status_changed');
+        socketInstance.off('new_active_listing');
         socketInstance.off('error');
       };
     }
