@@ -234,26 +234,41 @@ const getProfile = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     const { name, phone, profileImage } = req.body;
-    const User = require('../models/User');
+    
+    logger.info(`Update profile request for user ${req.userId}`);
+    logger.info(`Request body:`, { name, phone, profileImage: !!profileImage });
     
     const user = await User.findById(req.userId);
     if (!user) {
+      logger.error(`User not found: ${req.userId}`);
       return res.status(404).json({
         error: true,
         message: 'User not found',
       });
     }
 
+    logger.info(`Current user data:`, { 
+      name: user.name, 
+      phone: user.phone, 
+      hasProfileImage: !!user.profileImage 
+    });
+
     // Update fields
-    if (name) user.name = name;
-    if (phone) user.phone = phone;
-    if (profileImage) {
+    if (name !== undefined) user.name = name;
+    if (phone !== undefined) user.phone = phone;
+    if (profileImage !== undefined) {
       user.profileImage = profileImage;
     }
 
+    logger.info(`Updated user data:`, { 
+      name: user.name, 
+      phone: user.phone, 
+      hasProfileImage: !!user.profileImage 
+    });
+
     await user.save();
 
-    logger.info(`Profile updated for user ${req.userId}`);
+    logger.info(`✅ Profile updated successfully for user ${req.userId}`);
 
     res.status(200).json({
       error: false,
@@ -261,7 +276,22 @@ const updateProfile = async (req, res) => {
       user: user.profile,
     });
   } catch (error) {
-    logger.error('Update profile error:', error);
+    logger.error('❌ Update profile error:', error);
+    logger.error('Error name:', error.name);
+    logger.error('Error message:', error.message);
+    
+    // Check for validation errors
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(e => e.message);
+      logger.error('Validation errors:', validationErrors);
+      
+      return res.status(400).json({
+        error: true,
+        message: 'Validation failed',
+        details: validationErrors.join(', '),
+      });
+    }
+    
     res.status(500).json({
       error: true,
       message: 'Failed to update profile',
