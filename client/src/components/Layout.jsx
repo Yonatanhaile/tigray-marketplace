@@ -240,7 +240,7 @@ const Layout = () => {
               {/* Pending Orders (Sellers Only) */}
               {isAuthenticated && isSeller && (
                 <Link
-                  to="/seller-dashboard"
+                  to="/seller-dashboard#recent-orders"
                   className="relative p-2.5 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all"
                   title="Order Requests"
                 >
@@ -396,7 +396,7 @@ const Layout = () => {
               {isAuthenticated && (
                 <>
                   <Link 
-                    to="/orders" 
+                    to={isSeller ? "/seller-dashboard#recent-orders" : "/orders"}
                     className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors font-medium relative"
                     onClick={() => setMobileMenuOpen(false)}
                   >

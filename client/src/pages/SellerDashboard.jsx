@@ -14,6 +14,16 @@ const SellerDashboard = () => {
   useEffect(() => {
     // Emit custom event to Layout component to clear notification
     window.dispatchEvent(new CustomEvent('clear-order-notifications'));
+    
+    // Scroll to Recent Orders section if coming from notification
+    if (window.location.hash === '#recent-orders') {
+      setTimeout(() => {
+        const element = document.getElementById('recent-orders');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
   }, []);
 
   const { data: listingsData, isLoading: listingsLoading } = useQuery({
@@ -317,7 +327,7 @@ const SellerDashboard = () => {
       </div>
 
       {/* Recent Orders */}
-      <div>
+      <div id="recent-orders" className="scroll-mt-20">
         <h2 className="text-2xl font-bold mb-4">Recent Orders</h2>
         {ordersLoading ? (
           <p>Loading...</p>
