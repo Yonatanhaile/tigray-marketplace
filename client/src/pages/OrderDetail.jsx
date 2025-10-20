@@ -64,8 +64,13 @@ const OrderDetail = () => {
   if (!data?.order) return <div className="max-w-4xl mx-auto px-4 py-12 text-center">Order not found</div>;
 
   const order = data.order;
-  const isSeller = user?._id === order.sellerId?._id;
-  const isBuyer = user?._id === order.buyerId?._id;
+  
+  // Handle both string IDs and populated objects
+  const sellerId = typeof order.sellerId === 'object' ? order.sellerId?._id : order.sellerId;
+  const buyerId = typeof order.buyerId === 'object' ? order.buyerId?._id : order.buyerId;
+  
+  const isSeller = user?._id && sellerId && user._id.toString() === sellerId.toString();
+  const isBuyer = user?._id && buyerId && user._id.toString() === buyerId.toString();
 
   const handleStatusUpdate = (newStatus) => {
     markOrderStatus({ orderId: id, status: newStatus });
@@ -195,6 +200,8 @@ const OrderDetail = () => {
           {!isSeller && !isBuyer && (
             <p className="text-gray-500 text-sm">You don't have permission to perform actions on this order.</p>
           )}
+          
+          {/* Status messages for completed/cancelled/disputed orders */}
           {(isSeller || isBuyer) && 
            ['completed', 'cancelled', 'disputed'].includes(order.status) && 
            (
@@ -211,6 +218,20 @@ const OrderDetail = () => {
               )}
             </div>
            )}
+          
+          {/* Waiting messages for buyers in other statuses */}
+          {isBuyer && ['seller_confirmed', 'paid_offsite'].includes(order.status) && (
+            <p className="text-gray-600 text-sm">
+              ⏳ Waiting for seller to complete the order process...
+            </p>
+          )}
+          
+          {/* Waiting messages for sellers */}
+          {isSeller && order.status === 'delivered' && (
+            <p className="text-gray-600 text-sm">
+              ⏳ Waiting for buyer to confirm delivery...
+            </p>
+          )}
         </div>
       </div>
 
