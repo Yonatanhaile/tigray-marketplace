@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminAPI } from '../services/api';
 import api from '../services/api';
+import { onListingCreated, onListingStatusChanged, offListingCreated, offListingStatusChanged } from '../services/socket';
 import toast from 'react-hot-toast';
 
 const AdminPanel = () => {
@@ -49,12 +50,64 @@ const AdminPanel = () => {
   });
   const approveListing = useMutation({
     mutationFn: (id) => api.patch(`/admin/listings/${id}/approve`),
-    onSuccess: () => queryClient.invalidateQueries(['admin', 'pending-listings']),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['admin', 'pending-listings']);
+      queryClient.invalidateQueries(['admin', 'stats']);
+      toast.success('✅ Listing approved');
+    },
+    onError: (error) => {
+      toast.error(error?.message || 'Failed to approve listing');
+    }
   });
   const rejectListing = useMutation({
     mutationFn: ({ id, reason }) => api.patch(`/admin/listings/${id}/reject`, { reason }),
-    onSuccess: () => queryClient.invalidateQueries(['admin', 'pending-listings']),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['admin', 'pending-listings']);
+      queryClient.invalidateQueries(['admin', 'stats']);
+      toast.success('❌ Listing rejected');
+    },
+    onError: (error) => {
+      toast.error(error?.message || 'Failed to reject listing');
+    }
   });
+
+  // Real-time updates for admin panel
+  useEffect(() => {
+    const handleListingCreated = (data) => {
+      console.log('📦 [AdminPanel] New listing created:', data);
+      // Invalidate pending listings to show new listing
+      queryClient.invalidateQueries(['admin', 'pending-listings']);
+      queryClient.invalidateQueries(['admin', 'stats']);
+      
+      // Refetch if on moderation tab
+      if (activeTab === 'moderation') {
+        queryClient.refetchQueries(['admin', 'pending-listings']);
+      }
+      
+      // Show toast notification
+      toast.info('📦 New listing pending review');
+    };
+
+    const handleListingStatusChanged = (data) => {
+      console.log('🔄 [AdminPanel] Listing status changed:', data);
+      // Invalidate queries when listing is approved/rejected
+      queryClient.invalidateQueries(['admin', 'pending-listings']);
+      queryClient.invalidateQueries(['admin', 'stats']);
+      
+      // Refetch if on moderation tab
+      if (activeTab === 'moderation') {
+        queryClient.refetchQueries(['admin', 'pending-listings']);
+      }
+    };
+
+    onListingCreated(handleListingCreated);
+    onListingStatusChanged(handleListingStatusChanged);
+
+    return () => {
+      offListingCreated(handleListingCreated);
+      offListingStatusChanged(handleListingStatusChanged);
+    };
+  }, [queryClient, activeTab]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
