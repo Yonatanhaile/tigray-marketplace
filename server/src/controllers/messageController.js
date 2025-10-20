@@ -39,7 +39,7 @@ const createMessage = async (req, res) => {
     });
 
     // Populate sender info
-    await message.populate('senderId', 'name email');
+    await message.populate('senderId', 'name email profileImage');
 
     logger.info(`Message created: ${message._id}`);
 
@@ -91,8 +91,8 @@ const getOrderMessages = async (req, res) => {
     // Fetch messages
     const [messages, total] = await Promise.all([
       Message.find({ orderId })
-        .populate('senderId', 'name email')
-        .populate('recipientId', 'name email')
+        .populate('senderId', 'name email profileImage')
+        .populate('recipientId', 'name email profileImage')
         .sort({ createdAt: 1 })
         .skip(skip)
         .limit(parseInt(limit)),

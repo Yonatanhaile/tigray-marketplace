@@ -160,7 +160,7 @@ const Layout = () => {
           },
           icon: '🛒',
           position: 'top-right',
-          onClick: () => navigate('/orders'),
+          onClick: () => navigate('/seller-dashboard'),
         });
         
         // Invalidate orders queries
@@ -254,7 +254,7 @@ const Layout = () => {
               {/* Pending Orders (Sellers Only) */}
               {isAuthenticated && isSeller && (
                 <Link
-                  to="/orders"
+                  to="/seller-dashboard"
                   className="relative p-2.5 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all"
                   title="Order Requests"
                 >

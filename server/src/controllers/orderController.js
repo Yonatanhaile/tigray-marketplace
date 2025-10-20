@@ -118,8 +118,8 @@ const getOrderById = async (req, res) => {
 
     const order = await Order.findById(id)
       .populate('listingId')
-      .populate('buyerId', 'name email phone badges')
-      .populate('sellerId', 'name email phone badges kyc.status');
+      .populate('buyerId', 'name email phone badges profileImage')
+      .populate('sellerId', 'name email phone badges profileImage kyc.status');
 
     if (!order) {
       return res.status(404).json({
@@ -174,8 +174,8 @@ const getMyOrders = async (req, res) => {
     const [orders, total] = await Promise.all([
       Order.find(filter)
         .populate('listingId', 'title price images')
-        .populate('buyerId', 'name email')
-        .populate('sellerId', 'name email')
+        .populate('buyerId', 'name email profileImage')
+        .populate('sellerId', 'name email profileImage')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(parseInt(limit)),
@@ -346,8 +346,8 @@ const requestInvoice = async (req, res) => {
 
     const order = await Order.findById(orderId)
       .populate('listingId')
-      .populate('buyerId', 'name email phone')
-      .populate('sellerId', 'name email phone');
+      .populate('buyerId', 'name email phone profileImage')
+      .populate('sellerId', 'name email phone profileImage');
 
     if (!order) {
       return res.status(404).json({

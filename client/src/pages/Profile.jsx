@@ -47,7 +47,12 @@ const Profile = () => {
       // Update local state
       setProfileImage(data.user.profileImage || null);
       
+      // Invalidate all queries that might display user profile
       queryClient.invalidateQueries(['user']);
+      queryClient.invalidateQueries(['messages']);
+      queryClient.invalidateQueries(['orders']);
+      queryClient.invalidateQueries(['listings']);
+      
       setIsEditing(false);
     },
     onError: (error) => {
@@ -85,6 +90,12 @@ const Profile = () => {
       // Update user in auth context
       const updatedUser = { ...user, ...response.data.user };
       updateUser(updatedUser);
+      
+      // Invalidate all queries that might display user profile
+      queryClient.invalidateQueries(['user']);
+      queryClient.invalidateQueries(['messages']);
+      queryClient.invalidateQueries(['orders']);
+      queryClient.invalidateQueries(['listings']);
       
       toast.success('✅ Profile picture updated successfully!', { duration: 3000 });
       
