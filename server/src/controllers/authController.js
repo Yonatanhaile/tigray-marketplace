@@ -31,7 +31,7 @@ const register = async (req, res) => {
       email,
       phone,
       passwordHash,
-      roles: roles || ['buyer'],
+      roles: roles || ['buyer', 'seller'], // All users are both buyers and sellers by default
     });
 
     // Generate token
