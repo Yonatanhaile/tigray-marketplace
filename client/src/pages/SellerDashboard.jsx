@@ -23,25 +23,41 @@ const SellerDashboard = () => {
   const deleteMutation = useMutation({
     mutationFn: (id) => listingsAPI.delete(id),
     onSuccess: () => {
-      toast.success('Listing deleted');
+      toast.success('✅ Listing deleted successfully', { 
+        duration: 3000,
+        icon: '🗑️' 
+      });
       queryClient.invalidateQueries(['listings']);
       queryClient.invalidateQueries(['listings', 'my-listings']);
     },
     onError: (e) => {
-      toast.error(e?.message || 'Failed to delete');
+      toast.error(`❌ Failed to delete listing: ${e?.message || 'Unknown error'}`, {
+        duration: 4000
+      });
     }
   });
 
   const markAsSoldMutation = useMutation({
     mutationFn: ({ id, status }) => listingsAPI.update(id, { status }),
     onSuccess: (_, variables) => {
-      const statusText = variables.status === 'sold' ? 'sold' : 'active';
-      toast.success(`Listing marked as ${statusText}`);
+      if (variables.status === 'sold') {
+        toast.success('🔴 Item marked as SOLD - Moved to Sold Items tab', { 
+          duration: 4000,
+          icon: '✓' 
+        });
+      } else {
+        toast.success('✅ Item marked as AVAILABLE - Moved to Active Listings tab', { 
+          duration: 4000,
+          icon: '✓' 
+        });
+      }
       queryClient.invalidateQueries(['listings']);
       queryClient.invalidateQueries(['listings', 'my-listings']);
     },
     onError: (e) => {
-      toast.error(e?.message || 'Failed to update status');
+      toast.error(`❌ Failed to update listing status: ${e?.message || 'Unknown error'}`, {
+        duration: 4000
+      });
     }
   });
 
@@ -62,13 +78,28 @@ const SellerDashboard = () => {
       // Refetch immediately to ensure UI updates
       queryClient.refetchQueries(['listings', 'my-listings']);
       
-      // Show toast notification
+      // Show toast notification with clear messages
       if (data.newStatus === 'active') {
-        toast.success('🎉 Your listing has been approved and is now active!');
+        toast.success('🎉 APPROVED! Your listing is now LIVE and visible to buyers!', {
+          duration: 5000,
+          style: {
+            background: '#10b981',
+            color: '#fff',
+            fontWeight: 'bold'
+          }
+        });
       } else if (data.newStatus === 'sold') {
-        toast.info('✅ Item marked as sold');
+        toast.info('✅ Item successfully marked as SOLD - Moved to Sold Items tab', {
+          duration: 4000
+        });
       } else if (data.newStatus === 'suspended') {
-        toast.error(`❌ Listing rejected: ${data.reason || 'Not specified'}`);
+        toast.error(`❌ REJECTED - Your listing was not approved.\nReason: ${data.reason || 'Not specified'}`, {
+          duration: 6000,
+          style: {
+            background: '#ef4444',
+            color: '#fff'
+          }
+        });
       }
     };
 
@@ -85,7 +116,7 @@ const SellerDashboard = () => {
     e.preventDefault();
     e.stopPropagation();
     if (deleteMutation.isPending) return;
-    if (window.confirm('Delete this listing? This cannot be undone.')) {
+    if (window.confirm('⚠️ DELETE LISTING?\n\nThis will permanently delete your listing and cannot be undone.\n\nAre you sure you want to continue?')) {
       deleteMutation.mutate(id);
     }
   };
@@ -94,6 +125,14 @@ const SellerDashboard = () => {
     e.preventDefault();
     e.stopPropagation();
     const newStatus = listing.status === 'sold' ? 'active' : 'sold';
+    
+    // Add confirmation for marking as sold
+    if (newStatus === 'sold') {
+      if (!window.confirm('🔴 MARK AS SOLD?\n\nThis will move your listing to the "Sold Items" tab and buyers will no longer see it in active listings.\n\nYou can mark it as available again later if needed.\n\nContinue?')) {
+        return;
+      }
+    }
+    
     markAsSoldMutation.mutate({ id: listing._id, status: newStatus });
   };
 
@@ -367,9 +406,10 @@ const ListingCard = ({ listing, onToggleSold, onDelete, markAsSoldMutation, dele
                   : 'bg-red-100 text-red-700 hover:bg-red-200'
               }`}
               disabled={markAsSoldMutation.isPending}
+              title={listing.status === 'sold' ? 'Mark this item as available again' : 'Mark this item as sold'}
             >
-              {markAsSoldMutation.isPending ? '...' : (
-                listing.status === 'sold' ? '✓ Mark Available' : '✗ Mark as Sold'
+              {markAsSoldMutation.isPending ? '⏳ Updating...' : (
+                listing.status === 'sold' ? '✅ Mark Available Again' : '🔴 Mark as Sold'
               )}
             </button>
           </div>
@@ -377,8 +417,18 @@ const ListingCard = ({ listing, onToggleSold, onDelete, markAsSoldMutation, dele
 
         {/* Pending Notice */}
         {listing.status === 'pending' && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 text-xs text-yellow-800">
-            ⏳ Waiting for admin approval
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-3 text-xs text-yellow-800">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-2">
+                <p className="font-semibold">⏳ Pending Admin Review</p>
+                <p className="text-xs mt-0.5">Your listing is waiting for admin approval. You'll be notified when it's reviewed.</p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -387,15 +437,17 @@ const ListingCard = ({ listing, onToggleSold, onDelete, markAsSoldMutation, dele
           <Link 
             to={`/listings/${listing._id}/edit`} 
             className="flex-1 text-center py-2 px-3 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-sm font-semibold transition-all"
+            title="Edit listing details, price, images, etc."
           >
-            ✏️ Edit
+            ✏️ Edit Listing
           </Link>
           <button 
             onClick={(e) => onDelete(e, listing._id)} 
             className="flex-1 py-2 px-3 bg-gray-100 text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-lg text-sm font-semibold transition-all"
             disabled={deleteMutation.isPending}
+            title="Permanently delete this listing"
           >
-            {deleteMutation.isPending ? '...' : '🗑️ Delete'}
+            {deleteMutation.isPending ? '⏳ Deleting...' : '🗑️ Delete'}
           </button>
         </div>
       </div>

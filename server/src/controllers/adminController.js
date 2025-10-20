@@ -44,6 +44,15 @@ const approveListing = async (req, res) => {
         listing,
       });
 
+      // Notify all admins to update their pending list
+      logger.info(`📡 [Admin Approve] Notifying admin room`);
+      io.to('admin').emit('listing_status_changed', {
+        listingId: listing._id,
+        oldStatus,
+        newStatus: 'active',
+        listing,
+      });
+
       // Broadcast to all users
       logger.info(`📡 [Admin Approve] Broadcasting new_active_listing to all users`);
       io.emit('new_active_listing', {
@@ -81,6 +90,16 @@ const rejectListing = async (req, res) => {
       
       // Notify the seller
       io.to(sellerRoom).emit('listing_status_changed', {
+        listingId: listing._id,
+        oldStatus,
+        newStatus: 'suspended',
+        listing,
+        reason: listing.moderation_reason,
+      });
+
+      // Notify all admins to update their pending list
+      logger.info(`📡 [Admin Reject] Notifying admin room`);
+      io.to('admin').emit('listing_status_changed', {
         listingId: listing._id,
         oldStatus,
         newStatus: 'suspended',

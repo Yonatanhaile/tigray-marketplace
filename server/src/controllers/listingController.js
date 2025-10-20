@@ -51,12 +51,20 @@ const createListing = async (req, res) => {
 
     logger.info(`Listing created: ${listing._id} by user ${req.userId}`);
 
-    // Emit real-time event to seller
+    // Emit real-time event to seller and admins
     const io = req.app.get('io');
     if (io) {
       const userRoom = `user:${req.userId.toString()}`;
       logger.info(`📡 Emitting listing_created to room: ${userRoom}`);
       io.to(userRoom).emit('listing_created', {
+        listingId: listing._id,
+        status: listing.status,
+        listing,
+      });
+
+      // Also emit to admin room for new pending listings
+      logger.info(`📡 Emitting listing_created to admin room`);
+      io.to('admin').emit('listing_created', {
         listingId: listing._id,
         status: listing.status,
         listing,

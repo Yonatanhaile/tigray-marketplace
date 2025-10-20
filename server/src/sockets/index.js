@@ -44,8 +44,17 @@ const initializeSocketHandlers = (io) => {
     // Join user's personal room
     socket.join(`user:${socket.userId}`);
     
+    // If user is admin, join admin room
+    if (socket.user.roles.includes('admin')) {
+      socket.join('admin');
+      logger.info(`✅ Admin user ${socket.userId} joined admin room`);
+    }
+    
     // Emit successful authentication
-    socket.emit('auth_success', { userId: socket.userId });
+    socket.emit('auth_success', { 
+      userId: socket.userId,
+      isAdmin: socket.user.roles.includes('admin')
+    });
 
     // =========================
     // Event: Join order room
