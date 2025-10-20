@@ -54,15 +54,21 @@ const SellerDashboard = () => {
     };
 
     const handleListingStatusChanged = (data) => {
-      console.log('🔄 Listing status changed:', data);
+      console.log('🔄 [SellerDashboard] Listing status changed:', data);
+      // Force immediate query refetch
       queryClient.invalidateQueries(['listings', 'my-listings']);
       queryClient.invalidateQueries(['listings']);
+      
+      // Refetch immediately to ensure UI updates
+      queryClient.refetchQueries(['listings', 'my-listings']);
       
       // Show toast notification
       if (data.newStatus === 'active') {
         toast.success('🎉 Your listing has been approved and is now active!');
       } else if (data.newStatus === 'sold') {
-        toast.info('Item marked as sold');
+        toast.info('✅ Item marked as sold');
+      } else if (data.newStatus === 'suspended') {
+        toast.error(`❌ Listing rejected: ${data.reason || 'Not specified'}`);
       }
     };
 

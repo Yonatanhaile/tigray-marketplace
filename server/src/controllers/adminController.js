@@ -25,10 +25,38 @@ const approveListing = async (req, res) => {
     const { id } = req.params;
     const listing = await Listing.findById(id);
     if (!listing) return res.status(404).json({ error: true, message: 'Listing not found' });
+    
+    const oldStatus = listing.status;
     listing.status = 'active';
     await listing.save();
+    
+    // Emit real-time socket event
+    const io = req.app.get('io');
+    if (io) {
+      const sellerRoom = `user:${listing.sellerId.toString()}`;
+      logger.info(`📡 [Admin Approve] Emitting listing_status_changed to room: ${sellerRoom}`);
+      
+      // Notify the seller
+      io.to(sellerRoom).emit('listing_status_changed', {
+        listingId: listing._id,
+        oldStatus,
+        newStatus: 'active',
+        listing,
+      });
+
+      // Broadcast to all users
+      logger.info(`📡 [Admin Approve] Broadcasting new_active_listing to all users`);
+      io.emit('new_active_listing', {
+        listingId: listing._id,
+        listing,
+      });
+    } else {
+      logger.warn('⚠️ Socket.io instance not available for approveListing');
+    }
+    
     res.json({ error: false, message: 'Listing approved', listing });
   } catch (e) {
+    logger.error('Approve listing error:', e);
     res.status(500).json({ error: true, message: 'Failed to approve listing' });
   }
 };
@@ -39,11 +67,33 @@ const rejectListing = async (req, res) => {
     const { reason } = req.body;
     const listing = await Listing.findById(id);
     if (!listing) return res.status(404).json({ error: true, message: 'Listing not found' });
+    
+    const oldStatus = listing.status;
     listing.status = 'suspended';
     listing.moderation_reason = reason || 'Rejected by admin';
     await listing.save();
+    
+    // Emit real-time socket event
+    const io = req.app.get('io');
+    if (io) {
+      const sellerRoom = `user:${listing.sellerId.toString()}`;
+      logger.info(`📡 [Admin Reject] Emitting listing_status_changed to room: ${sellerRoom}`);
+      
+      // Notify the seller
+      io.to(sellerRoom).emit('listing_status_changed', {
+        listingId: listing._id,
+        oldStatus,
+        newStatus: 'suspended',
+        listing,
+        reason: listing.moderation_reason,
+      });
+    } else {
+      logger.warn('⚠️ Socket.io instance not available for rejectListing');
+    }
+    
     res.json({ error: false, message: 'Listing rejected', listing });
   } catch (e) {
+    logger.error('Reject listing error:', e);
     res.status(500).json({ error: true, message: 'Failed to reject listing' });
   }
 };

@@ -84,9 +84,14 @@ const Layout = () => {
       const handleListingStatusChanged = (data) => {
         console.log('🔄 [Layout] Listing status changed:', data);
         queryClient.invalidateQueries(['listings']);
+        queryClient.invalidateQueries(['listings', 'my-listings']);
         
         if (data.newStatus === 'active') {
           toast.success('🎉 Your listing has been approved and is now active!');
+        } else if (data.newStatus === 'suspended') {
+          toast.error(`❌ Your listing was rejected. Reason: ${data.reason || 'Not specified'}`);
+        } else if (data.newStatus === 'sold') {
+          toast.info('✅ Listing marked as sold');
         }
       };
 
