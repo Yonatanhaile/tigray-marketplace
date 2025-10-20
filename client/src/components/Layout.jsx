@@ -65,6 +65,11 @@ const Layout = () => {
   // Listen for new messages via socket
   useEffect(() => {
     if (socket && isAuthenticated && user) {
+      console.log('🔌 [Layout] Setting up socket listeners...');
+      console.log('Socket connected:', socket.connected);
+      console.log('User ID:', user.id);
+      console.log('Is Seller:', isSeller);
+      
       const currentUserId = user._id?.toString() || user.id?.toString();
       
       const handleNewMessage = (data) => {
@@ -122,12 +127,19 @@ const Layout = () => {
       };
 
       const handleNewOrder = (data) => {
-        console.log('🛒 [Layout] New order received:', data);
+        console.log('🛒 [Layout] New order received!');
+        console.log('Order data:', data);
+        console.log('Current pending count:', pendingOrdersCount);
         
         // Update pending orders count
-        setPendingOrdersCount(prev => prev + 1);
+        setPendingOrdersCount(prev => {
+          const newCount = prev + 1;
+          console.log('Updated pending count:', newCount);
+          return newCount;
+        });
         
         // Show toast notification
+        console.log('Showing toast notification...');
         toast(`🛒 New Order Request!\n${data.buyerName} wants to buy "${data.listingTitle}"`, {
           duration: 6000,
           style: {
@@ -140,6 +152,7 @@ const Layout = () => {
         
         // Invalidate orders queries
         queryClient.invalidateQueries(['orders']);
+        console.log('✅ Order notification handled');
       };
 
       socket.on('new_message', handleNewMessage);
@@ -147,6 +160,8 @@ const Layout = () => {
       socket.on('listing_status_changed', handleListingStatusChanged);
       socket.on('new_active_listing', handleNewActiveListing);
       socket.on('new_order', handleNewOrder);
+      
+      console.log('✅ All socket listeners registered (including new_order)');
 
       return () => {
         socket.off('new_message', handleNewMessage);

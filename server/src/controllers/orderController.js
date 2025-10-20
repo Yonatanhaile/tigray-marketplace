@@ -75,7 +75,7 @@ const createOrder = async (req, res) => {
       const sellerRoom = `user:${listing.sellerId.toString()}`;
       logger.info(`📡 Emitting new_order notification to: ${sellerRoom}`);
       
-      io.to(sellerRoom).emit('new_order', {
+      const notificationData = {
         orderId: order._id,
         listingTitle: listing.title,
         buyerName: order.buyerId.name,
@@ -83,7 +83,15 @@ const createOrder = async (req, res) => {
         price: order.price_agreed,
         currency: order.currency,
         createdAt: order.createdAt,
-      });
+      };
+      
+      logger.info(`📡 Notification data:`, notificationData);
+      
+      io.to(sellerRoom).emit('new_order', notificationData);
+      
+      logger.info(`✅ new_order event emitted successfully`);
+    } else {
+      logger.warn('⚠️ Socket.io instance not available!');
     }
 
     res.status(201).json({

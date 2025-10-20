@@ -65,6 +65,10 @@ export const SocketProvider = ({ children }) => {
         console.log('✨ [useSocket] New active listing:', data);
       });
 
+      socketInstance.on('new_order', (data) => {
+        console.log('🛒 [useSocket] New order received:', data);
+      });
+
       socketInstance.on('error', (error) => {
         console.error('Socket error:', error);
         toast.error(error.message || 'Socket error occurred');
@@ -81,6 +85,7 @@ export const SocketProvider = ({ children }) => {
         socketInstance.off('listing_created');
         socketInstance.off('listing_status_changed');
         socketInstance.off('new_active_listing');
+        socketInstance.off('new_order');
         socketInstance.off('error');
       };
     }
