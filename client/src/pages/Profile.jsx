@@ -63,20 +63,32 @@ const Profile = () => {
     try {
       const uploadedImage = await uploadImage(file);
       setProfileImage(uploadedImage);
-      toast.success('✅ Profile image uploaded!');
+      
+      // Automatically save the profile image
+      const token = localStorage.getItem('token');
+      const response = await axios.patch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/profile`,
+        { profileImage: uploadedImage },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      // Update user in auth context
+      const updatedUser = { ...user, ...response.data.user };
+      updateUser(updatedUser);
+      
+      toast.success('✅ Profile picture updated successfully!', { duration: 3000 });
     } catch (error) {
-      toast.error(`❌ Failed to upload image: ${error.message}`);
+      toast.error(`❌ Failed to upload image: ${error.message}`, { duration: 4000 });
+      // Reset to previous image on error
+      setProfileImage(user?.profileImage || null);
     } finally {
       setUploadingImage(false);
     }
   };
 
   const onSubmit = (data) => {
-    const submitData = {
-      ...data,
-      profileImage: profileImage
-    };
-    updateMutation.mutate(submitData);
+    // Profile image is saved automatically on upload, so we don't need to include it here
+    updateMutation.mutate(data);
   };
 
   const handleCancel = () => {
@@ -96,7 +108,7 @@ const Profile = () => {
         {/* Profile Header */}
         <div className="flex items-start gap-6 mb-6 pb-6 border-b border-gray-200">
           {/* Profile Image */}
-          <div className="relative flex-shrink-0">
+          <div className="relative flex-shrink-0 group">
             {profileImage?.url ? (
               <img 
                 src={profileImage.url} 
@@ -109,30 +121,35 @@ const Profile = () => {
               </div>
             )}
             
-            {/* Upload Button (only in edit mode) */}
-            {isEditing && (
-              <label 
-                htmlFor="profile-image-upload" 
-                className="absolute bottom-0 right-0 bg-white border-2 border-purple-600 text-purple-600 rounded-full p-2 cursor-pointer hover:bg-purple-50 transition-colors shadow-lg"
-                title="Change profile picture"
-              >
-                {uploadingImage ? (
-                  <div className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-                ) : (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                )}
-                <input
-                  id="profile-image-upload"
-                  type="file"
-                  accept="image/*,.heic,.heif"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  disabled={uploadingImage}
-                />
-              </label>
+            {/* Upload Button - Always visible on hover */}
+            <label 
+              htmlFor="profile-image-upload" 
+              className="absolute bottom-0 right-0 bg-white border-2 border-purple-600 text-purple-600 rounded-full p-2 cursor-pointer hover:bg-purple-50 transition-all shadow-lg hover:scale-110"
+              title="Click to change profile picture"
+            >
+              {uploadingImage ? (
+                <div className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              )}
+              <input
+                id="profile-image-upload"
+                type="file"
+                accept="image/*,.heic,.heif"
+                onChange={handleImageUpload}
+                className="hidden"
+                disabled={uploadingImage}
+              />
+            </label>
+            
+            {/* Helper text */}
+            {!isEditing && (
+              <p className="absolute -bottom-6 left-0 text-xs text-gray-500 whitespace-nowrap">
+                Click camera to change
+              </p>
             )}
           </div>
 
