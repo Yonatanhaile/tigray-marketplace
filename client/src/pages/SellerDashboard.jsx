@@ -79,7 +79,8 @@ const SellerDashboard = () => {
       queryClient.refetchQueries(['listings', 'my-listings']);
       
       // Show toast notification with clear messages
-      if (data.newStatus === 'active') {
+      // Only show approval message if it was pending before (admin approval)
+      if (data.newStatus === 'active' && data.oldStatus === 'pending') {
         toast.success('🎉 APPROVED! Your listing is now LIVE and visible to buyers!', {
           duration: 5000,
           style: {
@@ -87,10 +88,6 @@ const SellerDashboard = () => {
             color: '#fff',
             fontWeight: 'bold'
           }
-        });
-      } else if (data.newStatus === 'sold') {
-        toast.info('✅ Item successfully marked as SOLD - Moved to Sold Items tab', {
-          duration: 4000
         });
       } else if (data.newStatus === 'suspended') {
         toast.error(`❌ REJECTED - Your listing was not approved.\nReason: ${data.reason || 'Not specified'}`, {
@@ -101,6 +98,7 @@ const SellerDashboard = () => {
           }
         });
       }
+      // Don't show toast for seller's own actions (sold/available) - mutation handles that
     };
 
     onListingCreated(handleListingCreated);

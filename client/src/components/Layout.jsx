@@ -86,13 +86,13 @@ const Layout = () => {
         queryClient.invalidateQueries(['listings']);
         queryClient.invalidateQueries(['listings', 'my-listings']);
         
-        if (data.newStatus === 'active') {
+        // Only show approval message if it was pending before (admin approval)
+        if (data.newStatus === 'active' && data.oldStatus === 'pending') {
           toast.success('🎉 Your listing has been approved and is now active!');
         } else if (data.newStatus === 'suspended') {
           toast.error(`❌ Your listing was rejected. Reason: ${data.reason || 'Not specified'}`);
-        } else if (data.newStatus === 'sold') {
-          toast.info('✅ Listing marked as sold');
         }
+        // Don't show toast for sold status - seller dashboard handles that
       };
 
       const handleNewActiveListing = (data) => {
