@@ -149,31 +149,6 @@ const Layout = () => {
           return newCount;
         });
         
-        // Show toast notification
-        console.log('Showing toast notification...');
-        
-        // Create clickable toast
-        const toastMessage = `🛒 New Order Request!\n\n${data.buyerName} wants to buy\n"${data.listingTitle}"\n\nClick to view →`;
-        
-        toast.success(toastMessage, {
-          duration: 8000,
-          style: {
-            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-            color: '#fff',
-            padding: '16px',
-            borderRadius: '12px',
-            boxShadow: '0 10px 25px rgba(16, 185, 129, 0.3)',
-            maxWidth: '400px',
-            cursor: 'pointer',
-            fontWeight: '600',
-            fontSize: '14px',
-            whiteSpace: 'pre-line',
-          },
-          icon: '🛒',
-          position: 'top-right',
-          onClick: () => navigate('/seller-dashboard'),
-        });
-        
         // Invalidate orders queries
         queryClient.invalidateQueries(['orders']);
         console.log('✅ Order notification handled');
