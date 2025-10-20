@@ -216,9 +216,17 @@ const Layout = () => {
                   {/* User Menu - Desktop */}
                   <div className="hidden lg:flex items-center space-x-3 px-4 py-2 bg-white/50 rounded-xl border border-gray-200">
                     <Link to="/profile" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-                      <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                        {user?.name?.charAt(0).toUpperCase()}
-                      </div>
+                      {user?.profileImage?.url ? (
+                        <img 
+                          src={user.profileImage.url} 
+                          alt={user?.name} 
+                          className="w-8 h-8 rounded-full object-cover border-2 border-purple-200"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                          {user?.name?.charAt(0).toUpperCase()}
+                        </div>
+                      )}
                       <div className="text-sm">
                         <div className="font-semibold text-gray-900">{user?.name}</div>
                         <div className="text-gray-500 text-xs">

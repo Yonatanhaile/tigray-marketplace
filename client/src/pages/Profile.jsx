@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../hooks/useAuth';
@@ -7,11 +7,18 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const [profileImage, setProfileImage] = useState(user?.profileImage || null);
   const [uploadingImage, setUploadingImage] = useState(false);
+
+  // Sync profileImage state when user changes
+  useEffect(() => {
+    if (user?.profileImage) {
+      setProfileImage(user.profileImage);
+    }
+  }, [user?.profileImage]);
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm({
     defaultValues: {
@@ -31,16 +38,20 @@ const Profile = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      toast.success('Profile updated successfully!');
-      // Update user in localStorage
+      toast.success('✅ Profile updated successfully!', { duration: 3000 });
+      
+      // Update user in auth context and localStorage
       const updatedUser = { ...user, ...data.user };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+      updateUser(updatedUser);
+      
+      // Update local state
+      setProfileImage(data.user.profileImage || null);
+      
       queryClient.invalidateQueries(['user']);
       setIsEditing(false);
-      window.location.reload(); // Refresh to update user context
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to update profile');
+      toast.error(`❌ ${error.response?.data?.message || 'Failed to update profile'}`, { duration: 4000 });
     }
   });
 
