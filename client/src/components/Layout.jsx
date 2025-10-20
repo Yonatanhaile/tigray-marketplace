@@ -140,15 +140,37 @@ const Layout = () => {
         
         // Show toast notification
         console.log('Showing toast notification...');
-        toast(`🛒 New Order Request!\n${data.buyerName} wants to buy "${data.listingTitle}"`, {
-          duration: 6000,
-          style: {
-            background: '#10b981',
-            color: '#fff',
-            fontWeight: 'bold',
-          },
-          icon: '🛒',
-        });
+        toast.success(
+          <div 
+            className="flex flex-col cursor-pointer"
+            onClick={() => navigate('/orders')}
+          >
+            <div className="font-bold text-lg mb-1">🛒 New Order Request!</div>
+            <div className="text-sm">
+              <span className="font-semibold">{data.buyerName}</span> wants to buy
+            </div>
+            <div className="text-sm font-medium">"{data.listingTitle}"</div>
+            <div className="text-xs mt-2 opacity-90 flex items-center gap-1">
+              <span>Click to view orders</span>
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>,
+          {
+            duration: 8000,
+            style: {
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              color: '#fff',
+              padding: '16px',
+              borderRadius: '12px',
+              boxShadow: '0 10px 25px rgba(16, 185, 129, 0.3)',
+              maxWidth: '400px',
+            },
+            icon: '🛒',
+            position: 'top-right',
+          }
+        );
         
         // Invalidate orders queries
         queryClient.invalidateQueries(['orders']);
@@ -233,6 +255,24 @@ const Layout = () => {
                   {unreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 text-xs font-bold text-white bg-gradient-to-r from-red-500 to-pink-500 rounded-full shadow-lg animate-pulse">
                       {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </Link>
+              )}
+
+              {/* Pending Orders (Sellers Only) */}
+              {isAuthenticated && isSeller && (
+                <Link
+                  to="/orders"
+                  className="relative p-2.5 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all"
+                  title="Order Requests"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                  </svg>
+                  {pendingOrdersCount > 0 && (
+                    <span className="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 text-xs font-bold text-white bg-gradient-to-r from-green-500 to-emerald-500 rounded-full shadow-lg animate-pulse">
+                      {pendingOrdersCount > 99 ? '99+' : pendingOrdersCount}
                     </span>
                   )}
                 </Link>
