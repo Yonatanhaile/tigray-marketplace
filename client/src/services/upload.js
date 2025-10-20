@@ -126,3 +126,14 @@ export const uploadFile = async (file) => {
   }
 };
 
+// Backwards-compatible helper used across the app
+// Normalizes the return shape to always include { url, publicId, format }
+export const uploadImage = async (file) => {
+  const result = await uploadFile(file);
+  return {
+    url: result.url,
+    publicId: result.publicId || result.key || undefined,
+    format: result.format,
+  };
+};
+
