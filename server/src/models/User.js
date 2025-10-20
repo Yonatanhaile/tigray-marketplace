@@ -25,6 +25,10 @@ const userSchema = new mongoose.Schema({
     index: true,
     match: [/^\+?[1-9]\d{1,14}$/, 'Please provide a valid phone number'],
   },
+  profileImage: {
+    url: String,
+    publicId: String,
+  },
   passwordHash: {
     type: String,
     select: false, // Don't include by default in queries
@@ -78,6 +82,7 @@ userSchema.virtual('profile').get(function() {
     name: this.name,
     email: this.email,
     phone: this.phone,
+    profileImage: this.profileImage,
     roles: this.roles,
     badges: this.badges,
     kyc: this.kyc,

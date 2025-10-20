@@ -233,7 +233,7 @@ const getProfile = async (req, res) => {
  */
 const updateProfile = async (req, res) => {
   try {
-    const { name, phone } = req.body;
+    const { name, phone, profileImage } = req.body;
     const User = require('../models/User');
     
     const user = await User.findById(req.userId);
@@ -247,6 +247,9 @@ const updateProfile = async (req, res) => {
     // Update fields
     if (name) user.name = name;
     if (phone) user.phone = phone;
+    if (profileImage) {
+      user.profileImage = profileImage;
+    }
 
     await user.save();
 
