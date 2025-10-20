@@ -102,7 +102,16 @@ const getListings = async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     // Build filter
-    const filter = { status };
+    const filter = {};
+
+    // Only filter by status if no sellerId is provided
+    // Sellers should see ALL their listings (active, pending, sold)
+    if (!sellerId) {
+      filter.status = status;
+    } else if (status !== 'active') {
+      // If sellerId is provided AND a specific status is requested, use it
+      filter.status = status;
+    }
 
     if (query) {
       filter.$text = { $search: query };
