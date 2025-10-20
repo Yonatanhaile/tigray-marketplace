@@ -59,28 +59,49 @@ const Profile = () => {
     const file = e.target.files[0];
     if (!file) return;
 
+    console.log('📸 Starting image upload:', file.name, file.type, file.size);
     setUploadingImage(true);
+    
     try {
+      // Upload to Cloudinary
+      console.log('⬆️ Uploading to Cloudinary...');
       const uploadedImage = await uploadImage(file);
+      console.log('✅ Cloudinary upload success:', uploadedImage);
+      
       setProfileImage(uploadedImage);
       
-      // Automatically save the profile image
+      // Automatically save the profile image to backend
       const token = localStorage.getItem('token');
+      console.log('💾 Saving to database...', { profileImage: uploadedImage });
+      
       const response = await axios.patch(
         `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/profile`,
         { profileImage: uploadedImage },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
+      console.log('✅ Database save success:', response.data);
+      
       // Update user in auth context
       const updatedUser = { ...user, ...response.data.user };
       updateUser(updatedUser);
       
       toast.success('✅ Profile picture updated successfully!', { duration: 3000 });
+      
+      // Reset file input
+      e.target.value = '';
     } catch (error) {
-      toast.error(`❌ Failed to upload image: ${error.message}`, { duration: 4000 });
+      console.error('❌ Profile image upload error:', error);
+      console.error('Error details:', error.response?.data || error.message);
+      
+      const errorMsg = error.response?.data?.message || error.message || 'Failed to upload image';
+      toast.error(`❌ ${errorMsg}`, { duration: 4000 });
+      
       // Reset to previous image on error
       setProfileImage(user?.profileImage || null);
+      
+      // Reset file input
+      e.target.value = '';
     } finally {
       setUploadingImage(false);
     }

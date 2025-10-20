@@ -63,11 +63,28 @@ const createOrder = async (req, res) => {
     // Populate for response
     await order.populate([
       { path: 'listingId', select: 'title price images' },
-      { path: 'buyerId', select: 'name email phone' },
-      { path: 'sellerId', select: 'name email phone' },
+      { path: 'buyerId', select: 'name email phone profileImage' },
+      { path: 'sellerId', select: 'name email phone profileImage' },
     ]);
 
     logger.info(`Order created: ${order._id}`);
+
+    // Emit socket notification to seller
+    const io = req.app.get('io');
+    if (io) {
+      const sellerRoom = `user:${listing.sellerId.toString()}`;
+      logger.info(`📡 Emitting new_order notification to: ${sellerRoom}`);
+      
+      io.to(sellerRoom).emit('new_order', {
+        orderId: order._id,
+        listingTitle: listing.title,
+        buyerName: order.buyerId.name,
+        buyerImage: order.buyerId.profileImage,
+        price: order.price_agreed,
+        currency: order.currency,
+        createdAt: order.createdAt,
+      });
+    }
 
     res.status(201).json({
       error: false,
@@ -449,6 +466,30 @@ const getInvoice = async (req, res) => {
   }
 };
 
+/**
+ * Get pending orders count for seller (notifications)
+ */
+const getPendingOrdersCount = async (req, res) => {
+  try {
+    const count = await Order.countDocuments({
+      sellerId: req.userId,
+      status: 'requested', // Only count new order requests
+    });
+
+    res.status(200).json({
+      error: false,
+      pendingCount: count,
+    });
+  } catch (error) {
+    logger.error('Get pending orders count error:', error);
+    res.status(500).json({
+      error: true,
+      message: 'Failed to fetch pending orders count',
+      details: error.message,
+    });
+  }
+};
+
 module.exports = {
   createOrder,
   getOrderById,
@@ -456,5 +497,6 @@ module.exports = {
   updateOrder,
   requestInvoice,
   getInvoice,
+  getPendingOrdersCount,
 };
 

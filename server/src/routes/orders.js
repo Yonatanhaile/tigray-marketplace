@@ -7,6 +7,7 @@ const {
   updateOrder,
   requestInvoice,
   getInvoice,
+  getPendingOrdersCount,
 } = require('../controllers/orderController');
 const { authenticateJWT } = require('../middleware/auth');
 const {
@@ -21,6 +22,7 @@ router.use(authenticateJWT);
 // Order routes
 router.post('/', createOrderValidation, createOrder);
 router.get('/my-orders', paginationValidation, getMyOrders);
+router.get('/pending/count', getPendingOrdersCount); // Must be before /:id route
 router.get('/:id', mongoIdValidation, getOrderById);
 router.patch('/:id', mongoIdValidation, updateOrder);
 

@@ -12,6 +12,7 @@ const Layout = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
@@ -20,7 +21,7 @@ const Layout = () => {
     setMobileMenuOpen(false);
   };
 
-  // Fetch unread message count
+  // Fetch unread message count and pending orders count
   useEffect(() => {
     if (isAuthenticated) {
       const fetchUnreadCount = async () => {
@@ -31,15 +32,35 @@ const Layout = () => {
           console.error('Failed to fetch unread count:', error);
         }
       };
+
+      const fetchPendingOrdersCount = async () => {
+        if (isSeller) {
+          try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/orders/pending/count`, {
+              headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+              },
+            });
+            const data = await response.json();
+            setPendingOrdersCount(data.pendingCount || 0);
+          } catch (error) {
+            console.error('Failed to fetch pending orders count:', error);
+          }
+        }
+      };
       
       fetchUnreadCount();
+      fetchPendingOrdersCount();
       
-      // Refresh count every 30 seconds
-      const interval = setInterval(fetchUnreadCount, 30000);
+      // Refresh counts every 30 seconds
+      const interval = setInterval(() => {
+        fetchUnreadCount();
+        fetchPendingOrdersCount();
+      }, 30000);
       
       return () => clearInterval(interval);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isSeller]);
 
   // Listen for new messages via socket
   useEffect(() => {
@@ -100,16 +121,39 @@ const Layout = () => {
         queryClient.invalidateQueries(['listings']);
       };
 
+      const handleNewOrder = (data) => {
+        console.log('🛒 [Layout] New order received:', data);
+        
+        // Update pending orders count
+        setPendingOrdersCount(prev => prev + 1);
+        
+        // Show toast notification
+        toast(`🛒 New Order Request!\n${data.buyerName} wants to buy "${data.listingTitle}"`, {
+          duration: 6000,
+          style: {
+            background: '#10b981',
+            color: '#fff',
+            fontWeight: 'bold',
+          },
+          icon: '🛒',
+        });
+        
+        // Invalidate orders queries
+        queryClient.invalidateQueries(['orders']);
+      };
+
       socket.on('new_message', handleNewMessage);
       socket.on('messages_read', handleMessagesRead);
       socket.on('listing_status_changed', handleListingStatusChanged);
       socket.on('new_active_listing', handleNewActiveListing);
+      socket.on('new_order', handleNewOrder);
 
       return () => {
         socket.off('new_message', handleNewMessage);
         socket.off('messages_read', handleMessagesRead);
         socket.off('listing_status_changed', handleListingStatusChanged);
         socket.off('new_active_listing', handleNewActiveListing);
+        socket.off('new_order', handleNewOrder);
       };
     }
   }, [socket, isAuthenticated, user, queryClient]);
@@ -141,8 +185,13 @@ const Layout = () => {
                 </Link>
               )}
               {isAuthenticated && (
-                <Link to="/orders" className="nav-link text-gray-700 hover:text-purple-600 px-4 py-2 rounded-lg transition-colors font-medium">
+                <Link to="/orders" className="nav-link text-gray-700 hover:text-purple-600 px-4 py-2 rounded-lg transition-colors font-medium relative">
                   🛒 My Orders
+                  {isSeller && pendingOrdersCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                      {pendingOrdersCount}
+                    </span>
+                  )}
                 </Link>
               )}
             </div>
@@ -316,10 +365,17 @@ const Layout = () => {
                 <>
                   <Link 
                     to="/orders" 
-                    className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors font-medium"
+                    className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors font-medium relative"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    🛒 My Orders
+                    <span className="flex items-center justify-between">
+                      <span>🛒 My Orders</span>
+                      {isSeller && pendingOrdersCount > 0 && (
+                        <span className="bg-green-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
+                          {pendingOrdersCount}
+                        </span>
+                      )}
+                    </span>
                   </Link>
                   <Link 
                     to="/profile" 
