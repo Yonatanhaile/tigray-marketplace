@@ -22,13 +22,44 @@ const ListingDetail = () => {
     queryFn: () => listingsAPI.getById(id),
   });
 
+  // Check if buyer already has an active order for this listing
+  const { data: existingOrderData } = useQuery({
+    queryKey: ['existing-order', id],
+    queryFn: async () => {
+      if (!isAuthenticated) return null;
+      const ordersData = await ordersAPI.getMyOrders({ role: 'buyer' });
+      return ordersData.orders.find(
+        order => order.listingId?._id === id && 
+        ['requested', 'confirmed', 'paid', 'delivered'].includes(order.status)
+      );
+    },
+    enabled: isAuthenticated && !!id,
+  });
+
   const createOrderMutation = useMutation({
     mutationFn: ordersAPI.create,
     onSuccess: (data) => {
-      toast.success('Order intent created successfully!');
+      if (data.isExisting) {
+        // Buyer already has an order for this item
+        toast.success('You already have an order for this item. Redirecting...', {
+          duration: 3000,
+          icon: 'ℹ️',
+        });
+      } else {
+        // New order created
+        toast.success('Order intent created successfully!', {
+          duration: 3000,
+        });
+      }
       setShowIntentModal(false);
       navigate(`/orders/${data.order._id}`);
       queryClient.invalidateQueries(['orders']);
+      queryClient.invalidateQueries(['existing-order', id]);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Failed to create order intent', {
+        duration: 4000,
+      });
     },
   });
 
@@ -256,12 +287,23 @@ const ListingDetail = () => {
 
           {/* Actions */}
           {!isOwnListing && listing.listing.status === 'active' && (
-            <button
-              onClick={() => setShowIntentModal(true)}
-              className="w-full btn btn-primary text-lg py-3"
-            >
-              Intent to Buy
-            </button>
+            <>
+              {existingOrderData ? (
+                <button
+                  onClick={() => navigate(`/orders/${existingOrderData._id}`)}
+                  className="w-full btn btn-success text-lg py-3 bg-green-600 hover:bg-green-700"
+                >
+                  ✓ View Your Order
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowIntentModal(true)}
+                  className="w-full btn btn-primary text-lg py-3"
+                >
+                  Intent to Buy
+                </button>
+              )}
+            </>
           )}
 
           {isOwnListing && (

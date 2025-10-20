@@ -32,6 +32,27 @@ const createOrder = async (req, res) => {
       });
     }
 
+    // Check if buyer already has a pending/active order for this listing
+    const existingOrder = await Order.findOne({
+      listingId,
+      buyerId: req.userId,
+      status: { $in: ['requested', 'confirmed', 'paid', 'delivered'] }, // Active order statuses
+    }).populate([
+      { path: 'listingId', select: 'title price images' },
+      { path: 'buyerId', select: 'name email phone profileImage' },
+      { path: 'sellerId', select: 'name email phone profileImage' },
+    ]);
+
+    if (existingOrder) {
+      logger.info(`Buyer ${req.userId} already has an order (${existingOrder._id}) for listing ${listingId}`);
+      return res.status(200).json({
+        error: false,
+        message: 'You already have an order intent for this item',
+        order: existingOrder,
+        isExisting: true, // Flag to indicate this is an existing order
+      });
+    }
+
     // Verify payment method is available
     if (!listing.payment_methods.includes(selected_payment_method)) {
       return res.status(400).json({

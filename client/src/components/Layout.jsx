@@ -29,7 +29,10 @@ const Layout = () => {
           const data = await messagesAPI.getUnreadCount();
           setUnreadCount(data.unreadCount || 0);
         } catch (error) {
-          console.error('Failed to fetch unread count:', error);
+          // Silently fail - API might be deploying
+          if (error.code !== 'ERR_NETWORK' && error.message !== 'Network Error') {
+            console.warn('Could not fetch unread count:', error.message);
+          }
         }
       };
 
@@ -41,10 +44,16 @@ const Layout = () => {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
               },
             });
+            
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+            
             const data = await response.json();
             setPendingOrdersCount(data.pendingCount || 0);
           } catch (error) {
-            console.error('Failed to fetch pending orders count:', error);
+            // Silently fail - API might be deploying or sleeping (Render free tier)
+            // Keep the last known count instead of showing error
           }
         }
       };
