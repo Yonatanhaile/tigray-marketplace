@@ -21,18 +21,42 @@ const OrderDetail = () => {
 
   const updateMutation = useMutation({
     mutationFn: (updates) => ordersAPI.update(id, updates),
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries(['order', id]);
-      toast.success('Order updated');
+      queryClient.invalidateQueries(['orders']);
+      
+      // Show specific success message based on status
+      const status = data?.order?.status;
+      if (status === 'seller_confirmed') {
+        toast.success('✅ Order confirmed!');
+      } else if (status === 'paid_offsite') {
+        toast.success('💰 Payment confirmed!');
+      } else if (status === 'delivered') {
+        toast.success('📦 Order marked as delivered!');
+      } else if (status === 'completed') {
+        toast.success('✅ Order completed successfully!');
+      } else if (status === 'cancelled') {
+        toast.success('Order cancelled');
+      } else {
+        toast.success('Order updated successfully');
+      }
+    },
+    onError: (error) => {
+      toast.error(error?.message || 'Failed to update order');
     },
   });
 
   const disputeMutation = useMutation({
     mutationFn: disputesAPI.create,
     onSuccess: () => {
-      toast.success('Dispute filed successfully');
+      toast.success('⚠️ Dispute filed successfully');
       setShowDisputeModal(false);
+      setDisputeReason('');
       queryClient.invalidateQueries(['order', id]);
+      queryClient.invalidateQueries(['orders']);
+    },
+    onError: (error) => {
+      toast.error(error?.message || 'Failed to file dispute');
     },
   });
 
@@ -194,11 +218,45 @@ const OrderDetail = () => {
       {showDisputeModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 max-w-lg w-full">
-            <h2 className="text-2xl font-bold mb-4">File Dispute</h2>
-            <textarea value={disputeReason} onChange={e => setDisputeReason(e.target.value)} placeholder="Describe the issue..." className="input" rows="6" />
+            <h2 className="text-2xl font-bold mb-4">⚠️ File Dispute</h2>
+            <p className="text-gray-600 text-sm mb-4">
+              Please describe the issue with this order. An admin will review your dispute and help resolve it.
+            </p>
+            <textarea 
+              value={disputeReason} 
+              onChange={e => setDisputeReason(e.target.value)} 
+              placeholder="Describe the issue in detail..." 
+              className="input" 
+              rows="6"
+              disabled={disputeMutation.isPending}
+            />
+            {disputeReason.trim().length < 10 && disputeReason.length > 0 && (
+              <p className="text-red-500 text-xs mt-1">Please provide at least 10 characters</p>
+            )}
             <div className="flex space-x-3 mt-4">
-              <button onClick={() => setShowDisputeModal(false)} className="btn btn-secondary flex-1">Cancel</button>
-              <button onClick={() => disputeMutation.mutate({ orderId: id, reason: disputeReason })} className="btn btn-danger flex-1">Submit Dispute</button>
+              <button 
+                onClick={() => {
+                  setShowDisputeModal(false);
+                  setDisputeReason('');
+                }} 
+                className="btn btn-secondary flex-1"
+                disabled={disputeMutation.isPending}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => {
+                  if (disputeReason.trim().length < 10) {
+                    toast.error('Please describe the issue in more detail (minimum 10 characters)');
+                    return;
+                  }
+                  disputeMutation.mutate({ orderId: id, reason: disputeReason });
+                }} 
+                className="btn bg-red-500 hover:bg-red-600 text-white flex-1"
+                disabled={disputeMutation.isPending || disputeReason.trim().length < 10}
+              >
+                {disputeMutation.isPending ? 'Submitting...' : 'Submit Dispute'}
+              </button>
             </div>
           </div>
         </div>

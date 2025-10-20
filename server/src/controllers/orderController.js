@@ -223,9 +223,43 @@ const updateOrder = async (req, res) => {
       });
     }
 
-    // Update status (only seller or admin)
-    if (status && (isSeller || isAdmin)) {
-      await order.updateStatus(status, req.userId);
+    // Update status with role-based permissions
+    if (status) {
+      // Seller can update: seller_confirmed, paid_offsite, delivered
+      // Buyer can update: cancelled (when status is 'requested'), completed (when status is 'delivered')
+      // Admin can update: any status
+      
+      const allowedUpdates = {
+        seller: ['seller_confirmed', 'paid_offsite', 'delivered', 'cancelled'],
+        buyer: ['cancelled', 'completed'],
+        admin: ['requested', 'seller_confirmed', 'paid_offsite', 'delivered', 'completed', 'cancelled', 'disputed']
+      };
+      
+      let canUpdate = false;
+      
+      if (isAdmin) {
+        canUpdate = true;
+      } else if (isSeller && allowedUpdates.seller.includes(status)) {
+        canUpdate = true;
+      } else if (isBuyer && allowedUpdates.buyer.includes(status)) {
+        // Buyer can only cancel if order is still 'requested'
+        if (status === 'cancelled' && order.status === 'requested') {
+          canUpdate = true;
+        }
+        // Buyer can only complete if order is 'delivered'
+        else if (status === 'completed' && order.status === 'delivered') {
+          canUpdate = true;
+        }
+      }
+      
+      if (canUpdate) {
+        await order.updateStatus(status, req.userId);
+      } else {
+        return res.status(403).json({
+          error: true,
+          message: `You do not have permission to update order status to '${status}'`,
+        });
+      }
     }
 
     // Update payment status
