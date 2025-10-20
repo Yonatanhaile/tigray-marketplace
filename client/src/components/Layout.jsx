@@ -140,37 +140,28 @@ const Layout = () => {
         
         // Show toast notification
         console.log('Showing toast notification...');
-        toast.success(
-          <div 
-            className="flex flex-col cursor-pointer"
-            onClick={() => navigate('/orders')}
-          >
-            <div className="font-bold text-lg mb-1">🛒 New Order Request!</div>
-            <div className="text-sm">
-              <span className="font-semibold">{data.buyerName}</span> wants to buy
-            </div>
-            <div className="text-sm font-medium">"{data.listingTitle}"</div>
-            <div className="text-xs mt-2 opacity-90 flex items-center gap-1">
-              <span>Click to view orders</span>
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
-          </div>,
-          {
-            duration: 8000,
-            style: {
-              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-              color: '#fff',
-              padding: '16px',
-              borderRadius: '12px',
-              boxShadow: '0 10px 25px rgba(16, 185, 129, 0.3)',
-              maxWidth: '400px',
-            },
-            icon: '🛒',
-            position: 'top-right',
-          }
-        );
+        
+        // Create clickable toast
+        const toastMessage = `🛒 New Order Request!\n\n${data.buyerName} wants to buy\n"${data.listingTitle}"\n\nClick to view →`;
+        
+        toast.success(toastMessage, {
+          duration: 8000,
+          style: {
+            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+            color: '#fff',
+            padding: '16px',
+            borderRadius: '12px',
+            boxShadow: '0 10px 25px rgba(16, 185, 129, 0.3)',
+            maxWidth: '400px',
+            cursor: 'pointer',
+            fontWeight: '600',
+            fontSize: '14px',
+            whiteSpace: 'pre-line',
+          },
+          icon: '🛒',
+          position: 'top-right',
+          onClick: () => navigate('/orders'),
+        });
         
         // Invalidate orders queries
         queryClient.invalidateQueries(['orders']);
