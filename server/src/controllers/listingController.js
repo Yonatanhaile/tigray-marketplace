@@ -51,6 +51,16 @@ const createListing = async (req, res) => {
 
     logger.info(`Listing created: ${listing._id} by user ${req.userId}`);
 
+    // Emit real-time event to seller
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`user:${req.userId}`).emit('listing_created', {
+        listingId: listing._id,
+        status: listing.status,
+        listing,
+      });
+    }
+
     res.status(201).json({
       error: false,
       message: 'Listing created successfully',
@@ -243,6 +253,9 @@ const updateListing = async (req, res) => {
       });
     }
 
+    // Track if status changed
+    const oldStatus = listing.status;
+    
     // Update allowed fields
     const allowedUpdates = [
       'title',
@@ -259,6 +272,7 @@ const updateListing = async (req, res) => {
       'pickup_options',
       'highValue',
       'status',
+      'priceType',
     ];
 
     allowedUpdates.forEach(field => {
@@ -270,6 +284,26 @@ const updateListing = async (req, res) => {
     await listing.save();
 
     logger.info(`Listing updated: ${listing._id}`);
+
+    // Emit real-time event if status changed
+    const io = req.app.get('io');
+    if (io && oldStatus !== listing.status) {
+      // Notify the seller
+      io.to(`user:${listing.sellerId}`).emit('listing_status_changed', {
+        listingId: listing._id,
+        oldStatus,
+        newStatus: listing.status,
+        listing,
+      });
+
+      // Broadcast to all users if listing is now active
+      if (listing.status === 'active') {
+        io.emit('new_active_listing', {
+          listingId: listing._id,
+          listing,
+        });
+      }
+    }
 
     res.status(200).json({
       error: false,

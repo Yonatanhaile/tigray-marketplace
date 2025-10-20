@@ -1,10 +1,13 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { listingsAPI, messagesAPI } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
+import { onNewActiveListing, offNewActiveListing } from '../services/socket';
 
 const Home = () => {
   const { isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
 
   // Fetch recent listings
   const { data: listingsData, isLoading } = useQuery({
@@ -21,6 +24,22 @@ const Home = () => {
   });
 
   const unreadCount = unreadData?.unreadCount || 0;
+
+  // Real-time updates for new active listings
+  useEffect(() => {
+    const handleNewActiveListing = (data) => {
+      console.log('✨ New active listing:', data);
+      // Invalidate listings queries to refresh the data
+      queryClient.invalidateQueries(['listings', 'recent']);
+      queryClient.invalidateQueries(['listings']);
+    };
+
+    onNewActiveListing(handleNewActiveListing);
+
+    return () => {
+      offNewActiveListing(handleNewActiveListing);
+    };
+  }, [queryClient]);
 
   return (
     <div>

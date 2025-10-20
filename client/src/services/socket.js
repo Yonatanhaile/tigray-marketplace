@@ -87,3 +87,40 @@ export const markMessageRead = (messageId) => {
   }
 };
 
+// Listing event listeners
+export const onListingCreated = (callback) => {
+  if (socket) {
+    socket.on('listing_created', callback);
+  }
+};
+
+export const onListingStatusChanged = (callback) => {
+  if (socket) {
+    socket.on('listing_status_changed', callback);
+  }
+};
+
+export const onNewActiveListing = (callback) => {
+  if (socket) {
+    socket.on('new_active_listing', callback);
+  }
+};
+
+export const offListingCreated = (callback) => {
+  if (socket) {
+    socket.off('listing_created', callback);
+  }
+};
+
+export const offListingStatusChanged = (callback) => {
+  if (socket) {
+    socket.off('listing_status_changed', callback);
+  }
+};
+
+export const offNewActiveListing = (callback) => {
+  if (socket) {
+    socket.off('new_active_listing', callback);
+  }
+};
+

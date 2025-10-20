@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { listingsAPI, ordersAPI } from '../services/api';
+import { onListingCreated, onListingStatusChanged, offListingCreated, offListingStatusChanged } from '../services/socket';
 import toast from 'react-hot-toast';
 
 const SellerDashboard = () => {
@@ -43,6 +44,36 @@ const SellerDashboard = () => {
       toast.error(e?.message || 'Failed to update status');
     }
   });
+
+  // Real-time updates via socket
+  useEffect(() => {
+    const handleListingCreated = (data) => {
+      console.log('📦 New listing created:', data);
+      queryClient.invalidateQueries(['listings', 'my-listings']);
+      queryClient.invalidateQueries(['listings']);
+    };
+
+    const handleListingStatusChanged = (data) => {
+      console.log('🔄 Listing status changed:', data);
+      queryClient.invalidateQueries(['listings', 'my-listings']);
+      queryClient.invalidateQueries(['listings']);
+      
+      // Show toast notification
+      if (data.newStatus === 'active') {
+        toast.success('🎉 Your listing has been approved and is now active!');
+      } else if (data.newStatus === 'sold') {
+        toast.info('Item marked as sold');
+      }
+    };
+
+    onListingCreated(handleListingCreated);
+    onListingStatusChanged(handleListingStatusChanged);
+
+    return () => {
+      offListingCreated(handleListingCreated);
+      offListingStatusChanged(handleListingStatusChanged);
+    };
+  }, [queryClient]);
 
   const onDelete = (e, id) => {
     e.preventDefault();

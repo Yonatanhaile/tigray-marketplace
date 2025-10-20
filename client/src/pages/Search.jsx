@@ -1,14 +1,16 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 import { listingsAPI } from '../services/api';
 import { CATEGORIES } from '../constants/categories';
 import ETHIOPIAN_LOCATIONS from '../constants/locations';
 import { formatPrice } from '../utils/format';
 import { getCategoryIcon, getSubcategoryIcon } from '../constants/categoryIcons';
+import { onNewActiveListing, offNewActiveListing } from '../services/socket';
 
 const Search = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const queryClient = useQueryClient();
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
@@ -36,6 +38,22 @@ const Search = () => {
         limit: 12,
       }),
   });
+
+  // Real-time updates for new active listings
+  useEffect(() => {
+    const handleNewActiveListing = (data) => {
+      console.log('✨ New active listing in search:', data);
+      // Invalidate all search queries to refresh the data
+      queryClient.invalidateQueries(['listings', 'search']);
+      queryClient.invalidateQueries(['listings']);
+    };
+
+    onNewActiveListing(handleNewActiveListing);
+
+    return () => {
+      offNewActiveListing(handleNewActiveListing);
+    };
+  }, [queryClient]);
 
   const handleSearch = (e) => {
     e.preventDefault();
