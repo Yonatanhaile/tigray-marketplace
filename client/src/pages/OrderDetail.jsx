@@ -69,8 +69,21 @@ const OrderDetail = () => {
   const sellerId = typeof order.sellerId === 'object' ? order.sellerId?._id : order.sellerId;
   const buyerId = typeof order.buyerId === 'object' ? order.buyerId?._id : order.buyerId;
   
+  // Debug logging
+  console.log('🔍 Debug Order Detail:', {
+    userId: user?._id,
+    sellerId,
+    buyerId,
+    orderSellerIdType: typeof order.sellerId,
+    orderBuyerIdType: typeof order.buyerId,
+    orderSellerIdRaw: order.sellerId,
+    orderBuyerIdRaw: order.buyerId,
+  });
+  
   const isSeller = user?._id && sellerId && user._id.toString() === sellerId.toString();
   const isBuyer = user?._id && buyerId && user._id.toString() === buyerId.toString();
+  
+  console.log('👤 User Roles:', { isSeller, isBuyer, userId: user?._id, sellerId, buyerId });
 
   const handleStatusUpdate = (newStatus) => {
     markOrderStatus({ orderId: id, status: newStatus });
