@@ -98,18 +98,95 @@ const OrderDetail = () => {
       <div className="card mt-6">
         <h2 className="text-xl font-semibold mb-4">Actions</h2>
         <div className="flex flex-wrap gap-3">
+          {/* Seller Actions */}
           {isSeller && order.status === 'requested' && (
-            <button onClick={() => handleStatusUpdate('seller_confirmed')} className="btn btn-primary">Confirm Order</button>
+            <>
+              <button 
+                onClick={() => handleStatusUpdate('seller_confirmed')} 
+                className="btn btn-primary"
+                disabled={updateMutation.isPending}
+              >
+                ✅ Confirm Order
+              </button>
+              <button 
+                onClick={() => handleStatusUpdate('cancelled')} 
+                className="btn bg-gray-500 hover:bg-gray-600 text-white"
+                disabled={updateMutation.isPending}
+              >
+                ❌ Cancel Order
+              </button>
+            </>
           )}
           {isSeller && order.status === 'seller_confirmed' && (
-            <button onClick={() => handleStatusUpdate('paid_offsite')} className="btn btn-primary">Mark as Paid</button>
+            <button 
+              onClick={() => handleStatusUpdate('paid_offsite')} 
+              className="btn btn-primary"
+              disabled={updateMutation.isPending}
+            >
+              💰 Mark as Paid
+            </button>
           )}
           {isSeller && order.status === 'paid_offsite' && (
-            <button onClick={() => handleStatusUpdate('delivered')} className="btn btn-primary">Mark as Delivered</button>
+            <button 
+              onClick={() => handleStatusUpdate('delivered')} 
+              className="btn btn-primary"
+              disabled={updateMutation.isPending}
+            >
+              📦 Mark as Delivered
+            </button>
           )}
-          {(isBuyer || isSeller) && !['disputed', 'cancelled', 'delivered'].includes(order.status) && (
-            <button onClick={() => setShowDisputeModal(true)} className="btn btn-danger">File Dispute</button>
+
+          {/* Buyer Actions */}
+          {isBuyer && order.status === 'requested' && (
+            <button 
+              onClick={() => handleStatusUpdate('cancelled')} 
+              className="btn bg-gray-500 hover:bg-gray-600 text-white"
+              disabled={updateMutation.isPending}
+            >
+              ❌ Cancel Order
+            </button>
           )}
+          {isBuyer && order.status === 'delivered' && (
+            <button 
+              onClick={() => handleStatusUpdate('completed')} 
+              className="btn btn-primary"
+              disabled={updateMutation.isPending}
+            >
+              ✅ Confirm Received
+            </button>
+          )}
+
+          {/* Dispute Action */}
+          {(isBuyer || isSeller) && !['disputed', 'cancelled', 'delivered', 'completed'].includes(order.status) && (
+            <button 
+              onClick={() => setShowDisputeModal(true)} 
+              className="btn bg-red-500 hover:bg-red-600 text-white"
+              disabled={updateMutation.isPending || disputeMutation.isPending}
+            >
+              ⚠️ File Dispute
+            </button>
+          )}
+
+          {/* No actions available */}
+          {!isSeller && !isBuyer && (
+            <p className="text-gray-500 text-sm">You don't have permission to perform actions on this order.</p>
+          )}
+          {(isSeller || isBuyer) && 
+           ['completed', 'cancelled', 'disputed'].includes(order.status) && 
+           (
+            <div className="w-full">
+              <p className="text-gray-600 text-sm mb-2">
+                {order.status === 'completed' && '✅ This order has been completed successfully.'}
+                {order.status === 'cancelled' && '❌ This order has been cancelled.'}
+                {order.status === 'disputed' && '⚠️ This order is under dispute. Please wait for admin resolution.'}
+              </p>
+              {order.status === 'disputed' && (
+                <Link to={`/disputes?orderId=${order._id}`} className="text-purple-600 hover:underline text-sm">
+                  View Dispute Details →
+                </Link>
+              )}
+            </div>
+           )}
         </div>
       </div>
 
