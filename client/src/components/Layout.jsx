@@ -58,7 +58,18 @@ const Layout = () => {
         fetchPendingOrdersCount();
       }, 30000);
       
-      return () => clearInterval(interval);
+      // Listen for custom event to clear order notifications
+      const handleClearOrderNotifications = () => {
+        console.log('🔔 Clearing order notifications');
+        setPendingOrdersCount(0);
+      };
+      
+      window.addEventListener('clear-order-notifications', handleClearOrderNotifications);
+      
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('clear-order-notifications', handleClearOrderNotifications);
+      };
     }
   }, [isAuthenticated, isSeller]);
 

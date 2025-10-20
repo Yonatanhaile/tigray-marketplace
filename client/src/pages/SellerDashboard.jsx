@@ -9,6 +9,12 @@ const SellerDashboard = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('active'); // 'active', 'pending', 'sold'
+  
+  // Clear pending orders notification when seller visits dashboard
+  useEffect(() => {
+    // Emit custom event to Layout component to clear notification
+    window.dispatchEvent(new CustomEvent('clear-order-notifications'));
+  }, []);
 
   const { data: listingsData, isLoading: listingsLoading } = useQuery({
     queryKey: ['listings', 'my-listings'],
