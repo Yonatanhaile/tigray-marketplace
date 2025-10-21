@@ -88,19 +88,17 @@ const AllMessages = () => {
                   hasUnread ? 'bg-blue-50 border-l-4 border-blue-600' : ''
                 }`}
               >
-                {/* Avatar/Image */}
+                {/* Avatar/Image - User Profile Picture */}
                 <div className="flex-shrink-0">
-                  {order.listingId?.images?.[0] ? (
+                  {otherPerson?.profileImage?.url ? (
                     <img 
-                      src={order.listingId.images[0].url} 
-                      alt="" 
-                      className="w-16 h-16 object-contain bg-gray-50 rounded-lg" 
+                      src={otherPerson.profileImage.url} 
+                      alt={otherPerson?.name || 'User'} 
+                      className="w-16 h-16 object-cover rounded-full border-2 border-gray-200" 
                     />
                   ) : (
-                    <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
-                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                      </svg>
+                    <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-2xl border-2 border-gray-200">
+                      {otherPerson?.name?.charAt(0)?.toUpperCase() || 'U'}
                     </div>
                   )}
                 </div>

@@ -32,8 +32,8 @@ const createOrder = async (req, res) => {
       });
     }
 
-    // Check if buyer already has a pending/active order for this listing
-    const existingOrder = await Order.findOne({
+    // Check if buyer already has an active order for this listing
+    const activeOrder = await Order.findOne({
       listingId,
       buyerId: req.userId,
       status: { $in: ['requested', 'confirmed', 'paid', 'delivered'] }, // Active order statuses
@@ -43,13 +43,27 @@ const createOrder = async (req, res) => {
       { path: 'sellerId', select: 'name email phone profileImage' },
     ]);
 
-    if (existingOrder) {
-      logger.info(`Buyer ${req.userId} already has an order (${existingOrder._id}) for listing ${listingId}`);
+    if (activeOrder) {
+      logger.info(`Buyer ${req.userId} already has an active order (${activeOrder._id}) for listing ${listingId}`);
       return res.status(200).json({
         error: false,
         message: 'You already have an order intent for this item',
-        order: existingOrder,
+        order: activeOrder,
         isExisting: true, // Flag to indicate this is an existing order
+      });
+    }
+
+    // Check total number of orders (including completed/cancelled) - max 2 allowed
+    const totalOrdersCount = await Order.countDocuments({
+      listingId,
+      buyerId: req.userId,
+    });
+
+    if (totalOrdersCount >= 2) {
+      logger.info(`Buyer ${req.userId} has reached max orders (${totalOrdersCount}) for listing ${listingId}`);
+      return res.status(400).json({
+        error: true,
+        message: 'You have already created the maximum number of orders (2) for this item',
       });
     }
 

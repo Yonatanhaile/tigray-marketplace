@@ -176,15 +176,34 @@ const Messages = () => {
               const senderName = typeof msg.senderId === 'object' && msg.senderId?.name
                 ? msg.senderId.name
                 : (senderId === buyerId ? order?.buyerId?.name : order?.sellerId?.name);
+              const senderInfo = senderId === buyerId ? order?.buyerId : order?.sellerId;
+              const senderProfileImage = senderInfo?.profileImage?.url;
+              
               return (
                 <div key={msg._id} className={`w-full flex ${isMyMessage ? 'justify-end' : 'justify-start'} mb-4`}>
-                  <div className={`flex flex-col ${isMyMessage ? 'items-end' : 'items-start'} max-w-[85%] sm:max-w-[70%] min-w-[150px] sm:min-w-[200px]`}>
-                    {/* Sender name - only for received messages */}
-                    {!isMyMessage && (
-                      <span className="text-xs font-semibold text-gray-600 mb-1 ml-4">
-                        {senderName || 'User'}
-                      </span>
-                    )}
+                  <div className={`flex ${isMyMessage ? 'flex-row-reverse' : 'flex-row'} items-end gap-2 max-w-[85%] sm:max-w-[70%]`}>
+                    {/* Profile Image */}
+                    <div className="flex-shrink-0">
+                      {senderProfileImage ? (
+                        <img 
+                          src={senderProfileImage} 
+                          alt={senderName} 
+                          className="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-xs border-2 border-gray-200">
+                          {senderName?.charAt(0)?.toUpperCase() || 'U'}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className={`flex flex-col ${isMyMessage ? 'items-end' : 'items-start'} min-w-[150px] sm:min-w-[200px]`}>
+                      {/* Sender name - only for received messages */}
+                      {!isMyMessage && (
+                        <span className="text-xs font-semibold text-gray-600 mb-1 ml-4">
+                          {senderName || 'User'}
+                        </span>
+                      )}
                     
                     {/* Message bubble */}
                     <div className={`relative px-4 py-3 sm:px-6 sm:py-4 shadow-lg ${
@@ -220,12 +239,13 @@ const Messages = () => {
                       </p>
                     </div>
                     
-                    {/* "You" label for sent messages */}
-                    {isMyMessage && (
-                      <span className="text-xs text-gray-600 mt-1 mr-4 font-medium">
-                        You
-                      </span>
-                    )}
+                      {/* "You" label for sent messages */}
+                      {isMyMessage && (
+                        <span className="text-xs text-gray-600 mt-1 mr-4 font-medium">
+                          You
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               );

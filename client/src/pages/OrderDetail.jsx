@@ -112,7 +112,22 @@ const OrderDetail = () => {
         {/* Buyer Info */}
         <div className="card">
           <h2 className="text-xl font-semibold mb-4">Buyer</h2>
-          <p><strong>Name:</strong> {order.buyerId?.name}</p>
+          <div className="flex items-center gap-3 mb-3">
+            {order.buyerId?.profileImage?.url ? (
+              <img 
+                src={order.buyerId.profileImage.url} 
+                alt={order.buyerId?.name} 
+                className="w-12 h-12 rounded-full object-cover border-2 border-purple-200"
+              />
+            ) : (
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
+                {order.buyerId?.name?.charAt(0)?.toUpperCase()}
+              </div>
+            )}
+            <div>
+              <p className="font-semibold">{order.buyerId?.name}</p>
+            </div>
+          </div>
           <p><strong>Email:</strong> {order.buyerId?.email}</p>
           <p><strong>Phone:</strong> {order.buyerId?.phone}</p>
         </div>
@@ -120,7 +135,22 @@ const OrderDetail = () => {
         {/* Seller Info */}
         <div className="card">
           <h2 className="text-xl font-semibold mb-4">Seller</h2>
-          <p><strong>Name:</strong> {order.sellerId?.name}</p>
+          <div className="flex items-center gap-3 mb-3">
+            {order.sellerId?.profileImage?.url ? (
+              <img 
+                src={order.sellerId.profileImage.url} 
+                alt={order.sellerId?.name} 
+                className="w-12 h-12 rounded-full object-cover border-2 border-purple-200"
+              />
+            ) : (
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
+                {order.sellerId?.name?.charAt(0)?.toUpperCase()}
+              </div>
+            )}
+            <div>
+              <p className="font-semibold">{order.sellerId?.name}</p>
+            </div>
+          </div>
           <p><strong>Email:</strong> {order.sellerId?.email}</p>
           <p><strong>Phone:</strong> {order.sellerId?.phone}</p>
         </div>

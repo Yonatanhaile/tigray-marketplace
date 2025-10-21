@@ -22,16 +22,20 @@ const ListingDetail = () => {
     queryFn: () => listingsAPI.getById(id),
   });
 
-  // Check if buyer already has an active order for this listing
-  const { data: existingOrderData } = useQuery({
-    queryKey: ['existing-order', id],
+  // Check buyer's order history for this listing
+  const { data: orderHistory } = useQuery({
+    queryKey: ['order-history', id],
     queryFn: async () => {
-      if (!isAuthenticated) return null;
+      if (!isAuthenticated) return { activeOrder: null, totalOrders: 0 };
       const ordersData = await ordersAPI.getMyOrders({ role: 'buyer' });
-      return ordersData.orders.find(
-        order => order.listingId?._id === id && 
+      const listingOrders = ordersData.orders.filter(order => order.listingId?._id === id);
+      const activeOrder = listingOrders.find(order => 
         ['requested', 'confirmed', 'paid', 'delivered'].includes(order.status)
       );
+      return {
+        activeOrder,
+        totalOrders: listingOrders.length,
+      };
     },
     enabled: isAuthenticated && !!id,
   });
@@ -54,7 +58,7 @@ const ListingDetail = () => {
       setShowIntentModal(false);
       navigate(`/orders/${data.order._id}`);
       queryClient.invalidateQueries(['orders']);
-      queryClient.invalidateQueries(['existing-order', id]);
+      queryClient.invalidateQueries(['order-history', id]);
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || 'Failed to create order intent', {
@@ -250,9 +254,17 @@ const ListingDetail = () => {
           <div className="mb-6 card">
             <h3 className="font-semibold mb-2">Seller</h3>
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
-                {listing.listing.sellerId.name.charAt(0).toUpperCase()}
-              </div>
+              {listing.listing.sellerId.profileImage?.url ? (
+                <img 
+                  src={listing.listing.sellerId.profileImage.url} 
+                  alt={listing.listing.sellerId.name} 
+                  className="w-12 h-12 rounded-full object-cover border-2 border-purple-200"
+                />
+              ) : (
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  {listing.listing.sellerId.name.charAt(0).toUpperCase()}
+                </div>
+              )}
               <div>
                 <div className="font-medium">
                   <button
@@ -288,13 +300,18 @@ const ListingDetail = () => {
           {/* Actions */}
           {!isOwnListing && listing.listing.status === 'active' && (
             <>
-              {existingOrderData ? (
+              {orderHistory?.activeOrder ? (
                 <button
-                  onClick={() => navigate(`/orders/${existingOrderData._id}`)}
+                  onClick={() => navigate(`/orders/${orderHistory.activeOrder._id}`)}
                   className="w-full btn btn-success text-lg py-3 bg-green-600 hover:bg-green-700"
                 >
                   ✓ View Your Order
                 </button>
+              ) : orderHistory?.totalOrders >= 2 ? (
+                <div className="w-full text-center py-4 px-6 bg-yellow-50 border-2 border-yellow-400 rounded-lg">
+                  <p className="text-yellow-800 font-semibold mb-2">⚠️ Maximum Orders Reached</p>
+                  <p className="text-yellow-700 text-sm">You have already created 2 orders for this item</p>
+                </div>
               ) : (
                 <button
                   onClick={() => setShowIntentModal(true)}

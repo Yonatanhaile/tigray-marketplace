@@ -27,9 +27,17 @@ const SellerProfile = () => {
         ) : seller ? (
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center text-xl font-bold">
-                {seller?.name?.charAt(0)?.toUpperCase()}
-              </div>
+              {seller?.profileImage?.url ? (
+                <img 
+                  src={seller.profileImage.url} 
+                  alt={seller?.name} 
+                  className="w-16 h-16 rounded-full object-cover border-2 border-purple-200"
+                />
+              ) : (
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-xl font-bold text-white">
+                  {seller?.name?.charAt(0)?.toUpperCase()}
+                </div>
+              )}
               <div>
                 <h1 className="text-2xl font-bold">{seller?.name}</h1>
                 <p className="text-sm text-gray-600">{seller?.email}</p>
