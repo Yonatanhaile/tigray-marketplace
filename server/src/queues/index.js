@@ -3,13 +3,21 @@ const logger = require('../services/logger');
 
 // Initialize queues
 let invoiceQueue;
+let queueEnabled = false;
 
 /**
  * Initialize Bull queues with Redis connection
  */
 const initializeQueues = async () => {
   try {
-    const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+    const redisUrl = process.env.REDIS_URL;
+    
+    // Skip queue initialization if Redis URL is not provided or invalid
+    if (!redisUrl || redisUrl === 'redis://localhost:6379' || redisUrl.includes('undefined')) {
+      logger.warn('⚠️ Redis not configured. Invoice queue disabled. PDF invoices will not be generated.');
+      queueEnabled = false;
+      return;
+    }
     
     // Create invoice generation queue
     invoiceQueue = new Bull('invoice-generation', redisUrl, {
@@ -34,13 +42,15 @@ const initializeQueues = async () => {
     });
 
     invoiceQueue.on('error', (error) => {
-      logger.error('Invoice queue error:', error);
+      logger.warn('Invoice queue connection issue (this is normal if Redis is not configured):', error.message);
     });
 
+    queueEnabled = true;
     logger.info('✅ Bull queues initialized successfully');
   } catch (error) {
-    logger.error('❌ Failed to initialize queues:', error);
-    throw error;
+    logger.warn('⚠️ Failed to initialize queues. Invoice generation disabled:', error.message);
+    queueEnabled = false;
+    // Don't throw error - allow server to start without queues
   }
 };
 
@@ -48,6 +58,11 @@ const initializeQueues = async () => {
  * Add invoice generation job to queue
  */
 const addInvoiceJob = async (jobData) => {
+  if (!queueEnabled || !invoiceQueue) {
+    logger.warn('⚠️ Invoice queue not available. Skipping invoice generation.');
+    return null;
+  }
+  
   try {
     const job = await invoiceQueue.add('generate-invoice', jobData, {
       priority: jobData.priority || 1,
@@ -65,6 +80,17 @@ const addInvoiceJob = async (jobData) => {
  * Get queue statistics
  */
 const getQueueStats = async () => {
+  if (!queueEnabled || !invoiceQueue) {
+    return {
+      waiting: 0,
+      active: 0,
+      completed: 0,
+      failed: 0,
+      delayed: 0,
+      disabled: true,
+    };
+  }
+  
   try {
     const [waiting, active, completed, failed, delayed] = await Promise.all([
       invoiceQueue.getWaitingCount(),
@@ -91,6 +117,11 @@ const getQueueStats = async () => {
  * Clean old jobs from queue
  */
 const cleanQueue = async (grace = 7 * 24 * 60 * 60 * 1000) => {
+  if (!queueEnabled || !invoiceQueue) {
+    logger.warn('⚠️ Queue not available. Skipping cleanup.');
+    return;
+  }
+  
   try {
     await invoiceQueue.clean(grace, 'completed');
     await invoiceQueue.clean(grace, 'failed');
