@@ -51,6 +51,8 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
   'https://tigray-marketplace-client.vercel.app',
+  'https://yohatrade.com',
+  'http://yohatrade.com',
 ];
 
 // Add FRONTEND_URL if it exists
