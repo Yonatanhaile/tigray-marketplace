@@ -224,30 +224,30 @@ const ListingDetail = () => {
                   // Old format: plain string (for backward compatibility)
                   <p className="bg-white p-3 rounded">{listing.listing.payment_instructions}</p>
                 )}
+                <button
+                  onClick={() => {
+                    const instructions = listing.listing.payment_instructions;
+                    let textToCopy = '';
+                    
+                    if (typeof instructions === 'object') {
+                      // Format object as readable text
+                      if (instructions.cash) textToCopy += `Cash: ${instructions.cash}\n\n`;
+                      if (instructions.bank) textToCopy += `Bank Transfer:\n${instructions.bank}\n\n`;
+                      if (instructions.telebirr) textToCopy += `Telebirr: ${instructions.telebirr}\n\n`;
+                      if (instructions.mpesa) textToCopy += `M-Pesa: ${instructions.mpesa}\n\n`;
+                    } else {
+                      textToCopy = instructions || '';
+                    }
+                    
+                    navigator.clipboard.writeText(textToCopy.trim());
+                    toast.success('Payment details copied to clipboard');
+                  }}
+                  className="text-primary-600 text-sm mt-2 hover:underline inline-flex items-center gap-1"
+                >
+                  📋 Copy payment details
+                </button>
               </div>
             )}
-            <button
-              onClick={() => {
-                const instructions = listing.listing.payment_instructions;
-                let textToCopy = '';
-                
-                if (typeof instructions === 'object') {
-                  // Format object as readable text
-                  if (instructions.cash) textToCopy += `Cash: ${instructions.cash}\n\n`;
-                  if (instructions.bank) textToCopy += `Bank Transfer:\n${instructions.bank}\n\n`;
-                  if (instructions.telebirr) textToCopy += `Telebirr: ${instructions.telebirr}\n\n`;
-                  if (instructions.mpesa) textToCopy += `M-Pesa: ${instructions.mpesa}\n\n`;
-                } else {
-                  textToCopy = instructions || '';
-                }
-                
-                navigator.clipboard.writeText(textToCopy.trim());
-                toast.success('Payment details copied to clipboard');
-              }}
-              className="text-primary-600 text-sm mt-2 hover:underline inline-flex items-center gap-1"
-            >
-              📋 Copy payment details
-            </button>
           </div>
 
           {/* Seller Info */}

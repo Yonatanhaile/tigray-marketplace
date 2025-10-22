@@ -109,6 +109,66 @@ const OrderDetail = () => {
           <p className="text-gray-600 text-sm">{order.listingId?.description?.slice(0, 100)}...</p>
         </div>
 
+        {/* Payment Instructions */}
+        {isBuyer && order.listingId?.payment_instructions && (
+          <div className="card col-span-full bg-yellow-50 border-l-4 border-yellow-400">
+            <h2 className="text-xl font-semibold mb-4">Payment Instructions</h2>
+            <div className="text-sm text-gray-700 space-y-2">
+              {typeof order.listingId.payment_instructions === 'object' ? (
+                <div className="space-y-3">
+                  {order.listingId.payment_instructions.cash && (
+                    <div>
+                      <span className="font-medium text-gray-900">💵 Cash:</span>
+                      <p className="text-gray-700 ml-5">{order.listingId.payment_instructions.cash}</p>
+                    </div>
+                  )}
+                  {order.listingId.payment_instructions.bank && (
+                    <div>
+                      <span className="font-medium text-gray-900">🏦 Bank Transfer:</span>
+                      <p className="text-gray-700 ml-5 whitespace-pre-wrap">{order.listingId.payment_instructions.bank}</p>
+                    </div>
+                  )}
+                  {order.listingId.payment_instructions.telebirr && (
+                    <div>
+                      <span className="font-medium text-gray-900">📱 Telebirr:</span>
+                      <p className="text-gray-700 ml-5">{order.listingId.payment_instructions.telebirr}</p>
+                    </div>
+                  )}
+                  {order.listingId.payment_instructions.mpesa && (
+                    <div>
+                      <span className="font-medium text-gray-900">📲 M-Pesa:</span>
+                      <p className="text-gray-700 ml-5">{order.listingId.payment_instructions.mpesa}</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="bg-white p-3 rounded">{order.listingId.payment_instructions}</p>
+              )}
+              <button
+                onClick={() => {
+                  const instructions = order.listingId.payment_instructions;
+                  let textToCopy = '';
+                  
+                  if (typeof instructions === 'object') {
+                    if (instructions.cash) textToCopy += `Cash: ${instructions.cash}\n\n`;
+                    if (instructions.bank) textToCopy += `Bank Transfer:\n${instructions.bank}\n\n`;
+                    if (instructions.telebirr) textToCopy += `Telebirr: ${instructions.telebirr}\n\n`;
+                    if (instructions.mpesa) textToCopy += `M-Pesa: ${instructions.mpesa}\n\n`;
+                  } else {
+                    textToCopy = instructions || '';
+                  }
+                  
+                  navigator.clipboard.writeText(textToCopy.trim());
+                  toast.success('Payment details copied to clipboard');
+                }}
+                className="text-primary-600 text-sm mt-2 hover:underline inline-flex items-center gap-1"
+              >
+                📋 Copy payment details
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Buyer Info */}
         <div className="card">
           <h2 className="text-xl font-semibold mb-4">Buyer</h2>
