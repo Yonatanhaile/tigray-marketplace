@@ -7,6 +7,7 @@ import ETHIOPIAN_LOCATIONS from '../constants/locations';
 import { formatPrice } from '../utils/format';
 import { getCategoryIcon, getSubcategoryIcon } from '../constants/categoryIcons';
 import { onNewActiveListing, offNewActiveListing } from '../services/socket';
+import BackButton from '../components/BackButton';
 
 const Search = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -72,6 +73,9 @@ const Search = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mb-4">
+        <BackButton />
+      </div>
       <h1 className="text-3xl font-bold mb-6">Browse Listings</h1>
 
       {/* Search & Filters */}

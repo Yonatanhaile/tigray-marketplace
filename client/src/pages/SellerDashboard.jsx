@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { listingsAPI, ordersAPI } from '../services/api';
 import { onListingCreated, onListingStatusChanged, offListingCreated, offListingStatusChanged } from '../services/socket';
 import toast from 'react-hot-toast';
+import BackButton from '../components/BackButton';
 
 const SellerDashboard = () => {
   const queryClient = useQueryClient();
@@ -157,6 +158,9 @@ const SellerDashboard = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="mb-4">
+        <BackButton />
+      </div>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <div>

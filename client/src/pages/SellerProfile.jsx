@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { listingsAPI } from '../services/api';
+import BackButton from '../components/BackButton';
 
 const SellerProfile = () => {
   const { sellerId } = useParams();
@@ -20,6 +21,9 @@ const SellerProfile = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mb-4">
+        <BackButton />
+      </div>
       {/* Header */}
       <div className="card mb-8">
         {isLoading ? (

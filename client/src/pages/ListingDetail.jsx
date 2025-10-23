@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { listingsAPI, ordersAPI } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
+import BackButton from '../components/BackButton';
 
 const ListingDetail = () => {
   const { id } = useParams();
@@ -100,6 +101,9 @@ const ListingDetail = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mb-4">
+        <BackButton />
+      </div>
       <div className="grid md:grid-cols-2 gap-8">
         {/* Images */}
         <div>

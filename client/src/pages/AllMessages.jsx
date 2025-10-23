@@ -4,6 +4,7 @@ import { ordersAPI } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 import { useSocket } from '../hooks/useSocket';
 import { useEffect } from 'react';
+import BackButton from '../components/BackButton';
 
 const AllMessages = () => {
   const { user } = useAuth();
@@ -54,6 +55,9 @@ const AllMessages = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="mb-4">
+        <BackButton />
+      </div>
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Messages</h1>
         <p className="text-gray-600 mt-2">All your conversations in one place</p>

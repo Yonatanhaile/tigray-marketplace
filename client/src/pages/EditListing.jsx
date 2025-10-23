@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import { CATEGORIES, PAYMENT_METHODS } from '../constants/categories';
 import ETHIOPIAN_LOCATIONS from '../constants/locations';
 import { getCategoryIcon, getSubcategoryIcon } from '../constants/categoryIcons';
+import BackButton from '../components/BackButton';
 
 const EditListing = () => {
   const { id } = useParams();
@@ -188,6 +189,9 @@ const EditListing = () => {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="mb-4">
+        <BackButton />
+      </div>
       <h1 className="text-3xl font-bold mb-6">Edit Listing</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="card space-y-6">

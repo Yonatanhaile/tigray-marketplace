@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ordersAPI } from '../services/api';
+import BackButton from '../components/BackButton';
 
 const BuyerOrders = () => {
   const { data, isLoading } = useQuery({
@@ -10,6 +11,9 @@ const BuyerOrders = () => {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="mb-4">
+        <BackButton />
+      </div>
       <h1 className="text-3xl font-bold mb-6">My Orders</h1>
 
       {isLoading ? (

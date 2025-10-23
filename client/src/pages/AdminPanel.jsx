@@ -4,6 +4,7 @@ import { adminAPI } from '../services/api';
 import api from '../services/api';
 import { onListingCreated, onListingStatusChanged, offListingCreated, offListingStatusChanged } from '../services/socket';
 import toast from 'react-hot-toast';
+import BackButton from '../components/BackButton';
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('stats');
@@ -111,6 +112,9 @@ const AdminPanel = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="mb-4">
+        <BackButton />
+      </div>
       <h1 className="text-3xl font-bold mb-6">Admin Panel</h1>
 
       {/* Tabs */}

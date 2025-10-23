@@ -5,6 +5,7 @@ import { ordersAPI, disputesAPI } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 import { markOrderStatus } from '../services/socket';
 import toast from 'react-hot-toast';
+import BackButton from '../components/BackButton';
 
 const OrderDetail = () => {
   const { id } = useParams();
@@ -82,6 +83,9 @@ const OrderDetail = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="mb-4">
+        <BackButton />
+      </div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Order Details</h1>
         <Link to={`/orders/${id}/messages`} className="btn btn-secondary">💬 Messages</Link>
