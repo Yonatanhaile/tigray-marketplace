@@ -27,6 +27,7 @@ const Layout = () => {
       const fetchUnreadCount = async () => {
         try {
           const data = await messagesAPI.getUnreadCount();
+          console.log('📬 Fetched unread count:', data.unreadCount);
           setUnreadCount(data.unreadCount || 0);
         } catch (error) {
           // Silently fail - API might be deploying
@@ -73,11 +74,19 @@ const Layout = () => {
         setPendingOrdersCount(0);
       };
       
+      // Listen for custom event to clear message notifications
+      const handleClearMessageNotifications = () => {
+        console.log('🔔 Clearing message notifications');
+        fetchUnreadCount();
+      };
+      
       window.addEventListener('clear-order-notifications', handleClearOrderNotifications);
+      window.addEventListener('clear-message-notifications', handleClearMessageNotifications);
       
       return () => {
         clearInterval(interval);
         window.removeEventListener('clear-order-notifications', handleClearOrderNotifications);
+        window.removeEventListener('clear-message-notifications', handleClearMessageNotifications);
       };
     }
   }, [isAuthenticated, isSeller]);
@@ -116,10 +125,12 @@ const Layout = () => {
         }
       };
 
-      const handleMessagesRead = () => {
-        // Refresh unread count when messages are marked as read
+      const handleMessagesRead = (data) => {
+        console.log('🔔 Messages marked as read, updating count');
+        // Immediately fetch fresh unread count from server
         messagesAPI.getUnreadCount()
           .then(data => {
+            console.log('📊 New unread count:', data.unreadCount);
             setUnreadCount(data.unreadCount || 0);
             // Invalidate unread count query to refresh across all components
             queryClient.invalidateQueries(['messages', 'unread-count']);

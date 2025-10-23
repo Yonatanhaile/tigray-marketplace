@@ -20,6 +20,35 @@ const CreateListing = () => {
       payment_methods: [],
     }
   });
+  
+  // Load saved address from localStorage on component mount
+  useEffect(() => {
+    const savedAddress = localStorage.getItem('lastListingAddress');
+    if (savedAddress) {
+      try {
+        const addressData = JSON.parse(savedAddress);
+        console.log('📍 Loading saved address:', addressData);
+        
+        // Pre-fill address fields
+        if (addressData.region) {
+          setValue('location.region', addressData.region);
+        }
+        if (addressData.zone) {
+          setValue('location.zone', addressData.zone);
+        }
+        if (addressData.specificAddress) {
+          setValue('location.specificAddress', addressData.specificAddress);
+        }
+        
+        toast.success('✅ Previous address loaded', {
+          duration: 2000,
+          icon: '📍'
+        });
+      } catch (error) {
+        console.error('Failed to load saved address:', error);
+      }
+    }
+  }, [setValue]);
 
   const selectedCategory = watch('category');
   const selectedRegion = watch('location.region');
@@ -41,7 +70,18 @@ const CreateListing = () => {
 
   const createMutation = useMutation({
     mutationFn: listingsAPI.create,
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
+      // Save the address to localStorage for future listings
+      if (variables.location) {
+        const addressData = {
+          region: variables.location.region,
+          zone: variables.location.zone,
+          specificAddress: variables.location.specificAddress
+        };
+        localStorage.setItem('lastListingAddress', JSON.stringify(addressData));
+        console.log('💾 Saved address for future listings');
+      }
+      
       toast.success('Listing created successfully! It will be reviewed by admin before going live.');
       queryClient.invalidateQueries(['listings']);
       navigate('/seller-dashboard');
@@ -251,7 +291,17 @@ const CreateListing = () => {
 
         {/* Location Selection */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Location *</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">Location *</h3>
+            {localStorage.getItem('lastListingAddress') && (
+              <span className="text-xs text-green-600 font-medium flex items-center gap-1">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Address loaded from last listing
+              </span>
+            )}
+          </div>
           
           <div className="grid md:grid-cols-2 gap-4">
             <div>

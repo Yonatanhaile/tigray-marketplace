@@ -40,6 +40,9 @@ const Messages = () => {
   });
 
   useEffect(() => {
+    // Emit custom event to Layout component to clear message notifications
+    window.dispatchEvent(new CustomEvent('clear-message-notifications'));
+    
     if (orderId && socket) {
       joinOrderRoom(orderId);
     }
@@ -58,6 +61,8 @@ const Messages = () => {
       socket.on('messages_read', (data) => {
         // When messages are marked as read, update the unread count
         queryClient.invalidateQueries(['messages', 'unread-count']);
+        // Also emit custom event to update Layout immediately
+        window.dispatchEvent(new CustomEvent('clear-message-notifications'));
       });
 
       socket.on('error', (data) => {
@@ -79,6 +84,22 @@ const Messages = () => {
     setTimeout(scrollToBottom, 100);
     // Invalidate unread count when messages are loaded (they get marked as read on server)
     queryClient.invalidateQueries(['messages', 'unread-count']);
+    
+    // Manually fetch and update unread count to ensure UI updates immediately
+    const updateUnreadCount = async () => {
+      try {
+        const data = await messagesAPI.getUnreadCount();
+        // This will trigger a re-render in Layout component
+        queryClient.setQueryData(['messages', 'unread-count'], data);
+      } catch (error) {
+        console.error('Failed to update unread count:', error);
+      }
+    };
+    
+    if (messagesData?.messages) {
+      // Small delay to ensure server has marked messages as read
+      setTimeout(updateUnreadCount, 500);
+    }
   }, [messagesData, queryClient]);
 
   useEffect(() => {
