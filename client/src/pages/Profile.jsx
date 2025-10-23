@@ -28,6 +28,24 @@ const Profile = () => {
     }
   });
 
+  // Normalize phone number to international format
+  const normalizePhoneNumber = (phone) => {
+    // Remove all spaces and dashes
+    let normalized = phone.replace(/[\s-]/g, '');
+    
+    // If starts with 0, convert to +251 (Ethiopian format)
+    if (normalized.startsWith('0')) {
+      normalized = '+251' + normalized.substring(1);
+    }
+    
+    // If doesn't start with +, add +251
+    if (!normalized.startsWith('+')) {
+      normalized = '+251' + normalized;
+    }
+    
+    return normalized;
+  };
+
   const updateMutation = useMutation({
     mutationFn: async (data) => {
       const token = localStorage.getItem('token');
@@ -120,8 +138,13 @@ const Profile = () => {
   };
 
   const onSubmit = (data) => {
+    // Normalize phone number to international format
+    const normalizedData = {
+      ...data,
+      phone: normalizePhoneNumber(data.phone),
+    };
     // Profile image is saved automatically on upload, so we don't need to include it here
-    updateMutation.mutate(data);
+    updateMutation.mutate(normalizedData);
   };
 
   const handleCancel = () => {
@@ -238,16 +261,19 @@ const Profile = () => {
               <>
                 <input 
                   {...register('phone', {
-                    pattern: { 
-                      value: /^[0-9]{10}$/, 
-                      message: 'Enter a valid 10-digit phone number' 
-                    }
+                    required: 'Phone is required',
+                    pattern: {
+                      value: /^(\+251|0)?[9]\d{8}$/,
+                      message: 'Invalid Ethiopian phone number (e.g., 0912345678 or +251912345678)',
+                    },
                   })} 
                   className="input" 
-                  placeholder="0912345678"
-                  maxLength="10"
+                  placeholder="0912345678 or +251912345678"
                 />
                 {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
+                <p className="text-xs text-gray-500 mt-1">
+                  You can use Ethiopian format (0912345678) or international format (+251912345678)
+                </p>
               </>
             ) : (
               <p className="text-gray-800 py-2">{user?.phone || 'Not provided'}</p>

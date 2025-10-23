@@ -18,10 +18,31 @@ const Register = () => {
 
   const password = watch('password');
 
+  // Normalize phone number to international format
+  const normalizePhoneNumber = (phone) => {
+    // Remove all spaces and dashes
+    let normalized = phone.replace(/[\s-]/g, '');
+    
+    // If starts with 0, convert to +251 (Ethiopian format)
+    if (normalized.startsWith('0')) {
+      normalized = '+251' + normalized.substring(1);
+    }
+    
+    // If doesn't start with +, add +251
+    if (!normalized.startsWith('+')) {
+      normalized = '+251' + normalized;
+    }
+    
+    return normalized;
+  };
+
   const onSubmit = async (data) => {
     setLoading(true);
     try {
       const { confirmPassword, ...registerData } = data;
+      
+      // Normalize phone number to international format
+      registerData.phone = normalizePhoneNumber(registerData.phone);
       
       // All users are both buyers and sellers by default
       await registerUser(registerData);
@@ -88,16 +109,23 @@ const Register = () => {
                 {...register('phone', {
                   required: 'Phone is required',
                   pattern: {
-                    value: /^\+?[1-9]\d{1,14}$/,
-                    message: 'Invalid phone number (use international format)',
+                    value: /^(\+251|0)?[9]\d{8}$/,
+                    message: 'Invalid Ethiopian phone number (e.g., 0912345678 or +251912345678)',
+                  },
+                  minLength: {
+                    value: 10,
+                    message: 'Phone number must be at least 10 digits',
                   },
                 })}
                 className="input"
-                placeholder="+251912345678"
+                placeholder="0912345678 or +251912345678"
               />
               {errors.phone && (
                 <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
               )}
+              <p className="text-xs text-gray-500 mt-1">
+                You can use Ethiopian format (0912345678) or international format (+251912345678)
+              </p>
             </div>
 
             <div>
