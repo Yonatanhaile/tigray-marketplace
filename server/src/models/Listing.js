@@ -131,7 +131,9 @@ listingSchema.index({ price: 1 });
 listingSchema.index({ createdAt: -1 });
 listingSchema.index({ category: 1 });
 listingSchema.index({ subcategory: 1 });
-listingSchema.index({ title: 'text', description: 'text' }); // Text search
+listingSchema.index({ title: 1 }); // For regex search performance
+listingSchema.index({ description: 1 }); // For regex search performance
+// Note: We use regex search in controller for fuzzy/partial matching instead of MongoDB text search
 
 // Virtual for seller info (populated)
 listingSchema.virtual('seller', {

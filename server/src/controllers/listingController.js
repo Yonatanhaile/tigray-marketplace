@@ -136,7 +136,15 @@ const getListings = async (req, res) => {
     }
 
     if (query) {
-      filter.$text = { $search: query };
+      // Use regex for fuzzy/partial matching instead of exact text search
+      // This allows partial matches like "phon" matching "phone", "iphone", etc.
+      const searchRegex = new RegExp(query.split(' ').join('|'), 'i');
+      filter.$or = [
+        { title: searchRegex },
+        { description: searchRegex },
+        { category: searchRegex },
+        { subcategory: searchRegex },
+      ];
     }
 
     if (payment_methods) {
