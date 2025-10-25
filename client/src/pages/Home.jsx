@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { listingsAPI, messagesAPI } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 import { onNewActiveListing, offNewActiveListing } from '../services/socket';
 
 const Home = () => {
+  const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -71,16 +73,16 @@ const Home = () => {
                 </div>
                 <div>
                   <span className="font-bold text-lg">
-                    {unreadCount} {unreadCount === 1 ? 'New Message' : 'New Messages'}!
+                    {unreadCount} {unreadCount === 1 ? t('notifications.newMessage') : t('messages.newMessage')}!
                   </span>
-                  <p className="text-sm text-purple-100">Click to view your conversations</p>
+                  <p className="text-sm text-purple-100">{t('home.viewMessages')}</p>
                 </div>
               </div>
               <Link
                 to="/messages"
                 className="bg-white text-purple-600 px-6 md:px-8 py-3 rounded-xl font-bold hover:bg-purple-50 hover:shadow-xl transition-all transform hover:scale-105 flex items-center space-x-2 shadow-lg"
               >
-                <span>View Messages</span>
+                <span>{t('home.viewMessagesButton')}</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -94,14 +96,14 @@ const Home = () => {
       <div className="bg-gradient-to-br from-purple-600 via-indigo-600 to-purple-800 py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-6">
-            Find what you're looking for
+            {t('home.title')}
           </h2>
           <form onSubmit={handleSearch} className="flex gap-3">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search for items, services, jobs..."
+              placeholder={t('home.searchPlaceholder')}
               className="flex-1 px-6 py-4 rounded-xl text-lg focus:outline-none focus:ring-4 focus:ring-purple-300 shadow-xl"
             />
             <button
@@ -111,7 +113,7 @@ const Home = () => {
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              <span className="hidden sm:inline">Search</span>
+              <span className="hidden sm:inline">{t('common.search')}</span>
             </button>
           </form>
           <div className="mt-4 text-center">
@@ -119,7 +121,7 @@ const Home = () => {
               to="/search" 
               className="text-white hover:text-purple-200 text-sm underline transition-colors"
             >
-              or browse all listings
+              {t('home.browseAllListings')}
             </Link>
           </div>
         </div>
@@ -127,25 +129,25 @@ const Home = () => {
 
       {/* Features */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
+        <h2 className="text-3xl font-bold text-center mb-12">{t('home.howItWorks')}</h2>
         
         <div className="grid md:grid-cols-3 gap-8">
           <div className="card text-center">
             <div className="text-4xl mb-4">🛍️</div>
-            <h3 className="text-xl font-semibold mb-2">Browse Listings</h3>
-            <p className="text-gray-600">Discover items from local sellers in your area</p>
+            <h3 className="text-xl font-semibold mb-2">{t('home.browseListing')}</h3>
+            <p className="text-gray-600">{t('home.browseDescription')}</p>
           </div>
           
           <div className="card text-center">
             <div className="text-4xl mb-4">💬</div>
-            <h3 className="text-xl font-semibold mb-2">Express Intent to Buy</h3>
-            <p className="text-gray-600">Submit your intent with proposed terms and chat with the seller</p>
+            <h3 className="text-xl font-semibold mb-2">{t('home.expressIntent')}</h3>
+            <p className="text-gray-600">{t('home.expressIntentDescription')}</p>
           </div>
           
           <div className="card text-center">
             <div className="text-4xl mb-4">🤝</div>
-            <h3 className="text-xl font-semibold mb-2">Meet & Complete</h3>
-            <p className="text-gray-600">Meet safely and complete the transaction off-platform</p>
+            <h3 className="text-xl font-semibold mb-2">{t('home.meetComplete')}</h3>
+            <p className="text-gray-600">{t('home.meetCompleteDescription')}</p>
           </div>
         </div>
       </div>
@@ -154,9 +156,9 @@ const Home = () => {
       <div className="bg-gray-100 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold">Recent Listings</h2>
+            <h2 className="text-3xl font-bold">{t('home.recentListings')}</h2>
             <Link to="/search" className="text-primary-600 hover:text-primary-700 font-semibold">
-              View All →
+              {t('home.viewAll')} →
             </Link>
           </div>
 

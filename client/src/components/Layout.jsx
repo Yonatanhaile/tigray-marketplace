@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useSocket } from '../hooks/useSocket';
 import { messagesAPI } from '../services/api';
 import toast from 'react-hot-toast';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const Layout = () => {
+  const { t } = useTranslation();
   const { isAuthenticated, user, logout, isAdmin, isSeller } = useAuth();
   const { socket, connected, notifications, clearAllNotifications } = useSocket();
   const navigate = useNavigate();
@@ -211,16 +214,16 @@ const Layout = () => {
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-6">
               <Link to="/search" className="nav-link text-gray-700 hover:text-purple-600 px-4 py-2 rounded-lg transition-colors font-medium">
-                🔍 Browse
+                🔍 {t('nav.browse')}
               </Link>
               {isSeller && (
                 <Link to="/seller-dashboard" className="nav-link text-gray-700 hover:text-purple-600 px-4 py-2 rounded-lg transition-colors font-medium">
-                  📦 My Listings
+                  📦 {t('nav.myListings')}
                 </Link>
               )}
               {isAuthenticated && (
                 <Link to="/orders" className="nav-link text-gray-700 hover:text-purple-600 px-4 py-2 rounded-lg transition-colors font-medium relative">
-                  🛒 My Orders
+                  🛒 {t('nav.myOrders')}
                   {isSeller && pendingOrdersCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
                       {pendingOrdersCount}
@@ -231,11 +234,14 @@ const Layout = () => {
             </div>
 
             <div className="flex items-center space-x-2 md:space-x-4">
+              {/* Language Switcher */}
+              <LanguageSwitcher />
+
               {/* Socket connection indicator - Desktop only */}
               {isAuthenticated && (
                 <div className="hidden md:flex items-center space-x-2 px-3 py-1.5 bg-white/50 rounded-full border border-gray-200">
                   <div className={`w-2 h-2 rounded-full ${connected ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
-                  <span className="text-xs font-medium text-gray-600">{connected ? 'Live' : 'Offline'}</span>
+                  <span className="text-xs font-medium text-gray-600">{connected ? t('nav.live') : t('nav.offline')}</span>
                 </div>
               )}
 
@@ -305,14 +311,14 @@ const Layout = () => {
                       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M12 5v14M5 12h14" />
                       </svg>
-                      <span>Create Listing</span>
+                      <span>{t('nav.createListing')}</span>
                     </Link>
                   )}
                   
                   {/* Admin Panel - Desktop */}
                   {isAdmin && (
                     <Link to="/admin" className="hidden md:inline-flex btn btn-secondary">
-                      ⚙️ Admin
+                      ⚙️ {t('nav.admin')}
                     </Link>
                   )}
 
@@ -362,10 +368,10 @@ const Layout = () => {
               ) : (
                 <>
                   <Link to="/login" className="hidden sm:inline-flex text-gray-700 hover:text-purple-600 px-4 py-2 font-medium transition-colors">
-                    Login
+                    {t('nav.login')}
                   </Link>
                   <Link to="/register" className="btn btn-primary text-sm md:text-base">
-                    Sign Up
+                    {t('nav.signup')}
                   </Link>
                 </>
               )}
@@ -395,7 +401,7 @@ const Layout = () => {
                 className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors font-medium"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                🔍 Browse Listings
+                🔍 {t('nav.browseListing')}
               </Link>
               {isSeller && (
                 <>
@@ -404,14 +410,14 @@ const Layout = () => {
                     className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors font-medium"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    📦 My Listings
+                    📦 {t('nav.myListings')}
                   </Link>
                   <Link 
                     to="/create-listing" 
                     className="block px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg text-center"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    ➕ Create New Listing
+                    ➕ {t('nav.createNewListing')}
                   </Link>
                 </>
               )}
@@ -423,7 +429,7 @@ const Layout = () => {
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <span className="flex items-center justify-between">
-                      <span>🛒 My Orders</span>
+                      <span>🛒 {t('nav.myOrders')}</span>
                       {isSeller && pendingOrdersCount > 0 && (
                         <span className="bg-green-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
                           {pendingOrdersCount}
@@ -436,7 +442,7 @@ const Layout = () => {
                     className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors font-medium"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    👤 My Profile
+                    👤 {t('nav.profile')}
                   </Link>
                 </>
               )}
@@ -446,7 +452,7 @@ const Layout = () => {
                   className="block px-4 py-3 bg-gray-100 text-gray-900 font-semibold rounded-xl hover:bg-gray-200 transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  ⚙️ Admin Panel
+                  ⚙️ {t('nav.adminPanel')}
                 </Link>
               )}
               {!isAuthenticated && (
@@ -455,7 +461,7 @@ const Layout = () => {
                   className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors font-medium sm:hidden"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  🔐 Login
+                  🔐 {t('nav.login')}
                 </Link>
               )}
               {isAuthenticated && (
@@ -489,11 +495,10 @@ const Layout = () => {
             <div className="text-center md:text-left">
               <h3 className="font-bold text-gray-900 mb-3 flex items-center justify-center md:justify-start gap-2 text-lg">
                 <span className="text-2xl">⚠️</span>
-                Payment Disclaimer
+                {t('footer.disclaimer')}
               </h3>
               <p className="text-gray-600 text-sm leading-relaxed">
-                This platform does NOT process payments. All transactions are between buyer and seller. 
-                We are not liable for off-site payment disputes.
+                {t('footer.disclaimerText')}
               </p>
             </div>
 
@@ -501,7 +506,7 @@ const Layout = () => {
             <div className="text-center md:text-right">
               <h3 className="font-bold text-gray-900 mb-3 flex items-center justify-center md:justify-end gap-2 text-lg">
                 <span className="text-2xl">💻</span>
-                Contact Developer
+                {t('footer.contactDeveloper')}
               </h3>
               <div className="text-sm text-gray-600">
                 <a 
@@ -513,7 +518,7 @@ const Layout = () => {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                   </svg>
-                  Visit Portfolio
+                  {t('footer.visitPortfolio')}
                 </a>
               </div>
             </div>
@@ -522,7 +527,7 @@ const Layout = () => {
           {/* Copyright */}
           <div className="text-center pt-6 border-t border-gray-200">
             <p className="text-gray-500 text-sm">
-              &copy; {new Date().getFullYear()} YohaTrade. All rights reserved.
+              &copy; {new Date().getFullYear()} YohaTrade. {t('footer.copyright')}
             </p>
           </div>
         </div>

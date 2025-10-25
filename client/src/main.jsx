@@ -8,6 +8,7 @@ import './index.css'
 import { AuthProvider } from './hooks/useAuth'
 import { SocketProvider } from './hooks/useSocket'
 import ErrorBoundary from './components/ErrorBoundary'
+import './i18n/config' // Initialize i18n
 
 // Create React Query client
 const queryClient = new QueryClient({

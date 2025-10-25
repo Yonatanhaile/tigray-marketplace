@@ -12,6 +12,7 @@ export const CATEGORY_ICONS = {
   'Repair & Construction': '🛠️',
   'Commercial Equipment & Tools': '⚙️',
   'Leisure & Activities': '🎮',
+  'Musical Instruments': '🎸',
   'Babies & Kids': '👶',
   'Food, Agriculture & Farming': '🌾',
   'Animals & Pets': '🐾',
@@ -142,7 +143,6 @@ export const SUBCATEGORY_ICONS = {
   // Leisure & Activities
   'Sports Equipment (Football, Basketball, Gym)': '⚽',
   'Gym & Fitness': '💪',
-  'Musical Instruments': '🎸',
   'Books & Magazines': '📚',
   'CDs, DVDs & Media': '💿',
   'Toys & Games': '🧸',
@@ -150,6 +150,18 @@ export const SUBCATEGORY_ICONS = {
   'Camping & Outdoor Gear': '⛺',
   'Tickets & Events': '🎫',
   'Hobbies & Crafts': '🎨',
+  
+  // Musical Instruments
+  'String Instruments (Guitar, Violin, Bass, Cello, Mandolin)': '🎻',
+  'Keyboard Instruments (Piano, Keyboard, Organ, Synthesizer)': '🎹',
+  'Wind Instruments (Flute, Saxophone, Trumpet, Clarinet)': '🎺',
+  'Percussion Instruments (Drums, Drum Sets, Cymbals, Djembe)': '🥁',
+  'Traditional Instruments (Krar, Masinko, Kebero, Washint)': '🪘',
+  'DJ & Recording Equipment (Mixers, Turntables, Audio Interfaces)': '🎛️',
+  'Musical Accessories (Strings, Picks, Cases, Stands, Cables)': '🎼',
+  'Music Production Software & Equipment': '🎚️',
+  'Microphones & Studio Equipment': '🎤',
+  'Musical Instrument Repair & Services': '🔧',
   
   // Babies & Kids
   'Baby Clothing': '👶',
