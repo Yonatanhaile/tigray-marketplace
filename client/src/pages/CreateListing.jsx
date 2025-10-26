@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { listingsAPI } from '../services/api';
 import { uploadFile } from '../services/upload';
 import toast from 'react-hot-toast';
@@ -11,6 +12,7 @@ import { getCategoryIcon, getSubcategoryIcon } from '../constants/categoryIcons'
 import BackButton from '../components/BackButton';
 
 const CreateListing = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [uploading, setUploading] = useState(false);
@@ -218,8 +220,8 @@ const CreateListing = () => {
       <div className="mb-4">
         <BackButton />
       </div>
-      <h1 className="text-3xl font-bold mb-2">Create New Listing</h1>
-      <p className="text-gray-600 mb-6">List your products for sale or offer your professional services</p>
+      <h1 className="text-3xl font-bold mb-2">{t('createListing.title')}</h1>
+      <p className="text-gray-600 mb-6">{t('createListing.subtitle')}</p>
 
       {/* Helpful Tips */}
       {createMutation.isError && (

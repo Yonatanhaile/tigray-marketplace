@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { listingsAPI } from '../services/api';
 import { CATEGORIES } from '../constants/categories';
 import ETHIOPIAN_LOCATIONS from '../constants/locations';
@@ -10,6 +11,7 @@ import { onNewActiveListing, offNewActiveListing } from '../services/socket';
 import BackButton from '../components/BackButton';
 
 const Search = () => {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const [query, setQuery] = useState(searchParams.get('q') || '');
@@ -76,7 +78,7 @@ const Search = () => {
       <div className="mb-4">
         <BackButton />
       </div>
-      <h1 className="text-3xl font-bold mb-6">Browse Listings</h1>
+      <h1 className="text-3xl font-bold mb-6">{t('search.browseTitle')}</h1>
 
       {/* Search & Filters */}
       <form onSubmit={handleSearch} className="card mb-8">
@@ -87,13 +89,13 @@ const Search = () => {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search listings..."
+              placeholder={t('search.searchPlaceholder')}
               className="input"
             />
           </div>
           <div>
             <select value={category} onChange={(e) => { setCategory(e.target.value); setSubcategory(''); }} className="input">
-              <option value="">All Categories</option>
+              <option value="">{t('search.allCategories')}</option>
               {Object.keys(CATEGORIES).map(cat => (
                 <option key={cat} value={cat}>{getCategoryIcon(cat)} {cat}</option>
               ))}
@@ -101,7 +103,7 @@ const Search = () => {
           </div>
           <div>
             <select value={subcategory} onChange={(e) => setSubcategory(e.target.value)} className="input" disabled={!category}>
-              <option value="">All Subcategories</option>
+              <option value="">{t('search.allSubcategories')}</option>
               {(CATEGORIES[category] || []).map((sub) => (
                 <option key={sub} value={sub}>{getSubcategoryIcon(sub)} {sub}</option>
               ))}
@@ -113,7 +115,7 @@ const Search = () => {
         <div className="grid md:grid-cols-5 gap-4">
           <div>
             <select value={region} onChange={(e) => { setRegion(e.target.value); setZone(''); }} className="input">
-              <option value="">All Regions</option>
+              <option value="">{t('search.allRegions')}</option>
               {Object.keys(ETHIOPIAN_LOCATIONS).map(reg => (
                 <option key={reg} value={reg}>{reg}</option>
               ))}
@@ -121,7 +123,7 @@ const Search = () => {
           </div>
           <div>
             <select value={zone} onChange={(e) => setZone(e.target.value)} className="input" disabled={!region}>
-              <option value="">All Zones</option>
+              <option value="">{t('search.allZones')}</option>
               {(ETHIOPIAN_LOCATIONS[region] || []).map((z) => (
                 <option key={z} value={z}>{z}</option>
               ))}
@@ -132,7 +134,7 @@ const Search = () => {
               type="number"
               value={minPrice}
               onChange={(e) => setMinPrice(e.target.value)}
-              placeholder="Min Price"
+              placeholder={t('search.minPrice')}
               className="input"
             />
           </div>
@@ -141,22 +143,22 @@ const Search = () => {
               type="number"
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
-              placeholder="Max Price"
+              placeholder={t('search.maxPrice')}
               className="input"
             />
           </div>
           <div>
             <select value={sort} onChange={(e) => setSort(e.target.value)} className="input">
-              <option value="newest">Newest</option>
-              <option value="price_asc">Price: Low to High</option>
-              <option value="price_desc">Price: High to Low</option>
+              <option value="newest">{t('search.newest')}</option>
+              <option value="price_asc">{t('search.priceLowToHigh')}</option>
+              <option value="price_desc">{t('search.priceHighToLow')}</option>
             </select>
           </div>
         </div>
 
         <div className="mt-4 flex items-center space-x-3">
           <button type="submit" className="btn btn-primary">
-            🔍 Search
+            🔍 {t('common.search')}
           </button>
           {(query || category || subcategory || region || zone || minPrice || maxPrice) && (
             <button
@@ -173,7 +175,7 @@ const Search = () => {
               }}
               className="btn btn-secondary"
             >
-              Clear Filters
+              {t('search.clearFilters')}
             </button>
           )}
         </div>
@@ -193,7 +195,7 @@ const Search = () => {
         </div>
       ) : data?.listings?.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500">No listings found.</p>
+          <p className="text-gray-500">{t('search.noResults')}</p>
         </div>
       ) : (
         <>

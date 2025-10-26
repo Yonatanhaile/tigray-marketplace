@@ -209,13 +209,13 @@ const Home = () => {
       {/* Safety Notice */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded">
-          <h3 className="text-lg font-semibold mb-2">🛡️ Safety Tips</h3>
+          <h3 className="text-lg font-semibold mb-2">🛡️ {t('home.safetyTipsTitle')}</h3>
           <ul className="list-disc list-inside space-y-1 text-gray-700">
-            <li>Meet in public, well-lit places</li>
-            <li>Verify items before payment</li>
-            <li>Look for sellers with verified badges</li>
-            <li>Never share sensitive personal information</li>
-            <li>Report suspicious activity to admins</li>
+            <li>{t('home.safetyTip1')}</li>
+            <li>{t('home.safetyTip2')}</li>
+            <li>{t('home.safetyTip3')}</li>
+            <li>{t('home.safetyTip4')}</li>
+            <li>{t('home.safetyTip5')}</li>
           </ul>
         </div>
       </div>
