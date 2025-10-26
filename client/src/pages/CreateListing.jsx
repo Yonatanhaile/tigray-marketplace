@@ -15,6 +15,7 @@ const CreateListing = () => {
   const queryClient = useQueryClient();
   const [uploading, setUploading] = useState(false);
   const [images, setImages] = useState([]);
+  const [listingType, setListingType] = useState('product'); // 'product' or 'service'
 
   const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm({
     defaultValues: {
@@ -217,7 +218,8 @@ const CreateListing = () => {
       <div className="mb-4">
         <BackButton />
       </div>
-      <h1 className="text-3xl font-bold mb-6">Create New Listing</h1>
+      <h1 className="text-3xl font-bold mb-2">Create New Listing</h1>
+      <p className="text-gray-600 mb-6">List your products for sale or offer your professional services</p>
 
       {/* Helpful Tips */}
       {createMutation.isError && (
@@ -256,16 +258,76 @@ const CreateListing = () => {
           </p>
         </div>
 
+        {/* Listing Type Selector */}
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border-2 border-blue-200">
+          <label className="block text-lg font-semibold mb-3 text-gray-800">What are you listing? *</label>
+          <div className="grid md:grid-cols-2 gap-4">
+            <button
+              type="button"
+              onClick={() => setListingType('product')}
+              className={`p-4 rounded-lg border-2 transition-all ${
+                listingType === 'product'
+                  ? 'border-blue-500 bg-blue-100 shadow-md'
+                  : 'border-gray-300 bg-white hover:border-blue-300'
+              }`}
+            >
+              <div className="text-3xl mb-2">📦</div>
+              <div className="font-semibold text-lg">Product / Item</div>
+              <div className="text-sm text-gray-600 mt-1">Physical goods, electronics, furniture, etc.</div>
+            </button>
+            <button
+              type="button"
+              onClick={() => setListingType('service')}
+              className={`p-4 rounded-lg border-2 transition-all ${
+                listingType === 'service'
+                  ? 'border-purple-500 bg-purple-100 shadow-md'
+                  : 'border-gray-300 bg-white hover:border-purple-300'
+              }`}
+            >
+              <div className="text-3xl mb-2">💼</div>
+              <div className="font-semibold text-lg">Service / Skill</div>
+              <div className="text-sm text-gray-600 mt-1">Professional services, skills, expertise, etc.</div>
+            </button>
+          </div>
+        </div>
+
         <div>
-          <label className="block text-sm font-medium mb-2">Title *</label>
-          <input {...register('title', { required: 'Title is required', maxLength: 200 })} className="input" placeholder="e.g., iPhone 13 Pro Max" />
+          <label className="block text-sm font-medium mb-2">
+            {listingType === 'product' ? 'Title *' : 'Service Title *'}
+          </label>
+          <input 
+            {...register('title', { required: 'Title is required', maxLength: 200 })} 
+            className="input" 
+            placeholder={
+              listingType === 'product' 
+                ? 'e.g., iPhone 13 Pro Max, Toyota Corolla 2020, Leather Sofa'
+                : 'e.g., Professional Web Developer, Plumbing Services, Photography for Events'
+            }
+          />
           {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
         </div>
 
         <div>
           <label className="block text-sm font-medium mb-2">Description *</label>
-          <textarea {...register('description', { required: 'Description is required' })} className="input" rows="6" placeholder="Describe your item..." />
+          <textarea 
+            {...register('description', { required: 'Description is required' })} 
+            className="input" 
+            rows="6" 
+            placeholder={
+              listingType === 'product'
+                ? 'Describe your item in detail: condition, features, specifications, why you\'re selling...'
+                : 'Describe your service: your experience, skills, what you offer, previous work, availability, portfolio...'
+            }
+          />
           {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
+          {listingType === 'service' && (
+            <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded">
+              <p className="text-sm text-green-800">
+                <strong>💡 Tip for service providers:</strong> Include your years of experience, certifications, 
+                previous clients, portfolio links, and what makes your service unique!
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
@@ -279,6 +341,11 @@ const CreateListing = () => {
                 </option>
               ))}
             </select>
+            {listingType === 'service' && (
+              <p className="text-xs text-blue-600 mt-1">
+                💡 Recommended: Services, Repair & Construction, Beauty & Personal Care, Jobs
+              </p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">Subcategory *</label>
@@ -352,21 +419,45 @@ const CreateListing = () => {
         
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Price (ETB) *</label>
-            <input type="number" {...register('price', { required: 'Price is required', min: 0 })} className="input" placeholder="50000" />
+            <label className="block text-sm font-medium mb-2">
+              {listingType === 'product' ? 'Price (ETB) *' : 'Rate/Price (ETB) *'}
+            </label>
+            <input 
+              type="number" 
+              {...register('price', { required: 'Price is required', min: 0 })} 
+              className="input" 
+              placeholder={listingType === 'product' ? '50000' : '500'}
+            />
             {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
+            {listingType === 'service' && (
+              <p className="text-xs text-gray-600 mt-1">Enter your rate based on the pricing type selected</p>
+            )}
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-2">Price Type *</label>
             <select {...register('priceType')} className="input">
-              <option value="fixed">Fixed Price</option>
-              <option value="per-hour">Per Hour</option>
-              <option value="per-day">Per Day</option>
-              <option value="per-month">Per Month</option>
-              <option value="contract">Contract/Project</option>
-              <option value="negotiable">Negotiable</option>
+              {listingType === 'product' ? (
+                <>
+                  <option value="fixed">Fixed Price</option>
+                  <option value="negotiable">Negotiable</option>
+                  <option value="per-day">Per Day (Rental)</option>
+                  <option value="per-month">Per Month (Rental)</option>
+                </>
+              ) : (
+                <>
+                  <option value="per-hour">Per Hour</option>
+                  <option value="per-day">Per Day</option>
+                  <option value="per-month">Per Month</option>
+                  <option value="contract">Per Project/Contract</option>
+                  <option value="fixed">Fixed Rate</option>
+                  <option value="negotiable">Negotiable</option>
+                </>
+              )}
             </select>
+            {listingType === 'service' && (
+              <p className="text-xs text-gray-600 mt-1">Choose how you charge for your service</p>
+            )}
           </div>
         </div>
 
@@ -473,7 +564,9 @@ const CreateListing = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Images *</label>
+          <label className="block text-sm font-medium mb-2">
+            {listingType === 'product' ? 'Images *' : 'Images/Portfolio *'}
+          </label>
           <input 
             type="file" 
             accept="image/*,.heic,.heif" 
@@ -486,6 +579,19 @@ const CreateListing = () => {
             📸 Upload at least one image (max 10MB each). 
             <span className="block sm:inline"> Supported: JPG, PNG, WebP, HEIC</span>
           </p>
+          {listingType === 'service' && (
+            <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded">
+              <p className="text-sm text-blue-800">
+                <strong>💼 For service providers:</strong> Upload images of your previous work, portfolio samples, 
+                certificates, completed projects, or anything that showcases your skills!
+              </p>
+            </div>
+          )}
+          {listingType === 'product' && (
+            <p className="text-xs text-gray-600 mt-1">
+              Upload clear photos of your product from multiple angles
+            </p>
+          )}
           {uploading && (
             <div className="flex items-center gap-2 mt-2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
