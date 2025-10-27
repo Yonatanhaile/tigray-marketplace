@@ -1,0 +1,5 @@
+[33m3931030[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Extend JWT session duration from 1 hour to 1 week (7 days)
+[33m1879aa5[m[33m ([m[1;31morigin/main[m[33m)[m Fix duplicate user entries in messages list - group conversations by user
+[33mde93ad1[m feat: Improve mobile responsiveness for home page and navigation
+[33mf991f96[m feat: Display seller location to buyers on listing detail and seller profile pages
+[33m4971d6f[m feat: Add comprehensive multi-language support for untranslated content
