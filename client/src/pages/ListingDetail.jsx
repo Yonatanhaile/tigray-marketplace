@@ -183,6 +183,27 @@ const ListingDetail = () => {
             <p className="text-gray-700 whitespace-pre-wrap">{listing.listing.description}</p>
           </div>
 
+          {/* Location */}
+          <div className="mb-6 card bg-blue-50">
+            <h3 className="font-semibold mb-3 flex items-center gap-2">
+              <span>📍</span> Location
+            </h3>
+            <div className="space-y-2 text-gray-700">
+              <div className="flex items-start gap-2">
+                <span className="font-medium min-w-[80px]">Region:</span>
+                <span>{listing.listing.location.region}</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="font-medium min-w-[80px]">Zone:</span>
+                <span>{listing.listing.location.zone}</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="font-medium min-w-[80px]">Address:</span>
+                <span>{listing.listing.location.specificAddress}</span>
+              </div>
+            </div>
+          </div>
+
           {/* Payment Methods */}
           <div className="mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-4">
             <h3 className="font-semibold mb-2">Payment Methods</h3>

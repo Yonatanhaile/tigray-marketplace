@@ -29,38 +29,62 @@ const SellerProfile = () => {
         {isLoading ? (
           <div className="py-8 text-center">Loading...</div>
         ) : seller ? (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {seller?.profileImage?.url ? (
-                <img 
-                  src={seller.profileImage.url} 
-                  alt={seller?.name} 
-                  className="w-16 h-16 rounded-full object-cover border-2 border-purple-200"
-                />
-              ) : (
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-xl font-bold text-white">
-                  {seller?.name?.charAt(0)?.toUpperCase()}
-                </div>
-              )}
-              <div>
-                <h1 className="text-2xl font-bold">{seller?.name}</h1>
-                <p className="text-sm text-gray-600">{seller?.email}</p>
-                {seller?.kyc?.status && (
-                  <p className="text-xs mt-1">
-                    KYC: <span className="font-medium">{seller.kyc.status}</span>
-                  </p>
-                )}
-                {seller?.badges?.length > 0 && (
-                  <div className="flex gap-2 mt-2">
-                    {seller.badges.map((b) => (
-                      <span key={b} className="text-xs bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-full">
-                        ✓ {b}
-                      </span>
-                    ))}
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                {seller?.profileImage?.url ? (
+                  <img 
+                    src={seller.profileImage.url} 
+                    alt={seller?.name} 
+                    className="w-16 h-16 rounded-full object-cover border-2 border-purple-200"
+                  />
+                ) : (
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-xl font-bold text-white">
+                    {seller?.name?.charAt(0)?.toUpperCase()}
                   </div>
                 )}
+                <div>
+                  <h1 className="text-2xl font-bold">{seller?.name}</h1>
+                  <p className="text-sm text-gray-600">{seller?.email}</p>
+                  {seller?.kyc?.status && (
+                    <p className="text-xs mt-1">
+                      KYC: <span className="font-medium">{seller.kyc.status}</span>
+                    </p>
+                  )}
+                  {seller?.badges?.length > 0 && (
+                    <div className="flex gap-2 mt-2">
+                      {seller.badges.map((b) => (
+                        <span key={b} className="text-xs bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-full">
+                          ✓ {b}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
+            
+            {/* Seller Location */}
+            {listings.length > 0 && listings[0].location && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 className="font-semibold mb-2 flex items-center gap-2">
+                  <span>📍</span> Seller Location
+                </h3>
+                <div className="text-sm text-gray-700 space-y-1">
+                  <div>
+                    <span className="font-medium">Region:</span> {listings[0].location.region}
+                  </div>
+                  <div>
+                    <span className="font-medium">Zone:</span> {listings[0].location.zone}
+                  </div>
+                  {listings.length > 1 && (
+                    <p className="text-xs text-gray-600 mt-2 italic">
+                      Note: Location may vary by listing. Check individual items for specific addresses.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="py-8 text-center text-gray-500">Seller not found</div>
