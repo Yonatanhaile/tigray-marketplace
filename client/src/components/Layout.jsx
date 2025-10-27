@@ -199,14 +199,14 @@ const Layout = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
       {/* Modern Navigation with Glass Morphism */}
       <nav className="sticky top-0 z-50 glass border-b border-white/20 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16 md:h-20">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-14 sm:h-16 md:h-20">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2 group">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                <span className="text-white text-xl font-bold">Y</span>
+            <Link to="/" className="flex items-center space-x-1.5 sm:space-x-2 group">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <span className="text-white text-lg sm:text-xl font-bold">Y</span>
               </div>
-              <span className="text-xl md:text-2xl font-bold text-gradient hidden sm:block">
+              <span className="text-lg sm:text-xl md:text-2xl font-bold text-gradient hidden sm:block">
                 YohaTrade
               </span>
             </Link>
@@ -233,7 +233,7 @@ const Layout = () => {
               )}
             </div>
 
-            <div className="flex items-center space-x-2 md:space-x-4">
+            <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
               {/* Language Switcher */}
               <LanguageSwitcher />
 
@@ -249,14 +249,14 @@ const Layout = () => {
               {isAuthenticated && (
                 <Link
                   to="/messages"
-                  className="relative p-2.5 text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all"
+                  className="relative p-1.5 sm:p-2 md:p-2.5 text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg sm:rounded-xl transition-all"
                   title="Messages"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                   </svg>
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 text-xs font-bold text-white bg-gradient-to-r from-red-500 to-pink-500 rounded-full shadow-lg animate-pulse">
+                    <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 inline-flex items-center justify-center min-w-[18px] h-[18px] sm:min-w-[22px] sm:h-[22px] px-1 sm:px-1.5 text-[10px] sm:text-xs font-bold text-white bg-gradient-to-r from-red-500 to-pink-500 rounded-full shadow-lg animate-pulse">
                       {unreadCount > 99 ? '99+' : unreadCount}
                     </span>
                   )}
@@ -267,14 +267,14 @@ const Layout = () => {
               {isAuthenticated && isSeller && (
                 <Link
                   to="/seller-dashboard#recent-orders"
-                  className="relative p-2.5 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all"
+                  className="relative p-1.5 sm:p-2 md:p-2.5 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg sm:rounded-xl transition-all"
                   title="Order Requests"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                   </svg>
                   {pendingOrdersCount > 0 && (
-                    <span className="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 text-xs font-bold text-white bg-gradient-to-r from-green-500 to-emerald-500 rounded-full shadow-lg animate-pulse">
+                    <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 inline-flex items-center justify-center min-w-[18px] h-[18px] sm:min-w-[22px] sm:h-[22px] px-1 sm:px-1.5 text-[10px] sm:text-xs font-bold text-white bg-gradient-to-r from-green-500 to-emerald-500 rounded-full shadow-lg animate-pulse">
                       {pendingOrdersCount > 99 ? '99+' : pendingOrdersCount}
                     </span>
                   )}
@@ -287,13 +287,13 @@ const Layout = () => {
                   <Link
                     to="/orders"
                     onClick={clearAllNotifications}
-                    className="relative p-2.5 text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all block"
+                    className="relative p-1.5 sm:p-2 md:p-2.5 text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg sm:rounded-xl transition-all block"
                     title="View notifications"
                   >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
-                    <span className="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-gradient-to-r from-red-500 to-pink-500 rounded-full shadow-lg">
+                    <span className="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 text-[10px] sm:text-xs font-bold text-white bg-gradient-to-r from-red-500 to-pink-500 rounded-full shadow-lg">
                       {notifications.length}
                     </span>
                   </Link>
@@ -357,20 +357,20 @@ const Layout = () => {
                   {/* Mobile Logout Button */}
                   <button
                     onClick={handleLogout}
-                    className="lg:hidden p-2.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                    className="lg:hidden p-1.5 sm:p-2 md:p-2.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg sm:rounded-xl transition-all"
                     title="Logout"
                   >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
                   </button>
                 </>
               ) : (
                 <>
-                  <Link to="/login" className="hidden sm:inline-flex text-gray-700 hover:text-purple-600 px-4 py-2 font-medium transition-colors">
+                  <Link to="/login" className="hidden sm:inline-flex text-gray-700 hover:text-purple-600 px-3 sm:px-4 py-2 font-medium transition-colors text-sm sm:text-base">
                     {t('nav.login')}
                   </Link>
-                  <Link to="/register" className="btn btn-primary text-sm md:text-base">
+                  <Link to="/register" className="btn btn-primary text-xs sm:text-sm md:text-base px-3 sm:px-4 py-1.5 sm:py-2">
                     {t('nav.signup')}
                   </Link>
                 </>
@@ -379,10 +379,10 @@ const Layout = () => {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2.5 text-gray-700 hover:bg-purple-50 rounded-xl transition-all"
+                className="lg:hidden p-1.5 sm:p-2 md:p-2.5 text-gray-700 hover:bg-purple-50 rounded-lg sm:rounded-xl transition-all"
                 aria-label="Toggle menu"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {mobileMenuOpen ? (
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   ) : (

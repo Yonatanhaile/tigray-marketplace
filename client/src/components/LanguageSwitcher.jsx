@@ -37,15 +37,16 @@ const LanguageSwitcher = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 bg-white/50 hover:bg-white/80 rounded-xl border border-gray-200 transition-all shadow-sm hover:shadow-md"
+        className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 bg-white/50 hover:bg-white/80 rounded-lg sm:rounded-xl border border-gray-200 transition-all shadow-sm hover:shadow-md min-w-[44px] justify-center"
         title={t('languageSwitcher.selectLanguage')}
+        aria-label="Select language"
       >
-        <span className="text-lg">{currentLanguage.flag}</span>
-        <span className="hidden md:inline text-sm font-medium text-gray-700">
+        <span className="text-base sm:text-lg">{currentLanguage.flag}</span>
+        <span className="hidden md:inline text-sm font-medium text-gray-700 whitespace-nowrap">
           {currentLanguage.nativeName}
         </span>
         <svg 
-          className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-3 h-3 sm:w-4 sm:h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none" 
           stroke="currentColor" 
           viewBox="0 0 24 24"
@@ -55,7 +56,7 @@ const LanguageSwitcher = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden z-50 animate-fadeIn">
+        <div className="absolute right-0 mt-2 w-48 sm:w-52 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden z-50 animate-fadeIn">
           <div className="py-1">
             {languages.map((language) => (
               <button
@@ -68,12 +69,12 @@ const LanguageSwitcher = () => {
                 }`}
               >
                 <span className="text-xl">{language.flag}</span>
-                <div className="flex-1">
-                  <div className="font-medium">{language.nativeName}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium truncate">{language.nativeName}</div>
                   <div className="text-xs text-gray-500">{language.name}</div>
                 </div>
                 {i18n.language === language.code && (
-                  <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-purple-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 )}
