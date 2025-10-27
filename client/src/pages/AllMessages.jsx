@@ -47,11 +47,38 @@ const AllMessages = () => {
 
   const isLoading = buyerLoading || sellerLoading;
 
-  // Combine and sort all orders by last message time
+  // Combine all orders
   const allOrders = [
     ...(buyerOrders?.orders || []).map(o => ({ ...o, myRole: 'buyer' })),
     ...(sellerOrders?.orders || []).map(o => ({ ...o, myRole: 'seller' })),
-  ].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  ];
+
+  // Group orders by the other person and keep only the most recent conversation
+  const conversationsMap = new Map();
+  
+  allOrders.forEach(order => {
+    const isBuyer = order.myRole === 'buyer';
+    const otherPersonId = isBuyer 
+      ? (order.sellerId?._id || order.sellerId) 
+      : (order.buyerId?._id || order.buyerId);
+    
+    const otherPersonIdStr = String(otherPersonId);
+    
+    // Check if we already have a conversation with this person
+    const existing = conversationsMap.get(otherPersonIdStr);
+    
+    if (!existing || new Date(order.updatedAt) > new Date(existing.updatedAt)) {
+      // Keep the most recent order with this person
+      conversationsMap.set(otherPersonIdStr, order);
+    } else if (existing) {
+      // Add unread count from this order to existing
+      existing.unreadCount = (existing.unreadCount || 0) + (order.unreadCount || 0);
+    }
+  });
+
+  // Convert map to array and sort by most recent
+  const uniqueConversations = Array.from(conversationsMap.values())
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -68,7 +95,7 @@ const AllMessages = () => {
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
           <p className="mt-2 text-gray-500">Loading conversations...</p>
         </div>
-      ) : allOrders.length === 0 ? (
+      ) : uniqueConversations.length === 0 ? (
         <div className="text-center py-12 card">
           <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -79,7 +106,7 @@ const AllMessages = () => {
         </div>
       ) : (
         <div className="space-y-3">
-          {allOrders.map(order => {
+          {uniqueConversations.map(order => {
             const isBuyer = order.myRole === 'buyer';
             const otherPerson = isBuyer ? order.sellerId : order.buyerId;
             const hasUnread = order.unreadCount > 0;
