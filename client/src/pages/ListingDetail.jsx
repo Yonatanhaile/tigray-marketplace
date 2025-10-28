@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { listingsAPI, ordersAPI } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
 import BackButton from '../components/BackButton';
 
 const ListingDetail = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
@@ -90,11 +92,11 @@ const ListingDetail = () => {
   };
 
   if (isLoading) {
-    return <div className="max-w-7xl mx-auto px-4 py-12 text-center">Loading...</div>;
+    return <div className="max-w-7xl mx-auto px-4 py-12 text-center">{t('listingDetail.loading')}</div>;
   }
 
   if (!listing) {
-    return <div className="max-w-7xl mx-auto px-4 py-12 text-center">Listing not found</div>;
+    return <div className="max-w-7xl mx-auto px-4 py-12 text-center">{t('listingDetail.listingNotFound')}</div>;
   }
 
   const isOwnListing = user?._id === listing.listing.sellerId._id;
@@ -134,7 +136,7 @@ const ListingDetail = () => {
             </div>
           ) : (
             <div className="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center">
-              <span className="text-gray-400">No image</span>
+              <span className="text-gray-400">{t('listingDetail.noImage')}</span>
             </div>
           )}
         </div>
@@ -149,11 +151,11 @@ const ListingDetail = () => {
             </div>
             {listing.listing.priceType && listing.listing.priceType !== 'fixed' && (
               <p className="text-sm text-gray-600 mt-1">
-                {listing.listing.priceType === 'per-hour' && 'Per Hour'}
-                {listing.listing.priceType === 'per-day' && 'Per Day'}
-                {listing.listing.priceType === 'per-month' && 'Per Month'}
-                {listing.listing.priceType === 'contract' && 'Contract/Project Based'}
-                {listing.listing.priceType === 'negotiable' && 'Price Negotiable'}
+                {listing.listing.priceType === 'per-hour' && t('listingDetail.perHour')}
+                {listing.listing.priceType === 'per-day' && t('listingDetail.perDay')}
+                {listing.listing.priceType === 'per-month' && t('listingDetail.perMonth')}
+                {listing.listing.priceType === 'contract' && t('listingDetail.perProject')}
+                {listing.listing.priceType === 'negotiable' && t('listingDetail.priceNegotiable')}
               </p>
             )}
           </div>
@@ -161,13 +163,13 @@ const ListingDetail = () => {
           {listing.listing.condition && listing.listing.condition !== 'not-applicable' && (
             <div className="mb-6">
               <span className="inline-block bg-gray-100 px-3 py-1 rounded-full text-sm">
-                Condition: {listing.listing.condition}
+                {t('listingDetail.conditionLabel')} {listing.listing.condition}
               </span>
             </div>
           )}
 
           <nav className="text-sm text-gray-500 mb-4">
-            <button className="hover:underline" onClick={() => navigate('/search')}>Browse</button>
+            <button className="hover:underline" onClick={() => navigate('/search')}>{t('listingDetail.browse')}</button>
             <span className="mx-2">/</span>
             <span>{listing.listing.category}</span>
             {listing.listing.subcategory && (
@@ -179,26 +181,26 @@ const ListingDetail = () => {
           </nav>
 
           <div className="mb-6">
-            <h3 className="font-semibold mb-2">Description</h3>
+            <h3 className="font-semibold mb-2">{t('listing.description')}</h3>
             <p className="text-gray-700 whitespace-pre-wrap">{listing.listing.description}</p>
           </div>
 
           {/* Location */}
           <div className="mb-6 card bg-blue-50">
             <h3 className="font-semibold mb-3 flex items-center gap-2">
-              <span>📍</span> Location
+              <span>📍</span> {t('listing.location')}
             </h3>
             <div className="space-y-2 text-gray-700">
               <div className="flex items-start gap-2">
-                <span className="font-medium min-w-[80px]">Region:</span>
+                <span className="font-medium min-w-[80px]">{t('listingDetail.region')}</span>
                 <span>{listing.listing.location.region}</span>
               </div>
               <div className="flex items-start gap-2">
-                <span className="font-medium min-w-[80px]">Zone:</span>
+                <span className="font-medium min-w-[80px]">{t('listingDetail.zone')}</span>
                 <span>{listing.listing.location.zone}</span>
               </div>
               <div className="flex items-start gap-2">
-                <span className="font-medium min-w-[80px]">Address:</span>
+                <span className="font-medium min-w-[80px]">{t('listingDetail.address')}</span>
                 <span>{listing.listing.location.specificAddress}</span>
               </div>
             </div>
@@ -206,7 +208,7 @@ const ListingDetail = () => {
 
           {/* Payment Methods */}
           <div className="mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-4">
-            <h3 className="font-semibold mb-2">Payment Methods</h3>
+            <h3 className="font-semibold mb-2">{t('listingDetail.paymentMethods')}</h3>
             <div className="flex flex-wrap gap-2 mb-2">
               {listing.listing.payment_methods.map((method, idx) => (
                 <span key={idx} className="bg-white px-3 py-1 rounded-full text-sm border">
@@ -216,31 +218,31 @@ const ListingDetail = () => {
             </div>
             {listing.listing.payment_instructions && (
               <div className="text-sm text-gray-700 mt-3 space-y-2">
-                <strong className="block mb-1">Payment Instructions:</strong>
+                <strong className="block mb-1">{t('listingDetail.paymentInstructions')}</strong>
                 {typeof listing.listing.payment_instructions === 'object' ? (
                   // New format: object with keys (cash, bank, telebirr, mpesa)
                   <div className="space-y-2 bg-white p-3 rounded">
                     {listing.listing.payment_instructions.cash && (
                       <div>
-                        <span className="font-medium text-gray-900">💵 Cash:</span>
+                        <span className="font-medium text-gray-900">💵 {t('listingDetail.cash')}</span>
                         <p className="text-gray-700 ml-5">{listing.listing.payment_instructions.cash}</p>
                       </div>
                     )}
                     {listing.listing.payment_instructions.bank && (
                       <div>
-                        <span className="font-medium text-gray-900">🏦 Bank Transfer:</span>
+                        <span className="font-medium text-gray-900">🏦 {t('listingDetail.bankTransfer')}</span>
                         <p className="text-gray-700 ml-5 whitespace-pre-wrap">{listing.listing.payment_instructions.bank}</p>
                       </div>
                     )}
                     {listing.listing.payment_instructions.telebirr && (
                       <div>
-                        <span className="font-medium text-gray-900">📱 Telebirr:</span>
+                        <span className="font-medium text-gray-900">📱 {t('listingDetail.telebirr')}</span>
                         <p className="text-gray-700 ml-5">{listing.listing.payment_instructions.telebirr}</p>
                       </div>
                     )}
                     {listing.listing.payment_instructions.mpesa && (
                       <div>
-                        <span className="font-medium text-gray-900">📲 M-Pesa:</span>
+                        <span className="font-medium text-gray-900">📲 {t('listingDetail.mpesa')}</span>
                         <p className="text-gray-700 ml-5">{listing.listing.payment_instructions.mpesa}</p>
                       </div>
                     )}
@@ -265,11 +267,11 @@ const ListingDetail = () => {
                     }
                     
                     navigator.clipboard.writeText(textToCopy.trim());
-                    toast.success('Payment details copied to clipboard');
+                    toast.success(t('listingDetail.copyPaymentDetails'));
                   }}
                   className="text-primary-600 text-sm mt-2 hover:underline inline-flex items-center gap-1"
                 >
-                  📋 Copy payment details
+                  📋 {t('listingDetail.copyPaymentDetails')}
                 </button>
               </div>
             )}
@@ -277,7 +279,7 @@ const ListingDetail = () => {
 
           {/* Seller Info */}
           <div className="mb-6 card">
-            <h3 className="font-semibold mb-2">Seller</h3>
+            <h3 className="font-semibold mb-2">{t('listing.seller')}</h3>
             <div className="flex items-center space-x-3">
               {listing.listing.sellerId.profileImage?.url ? (
                 <img 
@@ -303,7 +305,7 @@ const ListingDetail = () => {
                 </div>
                 <div className="text-sm text-gray-500">{listing.listing.sellerId.email}</div>
                 {listing.listing.sellerId.badges?.includes('verified-seller') && (
-                  <div className="text-xs text-green-600">✓ Verified Seller</div>
+                  <div className="text-xs text-green-600">{t('listingDetail.verifiedSeller')}</div>
                 )}
               </div>
             </div>
@@ -312,13 +314,13 @@ const ListingDetail = () => {
           {/* Safety Notice */}
           <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 border-l-4 border-purple-500 p-4 rounded-lg">
             <p className="text-sm text-gray-700">
-              <strong>🛡️ Safety:</strong> Meet in public; confirm mobile-money receipt before handing the item.
+              <strong>🛡️ {t('listingDetail.safetyNotice')}</strong> {t('listingDetail.safetyShort')}
             </p>
             <button
               onClick={() => setShowSafetyModal(true)}
               className="text-purple-600 text-sm mt-1 hover:underline font-medium"
             >
-              Read full safety guidelines →
+              {t('listingDetail.readSafetyGuidelines')}
             </button>
           </div>
 
@@ -330,19 +332,19 @@ const ListingDetail = () => {
                   onClick={() => navigate(`/orders/${orderHistory.activeOrder._id}`)}
                   className="w-full btn btn-success text-lg py-3 bg-green-600 hover:bg-green-700"
                 >
-                  ✓ View Your Order
+                  {t('listingDetail.viewYourOrder')}
                 </button>
               ) : orderHistory?.totalOrders >= 2 ? (
                 <div className="w-full text-center py-4 px-6 bg-yellow-50 border-2 border-yellow-400 rounded-lg">
-                  <p className="text-yellow-800 font-semibold mb-2">⚠️ Maximum Orders Reached</p>
-                  <p className="text-yellow-700 text-sm">You have already created 2 orders for this item</p>
+                  <p className="text-yellow-800 font-semibold mb-2">⚠️ {t('listingDetail.maxOrdersReached')}</p>
+                  <p className="text-yellow-700 text-sm">{t('listingDetail.maxOrdersMessage')}</p>
                 </div>
               ) : (
                 <button
                   onClick={() => setShowIntentModal(true)}
                   className="w-full btn btn-primary text-lg py-3"
                 >
-                  Intent to Buy
+                  {t('listingDetail.intentToBuy')}
                 </button>
               )}
             </>
@@ -350,7 +352,7 @@ const ListingDetail = () => {
 
           {isOwnListing && (
             <div className="text-center text-gray-500">
-              This is your listing
+              {t('listingDetail.thisIsYourListing')}
             </div>
           )}
         </div>
@@ -360,27 +362,27 @@ const ListingDetail = () => {
       {showIntentModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold mb-4">Create Order Intent</h2>
+            <h2 className="text-2xl font-bold mb-4">{t('listingDetail.createOrderIntent')}</h2>
             
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
               <p className="text-sm font-semibold text-gray-800">
-                ⚠️ This platform does NOT process payments.
+                ⚠️ {t('listingDetail.platformDisclaimer')}
               </p>
               <p className="text-sm text-gray-700 mt-1">
-                Select your payment method. You can discuss meeting details in the message chat with the seller.
+                {t('listingDetail.paymentMethodNote')}
               </p>
             </div>
 
             <form onSubmit={handleIntentSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Payment Method *</label>
+                <label className="block text-sm font-medium mb-2">{t('listingDetail.paymentMethodLabel')}</label>
                 <select
                   value={selectedPaymentMethod}
                   onChange={(e) => setSelectedPaymentMethod(e.target.value)}
                   className="input"
                   required
                 >
-                  <option value="">Select payment method</option>
+                  <option value="">{t('listingDetail.selectPaymentMethod')}</option>
                   {listing.listing.payment_methods.map((method, idx) => (
                     <option key={idx} value={method}>
                       {method}
@@ -388,21 +390,21 @@ const ListingDetail = () => {
                   ))}
                 </select>
                 <p className="text-xs text-gray-500 mt-1">
-                  Payment instructions will be shown after creating the order
+                  {t('listingDetail.paymentInstructionsNote')}
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Note (optional)</label>
+                <label className="block text-sm font-medium mb-2">{t('listingDetail.noteOptional')}</label>
                 <textarea
                   value={buyerNote}
                   onChange={(e) => setBuyerNote(e.target.value)}
-                  placeholder="Any special requests or questions for the seller..."
+                  placeholder={t('listingDetail.notePlaceholder')}
                   className="input"
                   rows="3"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  💬 You can chat with the seller after creating the order to discuss meeting details
+                  💬 {t('listingDetail.chatNote')}
                 </p>
               </div>
 
@@ -412,14 +414,14 @@ const ListingDetail = () => {
                   onClick={() => setShowIntentModal(false)}
                   className="flex-1 btn btn-secondary"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={createOrderMutation.isPending}
                   className="flex-1 btn btn-primary"
                 >
-                  {createOrderMutation.isPending ? 'Creating...' : 'Create Intent'}
+                  {createOrderMutation.isPending ? t('listingDetail.creating') : t('listingDetail.createIntent')}
                 </button>
               </div>
             </form>
@@ -431,18 +433,18 @@ const ListingDetail = () => {
       {showSafetyModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 max-w-lg w-full">
-            <h2 className="text-2xl font-bold mb-4">🛡️ Safety Guidelines</h2>
+            <h2 className="text-2xl font-bold mb-4">🛡️ {t('listingDetail.safetyGuidelines')}</h2>
             <ul className="space-y-2 text-gray-700 mb-6">
-              <li>✓ Always meet in public places during daylight</li>
-              <li>✓ Bring a friend or inform someone about the meeting</li>
-              <li>✓ Inspect the item thoroughly before payment</li>
-              <li>✓ Verify payment confirmation (e.g., SMS receipt) before handing over item</li>
-              <li>✓ Never share sensitive personal information</li>
-              <li>✓ Report suspicious behavior to admins immediately</li>
-              <li>✓ Use dispute resolution if issues arise</li>
+              <li>✓ {t('listingDetail.safetyRule1')}</li>
+              <li>✓ {t('listingDetail.safetyRule2')}</li>
+              <li>✓ {t('listingDetail.safetyRule3')}</li>
+              <li>✓ {t('listingDetail.safetyRule4')}</li>
+              <li>✓ {t('listingDetail.safetyRule5')}</li>
+              <li>✓ {t('listingDetail.safetyRule6')}</li>
+              <li>✓ {t('listingDetail.safetyRule7')}</li>
             </ul>
             <button onClick={() => setShowSafetyModal(false)} className="w-full btn btn-primary">
-              Got it
+              {t('listingDetail.gotIt')}
             </button>
           </div>
         </div>

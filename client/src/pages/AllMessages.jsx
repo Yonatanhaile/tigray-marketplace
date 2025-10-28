@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { ordersAPI } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 import { useSocket } from '../hooks/useSocket';
@@ -7,6 +8,7 @@ import { useEffect } from 'react';
 import BackButton from '../components/BackButton';
 
 const AllMessages = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { socket } = useSocket();
 
@@ -86,23 +88,23 @@ const AllMessages = () => {
         <BackButton />
       </div>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Messages</h1>
-        <p className="text-gray-600 mt-2">All your conversations in one place</p>
+        <h1 className="text-3xl font-bold">{t('allMessages.title')}</h1>
+        <p className="text-gray-600 mt-2">{t('allMessages.subtitle')}</p>
       </div>
 
       {isLoading ? (
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-          <p className="mt-2 text-gray-500">Loading conversations...</p>
+          <p className="mt-2 text-gray-500">{t('allMessages.loadingConversations')}</p>
         </div>
       ) : uniqueConversations.length === 0 ? (
         <div className="text-center py-12 card">
           <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
-          <p className="text-gray-500 mb-4">No conversations yet</p>
-          <p className="text-sm text-gray-400 mb-6">Start by creating an order or listing</p>
-          <Link to="/search" className="btn btn-primary">Browse Listings</Link>
+          <p className="text-gray-500 mb-4">{t('allMessages.noConversations')}</p>
+          <p className="text-sm text-gray-400 mb-6">{t('allMessages.noConversationsHint')}</p>
+          <Link to="/search" className="btn btn-primary">{t('allMessages.browseListings')}</Link>
         </div>
       ) : (
         <div className="space-y-3">
@@ -140,19 +142,19 @@ const AllMessages = () => {
                     <div className="flex-1">
                       {/* Other person's name */}
                       <h3 className={`font-semibold text-lg mb-1 ${hasUnread ? 'text-blue-900' : 'text-gray-900'}`}>
-                        {otherPerson?.name || 'Unknown User'}
+                        {otherPerson?.name || t('allMessages.unknownUser')}
                       </h3>
                       
                       {/* Listing title */}
                       <p className="text-gray-600 text-sm truncate">
-                        {order.listingId?.title || 'Listing'}
+                        {order.listingId?.title || t('allMessages.listing')}
                       </p>
 
                       {/* Role badge */}
                       <span className={`inline-block px-2 py-1 rounded-full text-xs mt-2 ${
                         isBuyer ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'
                       }`}>
-                        You are the {isBuyer ? 'buyer' : 'seller'}
+                        {isBuyer ? t('allMessages.youAreTheBuyer') : t('allMessages.youAreTheSeller')}
                       </span>
                     </div>
 
@@ -195,7 +197,7 @@ const AllMessages = () => {
                   {/* Last message preview (if available) */}
                   {order.lastMessage && (
                     <p className={`text-sm mt-2 truncate ${hasUnread ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
-                      {order.lastMessage.senderId === user?._id ? 'You: ' : ''}
+                      {order.lastMessage.senderId === user?._id ? t('allMessages.you') : ''}
                       {order.lastMessage.text}
                     </p>
                   )}

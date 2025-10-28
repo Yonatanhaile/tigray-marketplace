@@ -1,7 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const NotFound = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,16 +41,16 @@ const NotFound = () => {
 
           {/* Error Message */}
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Page Not Found
+            {t('notFound.pageNotFound')}
           </h2>
           
           <p className="text-lg text-gray-600 mb-8">
-            Oops! The page you're looking for doesn't exist or has been moved.
+            {t('notFound.message')}
           </p>
 
           {/* Suggested Actions */}
           <div className="bg-gray-50 rounded-lg p-6 mb-8">
-            <h3 className="font-semibold text-gray-900 mb-3">Try these instead:</h3>
+            <h3 className="font-semibold text-gray-900 mb-3">{t('notFound.tryTheseInstead')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-left">
               <Link 
                 to="/" 
@@ -57,7 +59,7 @@ const NotFound = () => {
                 <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
-                <span className="text-sm font-medium">Go to Homepage</span>
+                <span className="text-sm font-medium">{t('notFound.goToHomepage')}</span>
               </Link>
               
               <Link 
@@ -67,7 +69,7 @@ const NotFound = () => {
                 <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <span className="text-sm font-medium">Browse Listings</span>
+                <span className="text-sm font-medium">{t('notFound.browseListings')}</span>
               </Link>
               
               <button 
@@ -77,7 +79,7 @@ const NotFound = () => {
                 <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                <span className="text-sm font-medium">Go Back</span>
+                <span className="text-sm font-medium">{t('notFound.goBack')}</span>
               </button>
               
               <Link 
@@ -87,7 +89,7 @@ const NotFound = () => {
                 <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
-                <span className="text-sm font-medium">My Orders</span>
+                <span className="text-sm font-medium">{t('notFound.myOrders')}</span>
               </Link>
             </div>
           </div>
@@ -98,20 +100,20 @@ const NotFound = () => {
               to="/"
               className="btn btn-primary px-8 py-3 text-lg"
             >
-              Return Home
+              {t('notFound.returnHome')}
             </Link>
             <Link
               to="/search"
               className="btn btn-secondary px-8 py-3 text-lg"
             >
-              Browse Marketplace
+              {t('notFound.browseMarketplace')}
             </Link>
           </div>
 
           {/* Contact Support */}
           <div className="mt-8 pt-6 border-t border-gray-200">
             <p className="text-sm text-gray-500 mb-2">
-              Need help? Contact our support team
+              {t('notFound.needHelp')}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm">
               <a 
