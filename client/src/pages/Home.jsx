@@ -128,26 +128,26 @@ const Home = () => {
       </div>
 
       {/* Features */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12 px-2">{t('home.howItWorks')}</h2>
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-center mb-4 sm:mb-6 px-2">{t('home.howItWorks')}</h2>
         
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
-          <div className="card text-center p-4 sm:p-6">
-            <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">🛍️</div>
-            <h3 className="text-lg sm:text-xl font-semibold mb-2">{t('home.browseListing')}</h3>
-            <p className="text-gray-600 text-sm sm:text-base">{t('home.browseDescription')}</p>
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6">
+          <div className="text-center p-2 sm:p-3 md:p-4 bg-white rounded-lg shadow-sm">
+            <div className="text-2xl sm:text-3xl mb-1 sm:mb-2">🛍️</div>
+            <h3 className="text-xs sm:text-sm md:text-base font-semibold mb-1">{t('home.browseListing')}</h3>
+            <p className="text-gray-600 text-xs hidden sm:block">{t('home.browseDescription')}</p>
           </div>
           
-          <div className="card text-center p-4 sm:p-6">
-            <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">💬</div>
-            <h3 className="text-lg sm:text-xl font-semibold mb-2">{t('home.expressIntent')}</h3>
-            <p className="text-gray-600 text-sm sm:text-base">{t('home.expressIntentDescription')}</p>
+          <div className="text-center p-2 sm:p-3 md:p-4 bg-white rounded-lg shadow-sm">
+            <div className="text-2xl sm:text-3xl mb-1 sm:mb-2">💬</div>
+            <h3 className="text-xs sm:text-sm md:text-base font-semibold mb-1">{t('home.expressIntent')}</h3>
+            <p className="text-gray-600 text-xs hidden sm:block">{t('home.expressIntentDescription')}</p>
           </div>
           
-          <div className="card text-center p-4 sm:p-6 sm:col-span-2 md:col-span-1">
-            <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">🤝</div>
-            <h3 className="text-lg sm:text-xl font-semibold mb-2">{t('home.meetComplete')}</h3>
-            <p className="text-gray-600 text-sm sm:text-base">{t('home.meetCompleteDescription')}</p>
+          <div className="text-center p-2 sm:p-3 md:p-4 bg-white rounded-lg shadow-sm">
+            <div className="text-2xl sm:text-3xl mb-1 sm:mb-2">🤝</div>
+            <h3 className="text-xs sm:text-sm md:text-base font-semibold mb-1">{t('home.meetComplete')}</h3>
+            <p className="text-gray-600 text-xs hidden sm:block">{t('home.meetCompleteDescription')}</p>
           </div>
         </div>
       </div>
