@@ -19,6 +19,8 @@ const ListingDetail = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
   const [buyerNote, setBuyerNote] = useState('');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [showImageViewer, setShowImageViewer] = useState(false);
+  const [viewerImageIndex, setViewerImageIndex] = useState(0);
 
   const { data: listing, isLoading } = useQuery({
     queryKey: ['listing', id],
@@ -111,12 +113,26 @@ const ListingDetail = () => {
         <div>
           {listing.listing.images?.length > 0 ? (
             <div>
-              <div className="w-full h-96 bg-gray-50 rounded-lg shadow-lg flex items-center justify-center mb-3">
+              <div 
+                className="w-full h-96 bg-gray-50 rounded-lg shadow-lg flex items-center justify-center mb-3 cursor-pointer hover:shadow-xl transition-shadow relative group"
+                onClick={() => {
+                  setViewerImageIndex(activeImageIndex);
+                  setShowImageViewer(true);
+                }}
+              >
                 <img
                   src={listing.listing.images[activeImageIndex]?.url}
                   alt={listing.listing.title}
                   className="max-h-96 object-contain"
                 />
+                {/* Zoom icon overlay */}
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all flex items-center justify-center">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-full p-3 shadow-lg">
+                    <svg className="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
               {listing.listing.images.length > 1 && (
                 <div className="grid grid-cols-5 gap-2">
@@ -125,8 +141,8 @@ const ListingDetail = () => {
                       key={idx}
                       type="button"
                       onClick={() => setActiveImageIndex(idx)}
-                      className={`relative rounded overflow-hidden ${activeImageIndex === idx ? 'ring-2 ring-primary-500' : ''}`}
-                      title={`Image ${idx + 1}`}
+                      className={`relative rounded overflow-hidden hover:ring-2 hover:ring-primary-300 transition-all ${activeImageIndex === idx ? 'ring-2 ring-primary-500' : ''}`}
+                      title={`${t('listingDetail.image')} ${idx + 1}`}
                     >
                       <img src={img.url} alt="" className="w-full h-20 object-contain bg-gray-50" />
                     </button>
@@ -447,6 +463,79 @@ const ListingDetail = () => {
               {t('listingDetail.gotIt')}
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Image Viewer Modal */}
+      {showImageViewer && listing?.listing?.images?.length > 0 && (
+        <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50">
+          {/* Close button */}
+          <button
+            onClick={() => setShowImageViewer(false)}
+            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors p-2 bg-black bg-opacity-50 rounded-full"
+            aria-label="Close"
+          >
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* Image counter */}
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-white bg-black bg-opacity-50 px-4 py-2 rounded-full">
+            {viewerImageIndex + 1} / {listing.listing.images.length}
+          </div>
+
+          {/* Previous button */}
+          {listing.listing.images.length > 1 && (
+            <button
+              onClick={() => setViewerImageIndex((prev) => (prev === 0 ? listing.listing.images.length - 1 : prev - 1))}
+              className="absolute left-4 text-white hover:text-gray-300 transition-colors p-3 bg-black bg-opacity-50 rounded-full"
+              aria-label="Previous image"
+            >
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+          )}
+
+          {/* Main image */}
+          <div className="max-w-7xl max-h-screen p-8 flex items-center justify-center">
+            <img
+              src={listing.listing.images[viewerImageIndex]?.url}
+              alt={`${listing.listing.title} - Image ${viewerImageIndex + 1}`}
+              className="max-w-full max-h-full object-contain"
+            />
+          </div>
+
+          {/* Next button */}
+          {listing.listing.images.length > 1 && (
+            <button
+              onClick={() => setViewerImageIndex((prev) => (prev === listing.listing.images.length - 1 ? 0 : prev + 1))}
+              className="absolute right-4 text-white hover:text-gray-300 transition-colors p-3 bg-black bg-opacity-50 rounded-full"
+              aria-label="Next image"
+            >
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          )}
+
+          {/* Thumbnail strip */}
+          {listing.listing.images.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 max-w-full overflow-x-auto px-4">
+              {listing.listing.images.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setViewerImageIndex(idx)}
+                  className={`flex-shrink-0 w-16 h-16 rounded overflow-hidden transition-all ${
+                    viewerImageIndex === idx ? 'ring-4 ring-white' : 'ring-2 ring-transparent opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <img src={img.url} alt="" className="w-full h-full object-cover bg-gray-800" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

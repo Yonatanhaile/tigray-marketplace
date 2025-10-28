@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { ordersAPI } from '../services/api';
 import BackButton from '../components/BackButton';
 
 const BuyerOrders = () => {
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery({
     queryKey: ['orders', 'buyer'],
     queryFn: () => ordersAPI.getMyOrders({ role: 'buyer' }),
@@ -14,14 +16,14 @@ const BuyerOrders = () => {
       <div className="mb-4">
         <BackButton />
       </div>
-      <h1 className="text-3xl font-bold mb-6">My Orders</h1>
+      <h1 className="text-3xl font-bold mb-6">{t('buyerOrders.title')}</h1>
 
       {isLoading ? (
-        <p>Loading...</p>
+        <p>{t('buyerOrders.loading')}</p>
       ) : data?.orders?.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500 mb-4">No orders yet.</p>
-          <Link to="/search" className="btn btn-primary">Browse Listings</Link>
+          <p className="text-gray-500 mb-4">{t('buyerOrders.noOrders')}</p>
+          <Link to="/search" className="btn btn-primary">{t('buyerOrders.browseListings')}</Link>
         </div>
       ) : (
         <div className="space-y-4">
@@ -32,8 +34,8 @@ const BuyerOrders = () => {
               )}
               <div className="flex-1">
                 <h3 className="font-semibold text-lg">{order.listingId?.title}</h3>
-                <p className="text-gray-600">Seller: {order.sellerId?.name}</p>
-                <p className="text-sm text-gray-500">Created: {new Date(order.createdAt).toLocaleDateString()}</p>
+                <p className="text-gray-600">{t('buyerOrders.seller')} {order.sellerId?.name}</p>
+                <p className="text-sm text-gray-500">{t('buyerOrders.created')} {new Date(order.createdAt).toLocaleDateString()}</p>
               </div>
               <div className="text-right">
                 <p className="text-xl font-bold text-primary-600">{order.price_agreed} {order.currency}</p>

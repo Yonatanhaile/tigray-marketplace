@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { ordersAPI, disputesAPI } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 import { markOrderStatus } from '../services/socket';
@@ -8,6 +9,7 @@ import toast from 'react-hot-toast';
 import BackButton from '../components/BackButton';
 
 const OrderDetail = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -29,40 +31,40 @@ const OrderDetail = () => {
       // Show specific success message based on status
       const status = data?.order?.status;
       if (status === 'seller_confirmed') {
-        toast.success('✅ Order confirmed!');
+        toast.success('✅ ' + t('orderDetail.orderConfirmed'));
       } else if (status === 'paid_offsite') {
-        toast.success('💰 Payment confirmed!');
+        toast.success('💰 ' + t('orderDetail.paymentConfirmed'));
       } else if (status === 'delivered') {
-        toast.success('📦 Order marked as delivered!');
+        toast.success('📦 ' + t('orderDetail.orderDelivered'));
       } else if (status === 'completed') {
-        toast.success('✅ Order completed successfully!');
+        toast.success('✅ ' + t('orderDetail.orderCompleted'));
       } else if (status === 'cancelled') {
-        toast.success('Order cancelled');
+        toast.success(t('orderDetail.orderCancelled'));
       } else {
-        toast.success('Order updated successfully');
+        toast.success(t('orderDetail.orderUpdated'));
       }
     },
     onError: (error) => {
-      toast.error(error?.message || 'Failed to update order');
+      toast.error(error?.message || t('orderDetail.updateFailed'));
     },
   });
 
   const disputeMutation = useMutation({
     mutationFn: disputesAPI.create,
     onSuccess: () => {
-      toast.success('⚠️ Dispute filed successfully');
+      toast.success('⚠️ ' + t('orderDetail.disputeFiled'));
       setShowDisputeModal(false);
       setDisputeReason('');
       queryClient.invalidateQueries(['order', id]);
       queryClient.invalidateQueries(['orders']);
     },
     onError: (error) => {
-      toast.error(error?.message || 'Failed to file dispute');
+      toast.error(error?.message || t('orderDetail.disputeFailed'));
     },
   });
 
-  if (isLoading) return <div className="max-w-4xl mx-auto px-4 py-12 text-center">Loading...</div>;
-  if (!data?.order) return <div className="max-w-4xl mx-auto px-4 py-12 text-center">Order not found</div>;
+  if (isLoading) return <div className="max-w-4xl mx-auto px-4 py-12 text-center">{t('orderDetail.loading')}</div>;
+  if (!data?.order) return <div className="max-w-4xl mx-auto px-4 py-12 text-center">{t('orderDetail.orderNotFound')}</div>;
 
   const order = data.order;
   
@@ -87,21 +89,21 @@ const OrderDetail = () => {
         <BackButton />
       </div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Order Details</h1>
-        <Link to={`/orders/${id}/messages`} className="btn btn-secondary">💬 Messages</Link>
+        <h1 className="text-3xl font-bold">{t('orderDetail.title')}</h1>
+        <Link to={`/orders/${id}/messages`} className="btn btn-secondary">💬 {t('orderDetail.messages')}</Link>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Order Info */}
         <div className="card">
-          <h2 className="text-xl font-semibold mb-4">Order Information</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('orderDetail.orderInformation')}</h2>
           <div className="space-y-2 text-sm">
-            <p><strong>Order ID:</strong> {order._id.slice(-8).toUpperCase()}</p>
-            <p><strong>Status:</strong> <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded">{order.status}</span></p>
-            <p><strong>Payment Status:</strong> <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">{order.payment_status}</span></p>
-            <p><strong>Amount:</strong> {order.price_agreed} {order.currency}</p>
-            <p><strong>Payment Method:</strong> {order.selected_payment_method}</p>
-            <p><strong>Created:</strong> {new Date(order.createdAt).toLocaleString()}</p>
+            <p><strong>{t('orderDetail.orderId')}</strong> {order._id.slice(-8).toUpperCase()}</p>
+            <p><strong>{t('orderDetail.status')}</strong> <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded">{order.status}</span></p>
+            <p><strong>{t('orderDetail.paymentMethod')}</strong> <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">{order.payment_status}</span></p>
+            <p><strong>{t('orderDetail.price')}</strong> {order.price_agreed} {order.currency}</p>
+            <p><strong>{t('orderDetail.paymentMethod')}</strong> {order.selected_payment_method}</p>
+            <p><strong>{t('orderDetail.created')}</strong> {new Date(order.createdAt).toLocaleString()}</p>
           </div>
         </div>
 
@@ -116,31 +118,31 @@ const OrderDetail = () => {
         {/* Payment Instructions */}
         {isBuyer && order.listingId?.payment_instructions && (
           <div className="card col-span-full bg-yellow-50 border-l-4 border-yellow-400">
-            <h2 className="text-xl font-semibold mb-4">Payment Instructions</h2>
+            <h2 className="text-xl font-semibold mb-4">{t('orderDetail.paymentInstructions')}</h2>
             <div className="text-sm text-gray-700 space-y-2">
               {typeof order.listingId.payment_instructions === 'object' ? (
                 <div className="space-y-3">
                   {order.listingId.payment_instructions.cash && (
                     <div>
-                      <span className="font-medium text-gray-900">💵 Cash:</span>
+                      <span className="font-medium text-gray-900">💵 {t('orderDetail.cash')}</span>
                       <p className="text-gray-700 ml-5">{order.listingId.payment_instructions.cash}</p>
                     </div>
                   )}
                   {order.listingId.payment_instructions.bank && (
                     <div>
-                      <span className="font-medium text-gray-900">🏦 Bank Transfer:</span>
+                      <span className="font-medium text-gray-900">🏦 {t('orderDetail.bankTransfer')}</span>
                       <p className="text-gray-700 ml-5 whitespace-pre-wrap">{order.listingId.payment_instructions.bank}</p>
                     </div>
                   )}
                   {order.listingId.payment_instructions.telebirr && (
                     <div>
-                      <span className="font-medium text-gray-900">📱 Telebirr:</span>
+                      <span className="font-medium text-gray-900">📱 {t('orderDetail.telebirr')}</span>
                       <p className="text-gray-700 ml-5">{order.listingId.payment_instructions.telebirr}</p>
                     </div>
                   )}
                   {order.listingId.payment_instructions.mpesa && (
                     <div>
-                      <span className="font-medium text-gray-900">📲 M-Pesa:</span>
+                      <span className="font-medium text-gray-900">📲 {t('orderDetail.mpesa')}</span>
                       <p className="text-gray-700 ml-5">{order.listingId.payment_instructions.mpesa}</p>
                     </div>
                   )}
@@ -222,63 +224,63 @@ const OrderDetail = () => {
 
       {/* Actions */}
       <div className="card mt-6">
-        <h2 className="text-xl font-semibold mb-4">Actions</h2>
+        <h2 className="text-xl font-semibold mb-4">{t('orderDetail.actions')}</h2>
         <div className="flex flex-wrap gap-3">
           {/* Seller Actions */}
           {isSeller && order.status === 'requested' && (
             <>
               <button 
-                onClick={() => handleStatusUpdate('seller_confirmed')} 
+                onClick={() => window.confirm(t('orderDetail.confirmConfirm')) && handleStatusUpdate('seller_confirmed')} 
                 className="btn btn-primary"
                 disabled={updateMutation.isPending}
               >
-                ✅ Confirm Order
+                ✅ {t('orderDetail.confirmOrder')}
               </button>
               <button 
-                onClick={() => handleStatusUpdate('cancelled')} 
+                onClick={() => window.confirm(t('orderDetail.confirmCancel')) && handleStatusUpdate('cancelled')} 
                 className="btn bg-gray-500 hover:bg-gray-600 text-white"
                 disabled={updateMutation.isPending}
               >
-                ❌ Cancel Order
+                ❌ {t('orderDetail.cancelOrder')}
               </button>
             </>
           )}
           {isSeller && order.status === 'seller_confirmed' && (
             <button 
-              onClick={() => handleStatusUpdate('paid_offsite')} 
+              onClick={() => window.confirm(t('orderDetail.confirmPaid')) && handleStatusUpdate('paid_offsite')} 
               className="btn btn-primary"
               disabled={updateMutation.isPending}
             >
-              💰 Mark as Paid
+              💰 {t('orderDetail.markPaid')}
             </button>
           )}
           {isSeller && order.status === 'paid_offsite' && (
             <button 
-              onClick={() => handleStatusUpdate('delivered')} 
+              onClick={() => window.confirm(t('orderDetail.confirmDelivered')) && handleStatusUpdate('delivered')} 
               className="btn btn-primary"
               disabled={updateMutation.isPending}
             >
-              📦 Mark as Delivered
+              📦 {t('orderDetail.markDelivered')}
             </button>
           )}
 
           {/* Buyer Actions */}
           {isBuyer && order.status === 'requested' && (
             <button 
-              onClick={() => handleStatusUpdate('cancelled')} 
+              onClick={() => window.confirm(t('orderDetail.confirmCancel')) && handleStatusUpdate('cancelled')} 
               className="btn bg-gray-500 hover:bg-gray-600 text-white"
               disabled={updateMutation.isPending}
             >
-              ❌ Cancel Order
+              ❌ {t('orderDetail.cancelOrder')}
             </button>
           )}
           {isBuyer && order.status === 'delivered' && (
             <button 
-              onClick={() => handleStatusUpdate('completed')} 
+              onClick={() => window.confirm(t('orderDetail.confirmComplete')) && handleStatusUpdate('completed')} 
               className="btn btn-primary"
               disabled={updateMutation.isPending}
             >
-              ✅ Confirm Received
+              ✅ {t('orderDetail.completeOrder')}
             </button>
           )}
 
@@ -289,7 +291,7 @@ const OrderDetail = () => {
               className="btn bg-red-500 hover:bg-red-600 text-white"
               disabled={updateMutation.isPending || disputeMutation.isPending}
             >
-              ⚠️ File Dispute
+              ⚠️ {t('orderDetail.fileDispute')}
             </button>
           )}
 
@@ -336,14 +338,14 @@ const OrderDetail = () => {
       {showDisputeModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 max-w-lg w-full">
-            <h2 className="text-2xl font-bold mb-4">⚠️ File Dispute</h2>
+            <h2 className="text-2xl font-bold mb-4">⚠️ {t('orderDetail.disputeReason')}</h2>
             <p className="text-gray-600 text-sm mb-4">
               Please describe the issue with this order. An admin will review your dispute and help resolve it.
             </p>
             <textarea 
               value={disputeReason} 
               onChange={e => setDisputeReason(e.target.value)} 
-              placeholder="Describe the issue in detail..." 
+              placeholder={t('orderDetail.reasonPlaceholder')} 
               className="input" 
               rows="6"
               disabled={disputeMutation.isPending}
@@ -360,7 +362,7 @@ const OrderDetail = () => {
                 className="btn btn-secondary flex-1"
                 disabled={disputeMutation.isPending}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button 
                 onClick={() => {
@@ -373,7 +375,7 @@ const OrderDetail = () => {
                 className="btn bg-red-500 hover:bg-red-600 text-white flex-1"
                 disabled={disputeMutation.isPending || disputeReason.trim().length < 10}
               >
-                {disputeMutation.isPending ? 'Submitting...' : 'Submit Dispute'}
+                {disputeMutation.isPending ? 'Submitting...' : t('orderDetail.submitDispute')}
               </button>
             </div>
           </div>
