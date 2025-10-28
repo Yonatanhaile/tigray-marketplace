@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { listingsAPI, ordersAPI } from '../services/api';
 import { onListingCreated, onListingStatusChanged, offListingCreated, offListingStatusChanged } from '../services/socket';
 import toast from 'react-hot-toast';
 import BackButton from '../components/BackButton';
 
 const SellerDashboard = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('active'); // 'active', 'pending', 'sold'
@@ -40,7 +42,7 @@ const SellerDashboard = () => {
   const deleteMutation = useMutation({
     mutationFn: (id) => listingsAPI.delete(id),
     onSuccess: () => {
-      toast.success('✅ Listing deleted successfully', { 
+      toast.success('✅ ' + t('sellerDashboard.listingDeleted'), { 
         duration: 3000,
         icon: '🗑️' 
       });
@@ -48,7 +50,7 @@ const SellerDashboard = () => {
       queryClient.invalidateQueries(['listings', 'my-listings']);
     },
     onError: (e) => {
-      toast.error(`❌ Failed to delete listing: ${e?.message || 'Unknown error'}`, {
+      toast.error(`❌ ${t('sellerDashboard.listingDeleteFailed')}: ${e?.message || 'Unknown error'}`, {
         duration: 4000
       });
     }
@@ -58,12 +60,12 @@ const SellerDashboard = () => {
     mutationFn: ({ id, status }) => listingsAPI.update(id, { status }),
     onSuccess: (_, variables) => {
       if (variables.status === 'sold') {
-        toast.success('🔴 Item marked as SOLD - Moved to Sold Items tab', { 
+        toast.success('🔴 ' + t('sellerDashboard.markedAsSold'), { 
           duration: 4000,
           icon: '✓' 
         });
       } else {
-        toast.success('✅ Item marked as AVAILABLE - Moved to Active Listings tab', { 
+        toast.success('✅ ' + t('sellerDashboard.markedAsAvailable'), { 
           duration: 4000,
           icon: '✓' 
         });
@@ -72,7 +74,7 @@ const SellerDashboard = () => {
       queryClient.invalidateQueries(['listings', 'my-listings']);
     },
     onError: (e) => {
-      toast.error(`❌ Failed to update listing status: ${e?.message || 'Unknown error'}`, {
+      toast.error(`❌ ${t('sellerDashboard.updateFailed')}: ${e?.message || 'Unknown error'}`, {
         duration: 4000
       });
     }
@@ -98,7 +100,7 @@ const SellerDashboard = () => {
       // Show toast notification with clear messages
       // Only show approval message if it was pending before (admin approval)
       if (data.newStatus === 'active' && data.oldStatus === 'pending') {
-        toast.success('🎉 APPROVED! Your listing is now LIVE and visible to buyers!', {
+        toast.success('🎉 ' + t('sellerDashboard.listingApproved'), {
           duration: 5000,
           style: {
             background: '#10b981',
@@ -107,7 +109,7 @@ const SellerDashboard = () => {
           }
         });
       } else if (data.newStatus === 'suspended') {
-        toast.error(`❌ REJECTED - Your listing was not approved.\nReason: ${data.reason || 'Not specified'}`, {
+        toast.error(`❌ ${t('sellerDashboard.listingRejected')} ${data.reason || 'Not specified'}`, {
           duration: 6000,
           style: {
             background: '#ef4444',
@@ -131,7 +133,7 @@ const SellerDashboard = () => {
     e.preventDefault();
     e.stopPropagation();
     if (deleteMutation.isPending) return;
-    if (window.confirm('⚠️ DELETE LISTING?\n\nThis will permanently delete your listing and cannot be undone.\n\nAre you sure you want to continue?')) {
+    if (window.confirm('⚠️ ' + t('sellerDashboard.deleteConfirm'))) {
       deleteMutation.mutate(id);
     }
   };
@@ -143,7 +145,7 @@ const SellerDashboard = () => {
     
     // Add confirmation for marking as sold
     if (newStatus === 'sold') {
-      if (!window.confirm('🔴 MARK AS SOLD?\n\nThis will move your listing to the "Sold Items" tab and buyers will no longer see it in active listings.\n\nYou can mark it as available again later if needed.\n\nContinue?')) {
+      if (!window.confirm('🔴 ' + t('sellerDashboard.markSoldConfirm'))) {
         return;
       }
     }
@@ -164,15 +166,15 @@ const SellerDashboard = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold">Seller Dashboard</h1>
-          <p className="text-gray-600 mt-1">Manage your listings and orders</p>
+          <h1 className="text-3xl font-bold">{t('sellerDashboard.title')}</h1>
+          <p className="text-gray-600 mt-1">{t('sellerDashboard.subtitle')}</p>
         </div>
         <div className="flex gap-3">
           <Link to="/profile" className="btn btn-secondary">
-            👤 My Profile
+            👤 {t('sellerDashboard.myProfile')}
           </Link>
           <Link to="/create-listing" className="btn btn-primary">
-            + Create Listing
+            + {t('sellerDashboard.createListing')}
           </Link>
         </div>
       </div>
@@ -182,7 +184,7 @@ const SellerDashboard = () => {
         <div className="card bg-gradient-to-br from-green-50 to-green-100 border-green-200">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm text-green-700 font-medium mb-1">Active Listings</h3>
+              <h3 className="text-sm text-green-700 font-medium mb-1">{t('sellerDashboard.activeListings')}</h3>
               <p className="text-3xl font-bold text-green-900">{activeListings.length}</p>
             </div>
             <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
@@ -194,7 +196,7 @@ const SellerDashboard = () => {
         <div className="card bg-gradient-to-br from-red-50 to-red-100 border-red-200">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm text-red-700 font-medium mb-1">Sold Items</h3>
+              <h3 className="text-sm text-red-700 font-medium mb-1">{t('sellerDashboard.soldItems')}</h3>
               <p className="text-3xl font-bold text-red-900">{soldListings.length}</p>
             </div>
             <div className="w-12 h-12 bg-red-200 rounded-full flex items-center justify-center">
@@ -206,7 +208,7 @@ const SellerDashboard = () => {
         <div className="card bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm text-yellow-700 font-medium mb-1">Pending Review</h3>
+              <h3 className="text-sm text-yellow-700 font-medium mb-1">{t('sellerDashboard.pendingReview')}</h3>
               <p className="text-3xl font-bold text-yellow-900">{pendingListings.length}</p>
             </div>
             <div className="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
@@ -218,7 +220,7 @@ const SellerDashboard = () => {
         <div className="card bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm text-purple-700 font-medium mb-1">Total Views</h3>
+              <h3 className="text-sm text-purple-700 font-medium mb-1">{t('sellerDashboard.totalViews')}</h3>
               <p className="text-3xl font-bold text-purple-900">{totalViews}</p>
             </div>
             <div className="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center">
@@ -231,7 +233,7 @@ const SellerDashboard = () => {
       {/* My Listings with Tabs */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold">My Listings</h2>
+          <h2 className="text-2xl font-bold">{t('sellerDashboard.myListings')}</h2>
         </div>
 
         {/* Tabs */}
@@ -244,7 +246,7 @@ const SellerDashboard = () => {
                 : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
-            ✅ Active ({activeListings.length})
+            ✅ {t('sellerDashboard.active')} ({activeListings.length})
           </button>
           <button
             onClick={() => setActiveTab('pending')}
@@ -254,7 +256,7 @@ const SellerDashboard = () => {
                 : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
-            ⏳ Pending Review ({pendingListings.length})
+            ⏳ {t('sellerDashboard.pending')} ({pendingListings.length})
           </button>
           <button
             onClick={() => setActiveTab('sold')}
@@ -264,7 +266,7 @@ const SellerDashboard = () => {
                 : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
-            🔴 Sold ({soldListings.length})
+            🔴 {t('sellerDashboard.sold')} ({soldListings.length})
           </button>
         </div>
 
@@ -272,7 +274,7 @@ const SellerDashboard = () => {
         {listingsLoading ? (
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-            <p className="ml-3 text-gray-600">Loading listings...</p>
+            <p className="ml-3 text-gray-600">{t('sellerDashboard.loadingListings')}</p>
           </div>
         ) : (
           <>
@@ -281,13 +283,13 @@ const SellerDashboard = () => {
               activeListings.length === 0 ? (
                 <div className="text-center py-12 card">
                   <div className="text-6xl mb-4">📦</div>
-                  <p className="text-gray-500 text-lg mb-2">No active listings</p>
-                  <p className="text-sm text-gray-400">Create a new listing to get started!</p>
+                  <p className="text-gray-500 text-lg mb-2">{t('sellerDashboard.noActiveListings')}</p>
+                  <p className="text-sm text-gray-400">{t('sellerDashboard.noActiveListingsHint')}</p>
                 </div>
               ) : (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {activeListings.map(listing => (
-                    <ListingCard key={listing._id} listing={listing} onToggleSold={toggleSoldStatus} onDelete={onDelete} markAsSoldMutation={markAsSoldMutation} deleteMutation={deleteMutation} />
+                    <ListingCard key={listing._id} listing={listing} onToggleSold={toggleSoldStatus} onDelete={onDelete} markAsSoldMutation={markAsSoldMutation} deleteMutation={deleteMutation} t={t} />
                   ))}
                 </div>
               )
@@ -298,13 +300,13 @@ const SellerDashboard = () => {
               pendingListings.length === 0 ? (
                 <div className="text-center py-12 card">
                   <div className="text-6xl mb-4">⏳</div>
-                  <p className="text-gray-500 text-lg mb-2">No pending listings</p>
-                  <p className="text-sm text-gray-400">New listings you create will appear here for admin review</p>
+                  <p className="text-gray-500 text-lg mb-2">{t('sellerDashboard.noPendingListings')}</p>
+                  <p className="text-sm text-gray-400">{t('sellerDashboard.noPendingListingsHint')}</p>
                 </div>
               ) : (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {pendingListings.map(listing => (
-                    <ListingCard key={listing._id} listing={listing} onToggleSold={toggleSoldStatus} onDelete={onDelete} markAsSoldMutation={markAsSoldMutation} deleteMutation={deleteMutation} />
+                    <ListingCard key={listing._id} listing={listing} onToggleSold={toggleSoldStatus} onDelete={onDelete} markAsSoldMutation={markAsSoldMutation} deleteMutation={deleteMutation} t={t} />
                   ))}
                 </div>
               )
@@ -315,13 +317,13 @@ const SellerDashboard = () => {
               soldListings.length === 0 ? (
                 <div className="text-center py-12 card">
                   <div className="text-6xl mb-4">🔴</div>
-                  <p className="text-gray-500 text-lg mb-2">No sold items yet</p>
-                  <p className="text-sm text-gray-400">Items you mark as sold will appear here</p>
+                  <p className="text-gray-500 text-lg mb-2">{t('sellerDashboard.noSoldItems')}</p>
+                  <p className="text-sm text-gray-400">{t('sellerDashboard.noSoldItemsHint')}</p>
                 </div>
               ) : (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {soldListings.map(listing => (
-                    <ListingCard key={listing._id} listing={listing} onToggleSold={toggleSoldStatus} onDelete={onDelete} markAsSoldMutation={markAsSoldMutation} deleteMutation={deleteMutation} />
+                    <ListingCard key={listing._id} listing={listing} onToggleSold={toggleSoldStatus} onDelete={onDelete} markAsSoldMutation={markAsSoldMutation} deleteMutation={deleteMutation} t={t} />
                   ))}
                 </div>
               )
@@ -332,18 +334,18 @@ const SellerDashboard = () => {
 
       {/* Recent Orders */}
       <div id="recent-orders" className="scroll-mt-20">
-        <h2 className="text-2xl font-bold mb-4">Recent Orders</h2>
+        <h2 className="text-2xl font-bold mb-4">{t('sellerDashboard.recentOrders')}</h2>
         {ordersLoading ? (
-          <p>Loading...</p>
+          <p>{t('sellerDashboard.loading')}</p>
         ) : ordersData?.orders?.length === 0 ? (
-          <p className="text-gray-500">No orders yet.</p>
+          <p className="text-gray-500">{t('sellerDashboard.noOrders')}</p>
         ) : (
           <div className="space-y-3">
             {ordersData?.orders?.slice(0, 5).map(order => (
               <Link key={order._id} to={`/orders/${order._id}`} className="card flex justify-between items-center hover:shadow-lg">
                 <div>
                   <h4 className="font-semibold">{order.listingId?.title}</h4>
-                  <p className="text-sm text-gray-500">Buyer: {order.buyerId?.name}</p>
+                  <p className="text-sm text-gray-500">{t('sellerDashboard.buyer')} {order.buyerId?.name}</p>
                 </div>
                 <div className="text-right">
                   <span className={`inline-block px-3 py-1 rounded-full text-xs ${order.status === 'requested' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`}>
@@ -360,7 +362,7 @@ const SellerDashboard = () => {
 };
 
 // Listing Card Component
-const ListingCard = ({ listing, onToggleSold, onDelete, markAsSoldMutation, deleteMutation }) => {
+const ListingCard = ({ listing, onToggleSold, onDelete, markAsSoldMutation, deleteMutation, t }) => {
   return (
     <div className="card hover:shadow-lg transition-shadow relative">
       {/* Status Badge */}
@@ -397,16 +399,16 @@ const ListingCard = ({ listing, onToggleSold, onDelete, markAsSoldMutation, dele
             <p className="text-purple-600 font-bold text-xl">{listing.price} ETB</p>
             {listing.priceType && listing.priceType !== 'fixed' && (
               <p className="text-xs text-gray-500 mt-0.5">
-                {listing.priceType === 'per-hour' && 'Per Hour'}
-                {listing.priceType === 'per-day' && 'Per Day'}
-                {listing.priceType === 'per-month' && 'Per Month'}
-                {listing.priceType === 'contract' && 'Contract'}
-                {listing.priceType === 'negotiable' && 'Negotiable'}
+                {listing.priceType === 'per-hour' && t('sellerDashboard.perHour')}
+                {listing.priceType === 'per-day' && t('sellerDashboard.perDay')}
+                {listing.priceType === 'per-month' && t('sellerDashboard.perMonth')}
+                {listing.priceType === 'contract' && t('sellerDashboard.contract')}
+                {listing.priceType === 'negotiable' && t('sellerDashboard.negotiable')}
               </p>
             )}
           </div>
           <div className="text-xs text-gray-500">
-            <p>{listing.views || 0} views</p>
+            <p>{listing.views || 0} {t('sellerDashboard.views')}</p>
           </div>
         </div>
       </div>
@@ -426,8 +428,8 @@ const ListingCard = ({ listing, onToggleSold, onDelete, markAsSoldMutation, dele
               disabled={markAsSoldMutation.isPending}
               title={listing.status === 'sold' ? 'Mark this item as available again' : 'Mark this item as sold'}
             >
-              {markAsSoldMutation.isPending ? '⏳ Updating...' : (
-                listing.status === 'sold' ? '✅ Mark Available Again' : '🔴 Mark as Sold'
+              {markAsSoldMutation.isPending ? '⏳ ' + t('sellerDashboard.updating') : (
+                listing.status === 'sold' ? '✅ ' + t('sellerDashboard.markAvailable') : '🔴 ' + t('sellerDashboard.markAsSold')
               )}
             </button>
           </div>
@@ -443,8 +445,8 @@ const ListingCard = ({ listing, onToggleSold, onDelete, markAsSoldMutation, dele
                 </svg>
               </div>
               <div className="ml-2">
-                <p className="font-semibold">⏳ Pending Admin Review</p>
-                <p className="text-xs mt-0.5">Your listing is waiting for admin approval. You'll be notified when it's reviewed.</p>
+                <p className="font-semibold">⏳ {t('sellerDashboard.pendingAdminReview')}</p>
+                <p className="text-xs mt-0.5">{t('sellerDashboard.pendingNotice')}</p>
               </div>
             </div>
           </div>
@@ -457,7 +459,7 @@ const ListingCard = ({ listing, onToggleSold, onDelete, markAsSoldMutation, dele
             className="flex-1 text-center py-2 px-3 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-sm font-semibold transition-all"
             title="Edit listing details, price, images, etc."
           >
-            ✏️ Edit Listing
+            ✏️ {t('sellerDashboard.editListing')}
           </Link>
           <button 
             onClick={(e) => onDelete(e, listing._id)} 
@@ -465,7 +467,7 @@ const ListingCard = ({ listing, onToggleSold, onDelete, markAsSoldMutation, dele
             disabled={deleteMutation.isPending}
             title="Permanently delete this listing"
           >
-            {deleteMutation.isPending ? '⏳ Deleting...' : '🗑️ Delete'}
+            {deleteMutation.isPending ? '⏳ ' + t('sellerDashboard.deleting') : '🗑️ ' + t('sellerDashboard.delete')}
           </button>
         </div>
       </div>
