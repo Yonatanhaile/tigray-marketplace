@@ -60,7 +60,8 @@ const CreateListing = () => {
   
   // Categories that don't need condition field
   const categoriesWithoutCondition = ['Jobs', 'Services', 'Repair & Construction', 'Property'];
-  const shouldShowCondition = !categoriesWithoutCondition.includes(selectedCategory);
+  // Hide condition field for all services/skills OR for specific categories
+  const shouldShowCondition = listingType !== 'service' && !categoriesWithoutCondition.includes(selectedCategory);
 
   // Reset subcategory when category changes
   useEffect(() => {
