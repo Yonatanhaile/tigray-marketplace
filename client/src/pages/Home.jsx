@@ -13,10 +13,10 @@ const Home = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Fetch recent listings
+  // Fetch smart home page listings (quality + popularity + recency)
   const { data: listingsData, isLoading } = useQuery({
-    queryKey: ['listings', 'recent'],
-    queryFn: () => listingsAPI.getAll({ limit: 6, page: 1 }),
+    queryKey: ['listings', 'home'],
+    queryFn: () => listingsAPI.getHomePageListings({ limit: 6 }),
   });
 
   // Fetch unread message count
@@ -34,7 +34,7 @@ const Home = () => {
     const handleNewActiveListing = (data) => {
       console.log('✨ New active listing:', data);
       // Invalidate listings queries to refresh the data
-      queryClient.invalidateQueries(['listings', 'recent']);
+      queryClient.invalidateQueries(['listings', 'home']);
       queryClient.invalidateQueries(['listings']);
     };
 
@@ -152,11 +152,11 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Recent Listings */}
+      {/* Featured Listings */}
       <div className="bg-gray-100 py-8 sm:py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-6 sm:mb-8 px-1">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">{t('home.recentListings')}</h2>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">{t('home.featuredListings') || t('home.recentListings')}</h2>
             <Link to="/search" className="text-primary-600 hover:text-primary-700 font-semibold text-sm sm:text-base whitespace-nowrap">
               {t('home.viewAll')} →
             </Link>

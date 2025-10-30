@@ -59,6 +59,7 @@ export const authAPI = {
 // Listings endpoints
 export const listingsAPI = {
   getAll: (params) => api.get('/listings', { params }),
+  getHomePageListings: (params) => api.get('/listings/home', { params }),
   getById: (id) => api.get(`/listings/${id}`),
   create: (data) => api.post('/listings', data),
   update: (id, data) => api.patch(`/listings/${id}`, data),

@@ -6,6 +6,7 @@ const {
   getListingById,
   updateListing,
   deleteListing,
+  getHomePageListings,
 } = require('../controllers/listingController');
 const { authenticateJWT, optionalAuth } = require('../middleware/auth');
 const {
@@ -15,6 +16,7 @@ const {
 } = require('../middleware/validation');
 
 // Public routes (with optional auth for views tracking)
+router.get('/home', optionalAuth, getHomePageListings); // Smart home page listings
 router.get('/', optionalAuth, paginationValidation, getListings);
 router.get('/:id', optionalAuth, mongoIdValidation, getListingById);
 

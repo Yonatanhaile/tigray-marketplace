@@ -394,11 +394,100 @@ const deleteListing = async (req, res) => {
   }
 };
 
+/**
+ * Get smart home page listings - combines quality, popularity, and recency
+ */
+const getHomePageListings = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 6;
+
+    // Only show active listings
+    const baseFilter = { status: 'active' };
+
+    // Get all active listings with populated seller info
+    const allListings = await Listing.find(baseFilter)
+      .populate('sellerId', 'name email badges kyc.status')
+      .lean();
+
+    // Calculate smart score for each listing
+    const scoredListings = allListings.map(listing => {
+      const now = Date.now();
+      const ageInDays = (now - new Date(listing.createdAt).getTime()) / (1000 * 60 * 60 * 24);
+      
+      // Recency score (decays over time, but never goes to zero)
+      // New listings get high score, gradually decreases
+      const recencyScore = 1 / Math.pow(ageInDays + 1, 0.3);
+      
+      // Popularity score (based on views)
+      const popularityScore = Math.min(listing.views / 100, 1); // Normalize to 0-1
+      
+      // Seller reputation score
+      let reputationScore = 0.5; // Base score
+      if (listing.sellerId) {
+        if (listing.sellerId.badges && listing.sellerId.badges.length > 0) {
+          reputationScore += 0.25;
+        }
+        if (listing.sellerId.kyc && listing.sellerId.kyc.status === 'verified') {
+          reputationScore += 0.25;
+        }
+      }
+      
+      // Quality score (has images and good description)
+      let qualityScore = 0;
+      if (listing.images && listing.images.length > 0) {
+        qualityScore += 0.5;
+      }
+      if (listing.description && listing.description.length > 100) {
+        qualityScore += 0.5;
+      }
+      
+      // Weighted final score
+      const finalScore = 
+        (recencyScore * 0.25) +      // 25% - Some freshness
+        (popularityScore * 0.30) +   // 30% - Popular items
+        (reputationScore * 0.30) +   // 30% - Trusted sellers
+        (qualityScore * 0.15);       // 15% - Good quality listings
+      
+      return {
+        ...listing,
+        _score: finalScore
+      };
+    });
+
+    // Sort by score (highest first) and take the top listings
+    const topListings = scoredListings
+      .sort((a, b) => b._score - a._score)
+      .slice(0, limit);
+
+    // Remove the score before sending response
+    const listings = topListings.map(({ _score, ...listing }) => listing);
+
+    res.status(200).json({
+      error: false,
+      listings,
+      pagination: {
+        page: 1,
+        limit,
+        total: listings.length,
+        pages: 1,
+      },
+    });
+  } catch (error) {
+    logger.error('Get home page listings error:', error);
+    res.status(500).json({
+      error: true,
+      message: 'Failed to fetch home page listings',
+      details: error.message,
+    });
+  }
+};
+
 module.exports = {
   createListing,
   getListings,
   getListingById,
   updateListing,
   deleteListing,
+  getHomePageListings,
 };
 
