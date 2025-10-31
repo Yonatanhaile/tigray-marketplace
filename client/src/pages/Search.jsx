@@ -22,6 +22,7 @@ const Search = () => {
   const [region, setRegion] = useState(searchParams.get('region') || '');
   const [zone, setZone] = useState(searchParams.get('zone') || '');
   const [sort, setSort] = useState(searchParams.get('sort') || 'newest');
+  const [showFilters, setShowFilters] = useState(false);
 
   const page = parseInt(searchParams.get('page')) || 1;
 
@@ -71,6 +72,8 @@ const Search = () => {
     if (sort) params.sort = sort;
     params.page = '1';
     setSearchParams(params);
+    // Close filters on mobile after searching
+    setShowFilters(false);
   };
 
   return (
@@ -78,10 +81,24 @@ const Search = () => {
       <div className="mb-3 sm:mb-4">
         <BackButton />
       </div>
-      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6">{t('search.browseTitle')}</h1>
+      <div className="flex justify-between items-center mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">{t('search.browseTitle')}</h1>
+        
+        {/* Mobile Filter Toggle Button */}
+        <button
+          type="button"
+          onClick={() => setShowFilters(!showFilters)}
+          className="md:hidden flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold text-sm shadow-lg hover:bg-purple-700 transition-all"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+          {showFilters ? 'Hide Filters' : 'Show Filters'}
+        </button>
+      </div>
 
       {/* Search & Filters */}
-      <form onSubmit={handleSearch} className="card mb-6 sm:mb-8">
+      <form onSubmit={handleSearch} className={`card mb-6 sm:mb-8 ${showFilters ? 'block' : 'hidden md:block'}`}>
         {/* Row 1: Search, Category, Subcategory */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-3 sm:mb-4">
           <div className="sm:col-span-2 md:col-span-2">
@@ -172,6 +189,7 @@ const Search = () => {
                 setMinPrice('');
                 setMaxPrice('');
                 setSearchParams({});
+                setShowFilters(false); // Close filters on mobile
               }}
               className="btn btn-secondary text-sm sm:text-base py-2 sm:py-2"
             >
