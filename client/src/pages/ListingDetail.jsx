@@ -558,18 +558,36 @@ const ListingDetail = () => {
           )}
 
           {/* Main image container with overflow for zoom */}
-          <div className="absolute inset-0 flex items-center justify-center overflow-auto p-8" style={{ paddingTop: '80px', paddingBottom: listing.listing.images.length > 1 ? '100px' : '80px' }}>
-            <div className="flex items-center justify-center min-w-full min-h-full">
+          <div 
+            className="absolute inset-0 overflow-auto" 
+            style={{ 
+              paddingTop: '80px', 
+              paddingBottom: listing.listing.images.length > 1 ? '100px' : '80px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              minWidth: imageZoom > 1 ? `${imageZoom * 100}%` : '100%',
+              minHeight: imageZoom > 1 ? `${imageZoom * 100}%` : '100%',
+              padding: '20px'
+            }}>
               <img
                 src={listing.listing.images[viewerImageIndex]?.url}
                 alt={`${listing.listing.title} - Image ${viewerImageIndex + 1}`}
                 style={{
                   transform: `scale(${imageZoom})`,
+                  transformOrigin: 'center center',
                   transition: 'transform 0.2s ease-out',
-                  maxWidth: imageZoom === 1 ? '100%' : 'none',
-                  maxHeight: imageZoom === 1 ? '100%' : 'none',
+                  width: imageZoom === 1 ? 'auto' : undefined,
+                  height: imageZoom === 1 ? 'auto' : undefined,
+                  maxWidth: imageZoom === 1 ? '100%' : undefined,
+                  maxHeight: imageZoom === 1 ? '100%' : undefined,
                 }}
-                className="object-contain"
               />
             </div>
           </div>
