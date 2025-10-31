@@ -1,5 +1,5 @@
 // Service Worker for PWA
-const CACHE_NAME = 'tigray-market-v1';
+const CACHE_NAME = 'yohatrade-v1';
 const urlsToCache = [
   '/',
   '/index.html',

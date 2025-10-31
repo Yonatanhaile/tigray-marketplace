@@ -1,6 +1,6 @@
 {
-  "name": "Tigray Marketplace",
-  "short_name": "Tigray Market",
+  "name": "YohaTrade",
+  "short_name": "YohaTrade",
   "description": "Buy and sell locally with secure intent-based transactions",
   "start_url": "/",
   "scope": "/",
