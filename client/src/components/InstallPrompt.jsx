@@ -124,18 +124,39 @@ const InstallPrompt = () => {
               </h3>
               <p className="text-xs sm:text-sm text-purple-100 mb-2">
                 {isIOS 
-                  ? 'Tap the Share button at the bottom, then select "Add to Home Screen"'
+                  ? browserType !== 'safari'
+                    ? 'Get quick access to YohaTrade from your home screen!'
+                    : 'Tap the Share button at the bottom, then select "Add to Home Screen"'
                   : 'Install our app for instant access and a better experience!'
                 }
               </p>
               
               {isIOS ? (
-                browserType !== 'safari' && (
-                  <div className="bg-yellow-400 text-yellow-900 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-2">
-                    <span className="text-lg">⚠️</span>
-                    <span>Please use <strong>Safari</strong> to add to home screen</span>
+                browserType !== 'safari' ? (
+                  <div className="bg-white/95 text-purple-900 px-3 py-2.5 rounded-lg text-xs sm:text-sm space-y-2">
+                    <div className="flex items-start gap-2">
+                      <span className="text-base sm:text-lg">ℹ️</span>
+                      <div>
+                        <p className="font-bold mb-1">Apple requires Safari for installation</p>
+                        <p className="text-purple-700">To add YohaTrade to your home screen:</p>
+                      </div>
+                    </div>
+                    <ol className="space-y-1 ml-6 text-purple-800">
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold">1.</span>
+                        <span>Copy this URL or tap the share icon in your browser</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold">2.</span>
+                        <span>Select "Open in Safari"</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold">3.</span>
+                        <span>In Safari, tap Share → "Add to Home Screen"</span>
+                      </li>
+                    </ol>
                   </div>
-                )
+                ) : null
               ) : (
                 deferredPrompt && (
                   <button
