@@ -21,7 +21,7 @@ const ListingDetail = () => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showImageViewer, setShowImageViewer] = useState(false);
   const [viewerImageIndex, setViewerImageIndex] = useState(0);
-  const [imageZoom, setImageZoom] = useState(1);
+  const [imageZoom, setImageZoom] = useState(0.5);
 
   const { data: listing, isLoading } = useQuery({
     queryKey: ['listing', id],
@@ -103,17 +103,17 @@ const ListingDetail = () => {
   };
 
   const handleZoomReset = () => {
-    setImageZoom(1);
+    setImageZoom(0.5);
   };
 
   const handleImageChange = (newIndex) => {
     setViewerImageIndex(newIndex);
-    setImageZoom(1); // Reset zoom when changing images
+    setImageZoom(0.5); // Reset zoom when changing images
   };
 
   const handleCloseViewer = () => {
     setShowImageViewer(false);
-    setImageZoom(1); // Reset zoom when closing
+    setImageZoom(0.5); // Reset zoom when closing
   };
 
   if (isLoading) {
@@ -534,10 +534,10 @@ const ListingDetail = () => {
               </button>
               <button
                 onClick={handleZoomReset}
-                disabled={imageZoom === 1}
+                disabled={imageZoom === 0.5}
                 className="text-white hover:text-gray-300 transition-colors disabled:opacity-30 disabled:cursor-not-allowed text-xs px-2 py-1 border border-white border-opacity-30 rounded"
                 aria-label="Reset zoom"
-                title="Reset zoom to 100%"
+                title="Reset zoom to 50%"
               >
                 Reset
               </button>
@@ -572,8 +572,8 @@ const ListingDetail = () => {
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'center',
-              minWidth: imageZoom > 1 ? `${imageZoom * 100}%` : '100%',
-              minHeight: imageZoom > 1 ? `${imageZoom * 100}%` : '100%',
+              minWidth: '100%',
+              minHeight: '100%',
               padding: '20px'
             }}>
               <img
@@ -583,10 +583,10 @@ const ListingDetail = () => {
                   transform: `scale(${imageZoom})`,
                   transformOrigin: 'center center',
                   transition: 'transform 0.2s ease-out',
-                  width: imageZoom === 1 ? 'auto' : undefined,
-                  height: imageZoom === 1 ? 'auto' : undefined,
-                  maxWidth: imageZoom === 1 ? '100%' : undefined,
-                  maxHeight: imageZoom === 1 ? '100%' : undefined,
+                  width: 'auto',
+                  height: 'auto',
+                  maxWidth: '100%',
+                  maxHeight: '100%',
                 }}
               />
             </div>
