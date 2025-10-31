@@ -74,27 +74,27 @@ const Search = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-4">
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <div className="mb-3 sm:mb-4">
         <BackButton />
       </div>
-      <h1 className="text-3xl font-bold mb-6">{t('search.browseTitle')}</h1>
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6">{t('search.browseTitle')}</h1>
 
       {/* Search & Filters */}
-      <form onSubmit={handleSearch} className="card mb-8">
+      <form onSubmit={handleSearch} className="card mb-6 sm:mb-8">
         {/* Row 1: Search, Category, Subcategory */}
-        <div className="grid md:grid-cols-4 gap-4 mb-4">
-          <div className="md:col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-3 sm:mb-4">
+          <div className="sm:col-span-2 md:col-span-2">
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t('search.searchPlaceholder')}
-              className="input"
+              className="input text-sm sm:text-base"
             />
           </div>
           <div>
-            <select value={category} onChange={(e) => { setCategory(e.target.value); setSubcategory(''); }} className="input">
+            <select value={category} onChange={(e) => { setCategory(e.target.value); setSubcategory(''); }} className="input text-sm sm:text-base">
               <option value="">{t('search.allCategories')}</option>
               {Object.keys(CATEGORIES).map(cat => (
                 <option key={cat} value={cat}>{getCategoryIcon(cat)} {cat}</option>
@@ -102,7 +102,7 @@ const Search = () => {
             </select>
           </div>
           <div>
-            <select value={subcategory} onChange={(e) => setSubcategory(e.target.value)} className="input" disabled={!category}>
+            <select value={subcategory} onChange={(e) => setSubcategory(e.target.value)} className="input text-sm sm:text-base" disabled={!category}>
               <option value="">{t('search.allSubcategories')}</option>
               {(CATEGORIES[category] || []).map((sub) => (
                 <option key={sub} value={sub}>{getSubcategoryIcon(sub)} {sub}</option>
@@ -112,9 +112,9 @@ const Search = () => {
         </div>
 
         {/* Row 2: Location, Price, Sort */}
-        <div className="grid md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
           <div>
-            <select value={region} onChange={(e) => { setRegion(e.target.value); setZone(''); }} className="input">
+            <select value={region} onChange={(e) => { setRegion(e.target.value); setZone(''); }} className="input text-sm sm:text-base">
               <option value="">{t('search.allRegions')}</option>
               {Object.keys(ETHIOPIAN_LOCATIONS).map(reg => (
                 <option key={reg} value={reg}>{reg}</option>
@@ -122,7 +122,7 @@ const Search = () => {
             </select>
           </div>
           <div>
-            <select value={zone} onChange={(e) => setZone(e.target.value)} className="input" disabled={!region}>
+            <select value={zone} onChange={(e) => setZone(e.target.value)} className="input text-sm sm:text-base" disabled={!region}>
               <option value="">{t('search.allZones')}</option>
               {(ETHIOPIAN_LOCATIONS[region] || []).map((z) => (
                 <option key={z} value={z}>{z}</option>
@@ -135,7 +135,7 @@ const Search = () => {
               value={minPrice}
               onChange={(e) => setMinPrice(e.target.value)}
               placeholder={t('search.minPrice')}
-              className="input"
+              className="input text-sm sm:text-base"
             />
           </div>
           <div>
@@ -144,11 +144,11 @@ const Search = () => {
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
               placeholder={t('search.maxPrice')}
-              className="input"
+              className="input text-sm sm:text-base"
             />
           </div>
-          <div>
-            <select value={sort} onChange={(e) => setSort(e.target.value)} className="input">
+          <div className="col-span-2 sm:col-span-1">
+            <select value={sort} onChange={(e) => setSort(e.target.value)} className="input text-sm sm:text-base">
               <option value="newest">{t('search.newest')}</option>
               <option value="price_asc">{t('search.priceLowToHigh')}</option>
               <option value="price_desc">{t('search.priceHighToLow')}</option>
@@ -156,8 +156,8 @@ const Search = () => {
           </div>
         </div>
 
-        <div className="mt-4 flex items-center space-x-3">
-          <button type="submit" className="btn btn-primary">
+        <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+          <button type="submit" className="btn btn-primary text-sm sm:text-base py-2 sm:py-2">
             🔍 {t('common.search')}
           </button>
           {(query || category || subcategory || region || zone || minPrice || maxPrice) && (
@@ -173,7 +173,7 @@ const Search = () => {
                 setMaxPrice('');
                 setSearchParams({});
               }}
-              className="btn btn-secondary"
+              className="btn btn-secondary text-sm sm:text-base py-2 sm:py-2"
             >
               {t('search.clearFilters')}
             </button>
@@ -183,7 +183,7 @@ const Search = () => {
 
       {/* Results */}
       {isLoading ? (
-        <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
           {Array.from({ length: 12 }).map((_, i) => (
             <div key={i} className="card">
               <div className="w-full h-48 skeleton mb-4" />
@@ -199,7 +199,7 @@ const Search = () => {
         </div>
       ) : (
         <>
-          <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             {data?.listings?.map((listing) => (
               <Link
                 key={listing._id}
@@ -210,30 +210,29 @@ const Search = () => {
                   <img
                     src={listing.images[0].url}
                     alt={listing.title}
-                    className="w-full h-48 object-contain bg-gray-50 rounded-lg mb-4 group-hover:scale-105 transition-transform"
+                    className="w-full h-32 sm:h-48 object-contain bg-gray-50 rounded-lg mb-2 sm:mb-4 group-hover:scale-105 transition-transform"
                   />
                 )}
-                {listing.category && (
-                  <div className="flex items-center gap-1 mb-2">
-                    <span className="text-sm bg-purple-50 text-purple-700 px-2 py-1 rounded-lg font-medium">
-                      {getCategoryIcon(listing.category)} {listing.category}
-                    </span>
-                    {listing.subcategory && (
-                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                        {getSubcategoryIcon(listing.subcategory)} {listing.subcategory}
-                      </span>
-                    )}
-                  </div>
-                )}
-                <h3 className="font-semibold text-lg mb-2 truncate">{listing.title}</h3>
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                <h3 className="font-semibold text-sm sm:text-lg mb-1 sm:mb-2 line-clamp-1">{listing.title}</h3>
+                <p className="text-gray-600 text-xs sm:text-sm mb-2 line-clamp-2">
                   {listing.description}
                 </p>
-                <div className="flex justify-between items-center">
-                  <span className="text-xl font-bold text-purple-600">{formatPrice(listing.price, listing.currency)}</span>
-                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                <div className="mb-2">
+                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded capitalize inline-block">
                     {listing.condition}
                   </span>
+                </div>
+                {listing.location && (
+                  <p className="text-xs text-gray-500 mb-2 flex items-center gap-1 line-clamp-1">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    {listing.location.region}{listing.location.zone ? `, ${listing.location.zone}` : ''}
+                  </p>
+                )}
+                <div className="flex justify-between items-center">
+                  <span className="text-base sm:text-xl font-bold text-purple-600">{formatPrice(listing.price, listing.currency)}</span>
                 </div>
               </Link>
             ))}

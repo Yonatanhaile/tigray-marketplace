@@ -145,16 +145,16 @@ const Messages = () => {
   const isBuyer = String(order?.buyerId?._id || order?.buyerId || '') === currentUserId;
 
   return (
-    <div className="max-w-4xl mx-auto px-2 sm:px-4 py-4 sm:py-8">
-      <div className="mb-3">
+    <div className="max-w-4xl mx-auto px-2 sm:px-4 py-3 sm:py-4 md:py-8">
+      <div className="mb-2 sm:mb-3">
         <BackButton />
       </div>
-      <div className="mb-4 sm:mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold mb-2">Order Messages</h1>
+      <div className="mb-3 sm:mb-4 md:mb-6">
+        <h1 className="text-lg sm:text-xl md:text-2xl font-bold mb-2">Order Messages</h1>
         {order && (
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-100 p-3 rounded-lg gap-2 sm:gap-0">
-            <div>
-              <p className="text-xs sm:text-sm text-gray-600">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-100 p-2 sm:p-3 rounded-lg gap-2 sm:gap-0">
+            <div className="flex-1">
+              <p className="text-xs sm:text-sm text-gray-600 truncate">
                 <span className="font-semibold">Order:</span> {order.listingId?.title || 'N/A'}
               </p>
               <p className="text-xs sm:text-sm text-gray-600">
@@ -162,7 +162,7 @@ const Messages = () => {
               </p>
             </div>
             <div className="sm:text-right">
-              <p className="text-xs sm:text-sm font-semibold text-gray-700">
+              <p className="text-xs sm:text-sm font-semibold text-gray-700 truncate">
                 {isBuyer ? 'Seller' : 'Buyer'}: {isBuyer ? order.sellerId?.name : order.buyerId?.name}
               </p>
               <p className="text-xs text-gray-500">Status: {order.status}</p>
@@ -171,11 +171,11 @@ const Messages = () => {
         )}
       </div>
 
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden h-[500px] sm:h-[600px] lg:h-[650px] flex flex-col">
+      <div className="bg-white rounded-lg sm:rounded-xl shadow-lg overflow-hidden h-[calc(100vh-220px)] sm:h-[500px] md:h-[600px] lg:h-[650px] flex flex-col">
         {/* Messages Container */}
         <div 
           ref={messagesContainerRef}
-          className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-4" 
+          className="flex-1 overflow-y-auto p-2 sm:p-3 md:p-6 space-y-3 sm:space-y-4" 
           style={{ 
             backgroundImage: 'linear-gradient(to bottom, #f3f4f6 0%, #e5e7eb 100%)',
             backgroundAttachment: 'fixed'
@@ -205,56 +205,56 @@ const Messages = () => {
               const senderProfileImage = senderInfo?.profileImage?.url;
               
               return (
-                <div key={msg._id} className={`w-full flex ${isMyMessage ? 'justify-end' : 'justify-start'} mb-4`}>
-                  <div className={`flex ${isMyMessage ? 'flex-row-reverse' : 'flex-row'} items-end gap-2 max-w-[85%] sm:max-w-[70%]`}>
+                <div key={msg._id} className={`w-full flex ${isMyMessage ? 'justify-end' : 'justify-start'} mb-3 sm:mb-4`}>
+                  <div className={`flex ${isMyMessage ? 'flex-row-reverse' : 'flex-row'} items-end gap-1 sm:gap-2 max-w-[90%] sm:max-w-[85%] md:max-w-[70%]`}>
                     {/* Profile Image */}
                     <div className="flex-shrink-0">
                       {senderProfileImage ? (
                         <img 
                           src={senderProfileImage} 
                           alt={senderName} 
-                          className="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
+                          className="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover border-2 border-gray-200"
                         />
                       ) : (
-                        <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-xs border-2 border-gray-200">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-[10px] sm:text-xs border-2 border-gray-200">
                           {senderName?.charAt(0)?.toUpperCase() || 'U'}
                         </div>
                       )}
                     </div>
 
-                    <div className={`flex flex-col ${isMyMessage ? 'items-end' : 'items-start'} min-w-[150px] sm:min-w-[200px]`}>
+                    <div className={`flex flex-col ${isMyMessage ? 'items-end' : 'items-start'} min-w-[120px] sm:min-w-[150px] md:min-w-[200px]`}>
                       {/* Sender name - only for received messages */}
                       {!isMyMessage && (
-                        <span className="text-xs font-semibold text-gray-600 mb-1 ml-4">
+                        <span className="text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 ml-2 sm:ml-4">
                           {senderName || 'User'}
                         </span>
                       )}
                     
                     {/* Message bubble */}
-                    <div className={`relative px-4 py-3 sm:px-6 sm:py-4 shadow-lg ${
+                    <div className={`relative px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 shadow-lg ${
                       isMyMessage 
-                        ? 'bg-gradient-to-br from-purple-600 to-indigo-600 text-white rounded-3xl rounded-br-md ml-auto' 
-                        : 'bg-white text-gray-900 rounded-3xl rounded-bl-md border border-gray-200 mr-auto'
+                        ? 'bg-gradient-to-br from-purple-600 to-indigo-600 text-white rounded-2xl sm:rounded-3xl rounded-br-md ml-auto' 
+                        : 'bg-white text-gray-900 rounded-2xl sm:rounded-3xl rounded-bl-md border border-gray-200 mr-auto'
                     }`}>
                       {/* Tail/pointer */}
                       <div className={`absolute bottom-0 w-0 h-0 ${
                         isMyMessage 
-                          ? 'right-0 border-l-[15px] border-l-transparent border-t-[15px] border-t-indigo-600 border-r-0'
-                          : 'left-0 border-r-[15px] border-r-transparent border-t-[15px] border-t-white border-l-0'
+                          ? 'right-0 border-l-[10px] sm:border-l-[15px] border-l-transparent border-t-[10px] sm:border-t-[15px] border-t-indigo-600 border-r-0'
+                          : 'left-0 border-r-[10px] sm:border-r-[15px] border-r-transparent border-t-[10px] sm:border-t-[15px] border-t-white border-l-0'
                       }`} style={{ 
-                        [isMyMessage ? 'right' : 'left']: '-7px',
+                        [isMyMessage ? 'right' : 'left']: '-5px',
                         bottom: '0px'
                       }}></div>
                       
                       {/* Message text */}
-                      <p className={`text-[15px] leading-relaxed break-words ${
+                      <p className={`text-[13px] sm:text-[15px] leading-relaxed break-words ${
                         isMyMessage ? 'text-white' : 'text-gray-800'
                       }`}>
                         {msg.text}
                       </p>
                       
                       {/* Timestamp */}
-                      <p className={`text-[11px] mt-2 text-right ${
+                      <p className={`text-[10px] sm:text-[11px] mt-1 sm:mt-2 text-right ${
                         isMyMessage ? 'text-purple-100' : 'text-gray-500'
                       }`}>
                         {new Date(msg.createdAt).toLocaleTimeString([], { 
@@ -266,7 +266,7 @@ const Messages = () => {
                     
                       {/* "You" label for sent messages */}
                       {isMyMessage && (
-                        <span className="text-xs text-gray-600 mt-1 mr-4 font-medium">
+                        <span className="text-[10px] sm:text-xs text-gray-600 mt-1 mr-2 sm:mr-4 font-medium">
                           You
                         </span>
                       )}
@@ -280,19 +280,19 @@ const Messages = () => {
         </div>
 
         {/* Input Area */}
-        <form onSubmit={handleSend} className="bg-white border-t border-gray-200 p-3 sm:p-4">
-          <div className="flex items-center gap-2 sm:gap-3">
+        <form onSubmit={handleSend} className="bg-white border-t border-gray-200 p-2 sm:p-3 md:p-4">
+          <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3">
             <input 
               value={messageText} 
               onChange={e => setMessageText(e.target.value)} 
               placeholder="Type your message here..." 
-              className="flex-1 min-w-0 px-3 py-2.5 sm:px-5 sm:py-3 border-2 border-gray-200 rounded-full focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all text-sm sm:text-base" 
+              className="flex-1 min-w-0 px-3 py-2 sm:px-4 sm:py-2.5 md:px-5 md:py-3 border-2 border-gray-200 rounded-full focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all text-xs sm:text-sm md:text-base" 
               disabled={!orderData?.order}
               ref={inputRef}
             />
             <button 
               type="submit" 
-              className={`flex-shrink-0 px-3 py-2.5 sm:px-6 sm:py-3 rounded-full font-semibold transition-all transform hover:scale-105 ${
+              className={`flex-shrink-0 px-3 py-2 sm:px-4 sm:py-2.5 md:px-6 md:py-3 rounded-full font-semibold transition-all transform hover:scale-105 ${
                 !orderData?.order || !messageText.trim()
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/50 hover:shadow-xl'
@@ -300,8 +300,8 @@ const Messages = () => {
               disabled={!orderData?.order || !messageText.trim()}
             >
               <div className="flex items-center gap-1 sm:gap-2">
-                <span className="hidden xs:inline sm:inline">Send</span>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span className="hidden sm:inline text-xs sm:text-sm md:text-base">Send</span>
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
               </div>
