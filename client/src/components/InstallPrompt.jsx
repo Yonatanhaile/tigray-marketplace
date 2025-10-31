@@ -8,6 +8,7 @@ const InstallPrompt = () => {
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [browserType, setBrowserType] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     // Check if already installed (standalone mode)
@@ -17,8 +18,15 @@ const InstallPrompt = () => {
     
     setIsStandalone(isInStandaloneMode);
 
-    // Detect iOS (including iPadOS)
+    // Detect if device is mobile (phone or tablet)
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) || // iPadOS
+      window.matchMedia('(max-width: 1024px)').matches; // Also check screen size
+    
+    setIsMobile(isMobileDevice);
+
+    // Detect iOS (including iPadOS)
     const isIOSDevice = /iPad|iPhone|iPod/.test(userAgent) || 
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPadOS detection
     
@@ -37,18 +45,19 @@ const InstallPrompt = () => {
     const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
     const shouldShowAgain = !dismissedTime || (Date.now() - parseInt(dismissedTime)) > sevenDaysInMs;
 
-    if (!isInStandaloneMode && (!dismissed || shouldShowAgain)) {
+    // Only show on mobile devices, not on desktop computers
+    if (isMobileDevice && !isInStandaloneMode && (!dismissed || shouldShowAgain)) {
       // For iOS, always show instructions (regardless of browser)
       if (isIOSDevice) {
         setTimeout(() => setShowInstallPrompt(true), 2000); // Show after 2 seconds
       }
     }
 
-    // For Android/Desktop - listen for beforeinstallprompt event
+    // For Android - listen for beforeinstallprompt event (only on mobile)
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      if (shouldShowAgain && !isIOSDevice) {
+      if (isMobileDevice && shouldShowAgain && !isIOSDevice) {
         setTimeout(() => setShowInstallPrompt(true), 2000); // Show after 2 seconds
       }
     };
@@ -87,6 +96,11 @@ const InstallPrompt = () => {
 
   // Don't show if already installed
   if (isStandalone) {
+    return null;
+  }
+
+  // Don't show on desktop computers - only on mobile devices
+  if (!isMobile) {
     return null;
   }
 
