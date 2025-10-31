@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import Layout from './components/Layout';
+import InstallPrompt from './components/InstallPrompt';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -43,8 +44,10 @@ const ProtectedRoute = ({ children, requireAdmin = false, requireSeller = false 
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
+    <>
+      <InstallPrompt />
+      <Routes>
+        <Route path="/" element={<Layout />}>
         {/* Public routes */}
         <Route index element={<Home />} />
         <Route path="login" element={<Login />} />
@@ -126,9 +129,10 @@ function App() {
             </ProtectedRoute>
           }
         />
-      </Route>
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
   );
 }
 

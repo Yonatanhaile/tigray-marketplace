@@ -49,6 +49,22 @@ body {
   background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
 }
 
+/* Animation for Install Prompt */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slideUp {
+  animation: slideUp 0.5s ease-out forwards;
+}
+
 @layer components {
   .btn {
     @apply px-5 py-2.5 rounded-xl font-semibold transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-offset-2 transform active:scale-95 relative overflow-hidden;
