@@ -21,6 +21,7 @@ const ListingDetail = () => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showImageViewer, setShowImageViewer] = useState(false);
   const [viewerImageIndex, setViewerImageIndex] = useState(0);
+  const [imageZoom, setImageZoom] = useState(1);
 
   const { data: listing, isLoading } = useQuery({
     queryKey: ['listing', id],
@@ -91,6 +92,28 @@ const ListingDetail = () => {
       selected_payment_method: selectedPaymentMethod,
       buyer_note: buyerNote || undefined,
     });
+  };
+
+  const handleZoomIn = () => {
+    setImageZoom((prev) => Math.min(prev + 0.25, 3));
+  };
+
+  const handleZoomOut = () => {
+    setImageZoom((prev) => Math.max(prev - 0.25, 0.5));
+  };
+
+  const handleZoomReset = () => {
+    setImageZoom(1);
+  };
+
+  const handleImageChange = (newIndex) => {
+    setViewerImageIndex(newIndex);
+    setImageZoom(1); // Reset zoom when changing images
+  };
+
+  const handleCloseViewer = () => {
+    setShowImageViewer(false);
+    setImageZoom(1); // Reset zoom when closing
   };
 
   if (isLoading) {
@@ -471,8 +494,8 @@ const ListingDetail = () => {
         <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50">
           {/* Close button */}
           <button
-            onClick={() => setShowImageViewer(false)}
-            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors p-2 bg-black bg-opacity-50 rounded-full"
+            onClick={handleCloseViewer}
+            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors p-2 bg-black bg-opacity-50 rounded-full z-10"
             aria-label="Close"
           >
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -480,16 +503,52 @@ const ListingDetail = () => {
             </svg>
           </button>
 
-          {/* Image counter */}
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-white bg-black bg-opacity-50 px-4 py-2 rounded-full">
-            {viewerImageIndex + 1} / {listing.listing.images.length}
+          {/* Image counter and zoom controls */}
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 flex items-center gap-4 z-10">
+            <div className="text-white bg-black bg-opacity-50 px-4 py-2 rounded-full">
+              {viewerImageIndex + 1} / {listing.listing.images.length}
+            </div>
+            <div className="flex items-center gap-2 bg-black bg-opacity-50 px-3 py-2 rounded-full">
+              <button
+                onClick={handleZoomOut}
+                disabled={imageZoom <= 0.5}
+                className="text-white hover:text-gray-300 transition-colors disabled:opacity-30 disabled:cursor-not-allowed p-1"
+                aria-label="Zoom out"
+                title="Zoom out"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+                </svg>
+              </button>
+              <span className="text-white text-sm min-w-[4rem] text-center">{Math.round(imageZoom * 100)}%</span>
+              <button
+                onClick={handleZoomIn}
+                disabled={imageZoom >= 3}
+                className="text-white hover:text-gray-300 transition-colors disabled:opacity-30 disabled:cursor-not-allowed p-1"
+                aria-label="Zoom in"
+                title="Zoom in"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                </svg>
+              </button>
+              <button
+                onClick={handleZoomReset}
+                disabled={imageZoom === 1}
+                className="text-white hover:text-gray-300 transition-colors disabled:opacity-30 disabled:cursor-not-allowed text-xs px-2 py-1 border border-white border-opacity-30 rounded"
+                aria-label="Reset zoom"
+                title="Reset zoom to 100%"
+              >
+                Reset
+              </button>
+            </div>
           </div>
 
           {/* Previous button */}
           {listing.listing.images.length > 1 && (
             <button
-              onClick={() => setViewerImageIndex((prev) => (prev === 0 ? listing.listing.images.length - 1 : prev - 1))}
-              className="absolute left-4 text-white hover:text-gray-300 transition-colors p-3 bg-black bg-opacity-50 rounded-full"
+              onClick={() => handleImageChange(viewerImageIndex === 0 ? listing.listing.images.length - 1 : viewerImageIndex - 1)}
+              className="absolute left-4 text-white hover:text-gray-300 transition-colors p-3 bg-black bg-opacity-50 rounded-full z-10"
               aria-label="Previous image"
             >
               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -498,20 +557,28 @@ const ListingDetail = () => {
             </button>
           )}
 
-          {/* Main image */}
-          <div className="max-w-7xl max-h-screen p-8 flex items-center justify-center">
-            <img
-              src={listing.listing.images[viewerImageIndex]?.url}
-              alt={`${listing.listing.title} - Image ${viewerImageIndex + 1}`}
-              className="max-w-full max-h-full object-contain"
-            />
+          {/* Main image container with overflow for zoom */}
+          <div className="absolute inset-0 flex items-center justify-center overflow-auto p-8" style={{ paddingTop: '80px', paddingBottom: listing.listing.images.length > 1 ? '100px' : '80px' }}>
+            <div className="flex items-center justify-center min-w-full min-h-full">
+              <img
+                src={listing.listing.images[viewerImageIndex]?.url}
+                alt={`${listing.listing.title} - Image ${viewerImageIndex + 1}`}
+                style={{
+                  transform: `scale(${imageZoom})`,
+                  transition: 'transform 0.2s ease-out',
+                  maxWidth: imageZoom === 1 ? '100%' : 'none',
+                  maxHeight: imageZoom === 1 ? '100%' : 'none',
+                }}
+                className="object-contain"
+              />
+            </div>
           </div>
 
           {/* Next button */}
           {listing.listing.images.length > 1 && (
             <button
-              onClick={() => setViewerImageIndex((prev) => (prev === listing.listing.images.length - 1 ? 0 : prev + 1))}
-              className="absolute right-4 text-white hover:text-gray-300 transition-colors p-3 bg-black bg-opacity-50 rounded-full"
+              onClick={() => handleImageChange(viewerImageIndex === listing.listing.images.length - 1 ? 0 : viewerImageIndex + 1)}
+              className="absolute right-4 text-white hover:text-gray-300 transition-colors p-3 bg-black bg-opacity-50 rounded-full z-10"
               aria-label="Next image"
             >
               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -522,11 +589,11 @@ const ListingDetail = () => {
 
           {/* Thumbnail strip */}
           {listing.listing.images.length > 1 && (
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 max-w-full overflow-x-auto px-4">
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 max-w-full overflow-x-auto px-4 z-10">
               {listing.listing.images.map((img, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setViewerImageIndex(idx)}
+                  onClick={() => handleImageChange(idx)}
                   className={`flex-shrink-0 w-16 h-16 rounded overflow-hidden transition-all ${
                     viewerImageIndex === idx ? 'ring-4 ring-white' : 'ring-2 ring-transparent opacity-60 hover:opacity-100'
                   }`}
