@@ -21,7 +21,14 @@ const ListingDetail = () => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showImageViewer, setShowImageViewer] = useState(false);
   const [viewerImageIndex, setViewerImageIndex] = useState(0);
-  const [imageZoom, setImageZoom] = useState(0.5);
+  
+  // Function to get default zoom based on device
+  const getDefaultZoom = () => {
+    // Check if mobile device (screen width less than 768px)
+    return window.innerWidth < 768 ? 1 : 0.5;
+  };
+  
+  const [imageZoom, setImageZoom] = useState(getDefaultZoom());
 
   const { data: listing, isLoading } = useQuery({
     queryKey: ['listing', id],
@@ -103,17 +110,17 @@ const ListingDetail = () => {
   };
 
   const handleZoomReset = () => {
-    setImageZoom(0.5);
+    setImageZoom(getDefaultZoom());
   };
 
   const handleImageChange = (newIndex) => {
     setViewerImageIndex(newIndex);
-    setImageZoom(0.5); // Reset zoom when changing images
+    setImageZoom(getDefaultZoom()); // Reset zoom when changing images
   };
 
   const handleCloseViewer = () => {
     setShowImageViewer(false);
-    setImageZoom(0.5); // Reset zoom when closing
+    setImageZoom(getDefaultZoom()); // Reset zoom when closing
   };
 
   if (isLoading) {
@@ -534,10 +541,10 @@ const ListingDetail = () => {
               </button>
               <button
                 onClick={handleZoomReset}
-                disabled={imageZoom === 0.5}
+                disabled={imageZoom === getDefaultZoom()}
                 className="text-white hover:text-gray-300 transition-colors disabled:opacity-30 disabled:cursor-not-allowed text-xs px-2 py-1 border border-white border-opacity-30 rounded"
                 aria-label="Reset zoom"
-                title="Reset zoom to 50%"
+                title={`Reset zoom to ${getDefaultZoom() * 100}%`}
               >
                 Reset
               </button>
