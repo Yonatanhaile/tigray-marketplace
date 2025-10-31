@@ -76,6 +76,8 @@
     "allRegions": "All Regions",
     "allZones": "All Zones",
     "filters": "Filters",
+    "showFilters": "Show Filters",
+    "hideFilters": "Hide Filters",
     "sortBy": "Sort by",
     "newest": "Newest",
     "oldest": "Oldest",
