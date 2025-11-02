@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const { verifyToken } = require('../services/jwt');
 const { User, Order, Message } = require('../models');
 const logger = require('../services/logger');
@@ -157,10 +158,19 @@ const initializeSocketHandlers = (io) => {
       try {
         const { orderId, toUserId, text, attachments = [] } = data;
 
+        logger.info(`📨 Attempting to save message - OrderID: ${orderId}, Sender: ${socket.userId}`);
+
+        // Check database connection
+        if (mongoose.connection.readyState !== 1) {
+          logger.error('❌ Database not connected! ReadyState:', mongoose.connection.readyState);
+          return socket.emit('error', { message: 'Database connection error. Please try again.' });
+        }
+
         // Verify order exists and user is authorized
         const order = await Order.findById(orderId);
         
         if (!order) {
+          logger.warn(`Order ${orderId} not found`);
           return socket.emit('error', { message: 'Order not found' });
         }
 
@@ -168,10 +178,12 @@ const initializeSocketHandlers = (io) => {
         const isSeller = order.sellerId.toString() === socket.userId;
 
         if (!isBuyer && !isSeller) {
+          logger.warn(`User ${socket.userId} not authorized for order ${orderId}`);
           return socket.emit('error', { message: 'Not authorized' });
         }
 
-        // Create message
+        // Create message with explicit error handling
+        logger.info(`💾 Saving message to database...`);
         const message = await Message.create({
           orderId,
           senderId: socket.userId,
@@ -180,6 +192,12 @@ const initializeSocketHandlers = (io) => {
           attachments,
           deliveredAt: new Date(),
         });
+
+        if (!message || !message._id) {
+          throw new Error('Message was not saved to database');
+        }
+
+        logger.info(`✅ Message saved successfully with ID: ${message._id}`);
 
         // Populate sender info
         await message.populate('senderId', 'name email');
@@ -200,10 +218,19 @@ const initializeSocketHandlers = (io) => {
           message,
         });
 
-        logger.info(`Message sent in order ${orderId}`);
+        logger.info(`📤 Message emitted to all parties - Order: ${orderId}, MessageID: ${message._id}`);
       } catch (error) {
-        logger.error('Error sending message:', error);
-        socket.emit('error', { message: 'Failed to send message' });
+        logger.error('❌ Error sending message:', {
+          error: error.message,
+          stack: error.stack,
+          orderId: data?.orderId,
+          senderId: socket.userId,
+          dbState: mongoose.connection.readyState
+        });
+        socket.emit('error', { 
+          message: 'Failed to send message. Please check server logs.',
+          details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
       }
     });
 
