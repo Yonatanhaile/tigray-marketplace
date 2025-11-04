@@ -16,7 +16,7 @@ const Home = () => {
   // Fetch smart home page listings (quality + popularity + recency)
   const { data: listingsData, isLoading } = useQuery({
     queryKey: ['listings', 'home'],
-    queryFn: () => listingsAPI.getHomePageListings({ limit: 6 }),
+    queryFn: () => listingsAPI.getHomePageListings({ limit: 20 }),
   });
 
   // Fetch unread message count
@@ -164,7 +164,7 @@ const Home = () => {
 
           {isLoading ? (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-              {[...Array(6)].map((_, i) => (
+              {[...Array(20)].map((_, i) => (
                 <div key={i} className="card animate-pulse">
                   <div className="w-full h-40 sm:h-48 bg-gray-200 rounded-lg mb-4"></div>
                   <div className="h-5 sm:h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
@@ -178,7 +178,7 @@ const Home = () => {
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-              {listingsData?.listings?.slice(0, 6).map((listing) => (
+              {listingsData?.listings?.slice(0, 20).map((listing) => (
                 <Link
                   key={listing._id}
                   to={`/listings/${listing._id}`}
