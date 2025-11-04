@@ -211,7 +211,12 @@ const getMyOrders = async (req, res) => {
         .populate('listingId', 'title price images')
         .populate('buyerId', 'name email profileImage')
         .populate('sellerId', 'name email profileImage')
-        .sort({ createdAt: -1 })
+        .populate({
+          path: 'lastMessage',
+          select: 'text senderId createdAt',
+          options: { sort: { createdAt: -1 } },
+        })
+        .sort({ updatedAt: -1 }) // Sort by most recent activity (including messages)
         .skip(skip)
         .limit(parseInt(limit)),
       Order.countDocuments(filter),

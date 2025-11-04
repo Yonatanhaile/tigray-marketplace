@@ -199,6 +199,11 @@ const initializeSocketHandlers = (io) => {
 
         logger.info(`✅ Message saved successfully with ID: ${message._id}`);
 
+        // Update order's updatedAt timestamp so it appears at top of conversations
+        await Order.findByIdAndUpdate(orderId, { 
+          updatedAt: new Date() 
+        });
+
         // Populate sender info
         await message.populate('senderId', 'name email');
 

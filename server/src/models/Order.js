@@ -136,6 +136,18 @@ orderSchema.virtual('seller', {
   justOne: true,
 });
 
+// Virtual for last message in the order (for conversations list)
+orderSchema.virtual('lastMessage', {
+  ref: 'Message',
+  localField: '_id',
+  foreignField: 'orderId',
+  justOne: true,
+  options: {
+    sort: { createdAt: -1 },
+    limit: 1,
+  },
+});
+
 // Clean JSON output
 orderSchema.set('toJSON', {
   virtuals: true,

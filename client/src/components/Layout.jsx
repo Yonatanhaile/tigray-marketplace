@@ -129,16 +129,22 @@ const Layout = () => {
       };
 
       const handleMessagesRead = (data) => {
-        console.log('🔔 Messages marked as read, updating count');
+        console.log('🔔 Messages marked as read, updating count. Data:', data);
         // Immediately fetch fresh unread count from server
         messagesAPI.getUnreadCount()
           .then(data => {
-            console.log('📊 New unread count:', data.unreadCount);
+            console.log('📊 New unread count after read:', data.unreadCount);
             setUnreadCount(data.unreadCount || 0);
             // Invalidate unread count query to refresh across all components
             queryClient.invalidateQueries(['messages', 'unread-count']);
           })
           .catch(err => console.error('Failed to refresh unread count:', err));
+      };
+
+      const handleMessagesReadByRecipient = (data) => {
+        console.log('✅ Your messages were read by recipient:', data);
+        // Refresh orders to update any UI indicators
+        queryClient.invalidateQueries(['orders']);
       };
 
       const handleListingStatusChanged = (data) => {
@@ -179,15 +185,17 @@ const Layout = () => {
 
       socket.on('new_message', handleNewMessage);
       socket.on('messages_read', handleMessagesRead);
+      socket.on('messages_read_by_recipient', handleMessagesReadByRecipient);
       socket.on('listing_status_changed', handleListingStatusChanged);
       socket.on('new_active_listing', handleNewActiveListing);
       socket.on('new_order', handleNewOrder);
       
-      console.log('✅ All socket listeners registered (including new_order)');
+      console.log('✅ All socket listeners registered (including new_order and messages_read_by_recipient)');
 
       return () => {
         socket.off('new_message', handleNewMessage);
         socket.off('messages_read', handleMessagesRead);
+        socket.off('messages_read_by_recipient', handleMessagesReadByRecipient);
         socket.off('listing_status_changed', handleListingStatusChanged);
         socket.off('new_active_listing', handleNewActiveListing);
         socket.off('new_order', handleNewOrder);

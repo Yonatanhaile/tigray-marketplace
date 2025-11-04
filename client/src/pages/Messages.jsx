@@ -41,9 +41,6 @@ const Messages = () => {
   });
 
   useEffect(() => {
-    // Emit custom event to Layout component to clear message notifications
-    window.dispatchEvent(new CustomEvent('clear-message-notifications'));
-    
     if (orderId && socket) {
       joinOrderRoom(orderId);
     }
@@ -56,10 +53,10 @@ const Messages = () => {
 
       socket.on('message_sent', (data) => {
         queryClient.invalidateQueries(['messages', orderId]);
-        toast.success('Message sent');
       });
 
       socket.on('messages_read', (data) => {
+        console.log('📬 Messages read event received:', data);
         // When messages are marked as read, update the unread count
         queryClient.invalidateQueries(['messages', 'unread-count']);
         // Also emit custom event to update Layout immediately
@@ -83,23 +80,28 @@ const Messages = () => {
 
   useEffect(() => {
     setTimeout(scrollToBottom, 100);
-    // Invalidate unread count when messages are loaded (they get marked as read on server)
-    queryClient.invalidateQueries(['messages', 'unread-count']);
-    
-    // Manually fetch and update unread count to ensure UI updates immediately
-    const updateUnreadCount = async () => {
-      try {
-        const data = await messagesAPI.getUnreadCount();
-        // This will trigger a re-render in Layout component
-        queryClient.setQueryData(['messages', 'unread-count'], data);
-      } catch (error) {
-        console.error('Failed to update unread count:', error);
-      }
-    };
     
     if (messagesData?.messages) {
-      // Small delay to ensure server has marked messages as read
-      setTimeout(updateUnreadCount, 500);
+      // Emit custom event to Layout component to clear message notifications
+      window.dispatchEvent(new CustomEvent('clear-message-notifications'));
+      
+      // Manually fetch and update unread count to ensure UI updates immediately
+      const updateUnreadCount = async () => {
+        try {
+          const data = await messagesAPI.getUnreadCount();
+          console.log('📊 Updated unread count after viewing messages:', data.unreadCount);
+          // This will trigger a re-render in Layout component
+          queryClient.setQueryData(['messages', 'unread-count'], data);
+          // Also invalidate to refetch in other components
+          queryClient.invalidateQueries(['messages', 'unread-count']);
+        } catch (error) {
+          console.error('Failed to update unread count:', error);
+        }
+      };
+      
+      // Delay to ensure server has marked messages as read
+      // The delay accounts for API processing time
+      setTimeout(updateUnreadCount, 800);
     }
   }, [messagesData, queryClient]);
 

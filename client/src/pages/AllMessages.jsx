@@ -195,9 +195,11 @@ const AllMessages = () => {
                   </div>
 
                   {/* Last message preview (if available) */}
-                  {order.lastMessage && (
+                  {order.lastMessage && order.lastMessage.text && (
                     <p className={`text-sm mt-2 truncate ${hasUnread ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
-                      {order.lastMessage.senderId === user?._id ? t('allMessages.you') : ''}
+                      {String(order.lastMessage.senderId) === String(user?._id || user?.id) && (
+                        <span className="font-medium">{t('allMessages.you')}: </span>
+                      )}
                       {order.lastMessage.text}
                     </p>
                   )}

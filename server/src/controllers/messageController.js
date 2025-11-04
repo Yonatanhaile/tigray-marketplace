@@ -107,13 +107,29 @@ const getOrderMessages = async (req, res) => {
     if (unreadMessages.length > 0) {
       await Promise.all(unreadMessages.map(msg => msg.markAsRead()));
       
+      logger.info(`Marked ${unreadMessages.length} messages as read for user ${req.userId} in order ${orderId}`);
+      
       // Notify user via socket to update unread count
       const io = req.app.get('io');
       if (io) {
+        // Emit to user's room to update their UI
         io.to(`user:${req.userId}`).emit('messages_read', {
           orderId,
           count: unreadMessages.length,
+          timestamp: Date.now(),
         });
+        
+        // Also emit to the sender so they know their messages were read
+        const senderIds = [...new Set(unreadMessages.map(msg => msg.senderId._id.toString()))];
+        senderIds.forEach(senderId => {
+          io.to(`user:${senderId}`).emit('messages_read_by_recipient', {
+            orderId,
+            recipientId: req.userId,
+            count: unreadMessages.filter(msg => msg.senderId._id.toString() === senderId).length,
+          });
+        });
+        
+        logger.info(`Emitted messages_read event to user ${req.userId}`);
       }
     }
 
