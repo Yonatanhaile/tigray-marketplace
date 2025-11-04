@@ -61,17 +61,67 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   </React.StrictMode>,
 )
 
-// Register Service Worker for PWA
+// Register Service Worker for PWA with update handling
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
       .register('/sw.js')
       .then((registration) => {
-        console.log('SW registered:', registration);
+        console.log('✅ Service Worker registered successfully:', registration);
+        
+        // Check for updates every 60 seconds
+        setInterval(() => {
+          registration.update().catch(err => {
+            console.log('SW update check failed:', err);
+          });
+        }, 60000);
+
+        // Listen for service worker updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          console.log('🔄 New service worker found, installing...');
+          
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('✨ New service worker installed, will activate on page refresh');
+              // The new service worker will automatically take over
+            }
+          });
+        });
+
+        // Listen for controller change (new SW activated)
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          console.log('🔄 Service Worker controller changed - reloading page');
+          // New service worker has taken control - reload to get fresh content
+          window.location.reload();
+        });
+
+        // Initial update check
+        registration.update().catch(err => {
+          console.log('Initial SW update check failed:', err);
+        });
       })
       .catch((error) => {
-        console.log('SW registration failed:', error);
+        console.error('❌ Service Worker registration failed:', error);
       });
+  });
+
+  // Listen for service worker messages
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    console.log('📨 Message from Service Worker:', event.data);
+  });
+}
+
+// Clear old caches on page load to ensure fresh content
+if ('caches' in window) {
+  caches.keys().then(cacheNames => {
+    cacheNames.forEach(cacheName => {
+      // Delete old cache versions
+      if (cacheName.startsWith('yohatrade-') && !cacheName.includes('v2.1.0')) {
+        console.log('🗑️ Deleting old cache:', cacheName);
+        caches.delete(cacheName);
+      }
+    });
   });
 }
 

@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import Layout from './components/Layout';
 import InstallPrompt from './components/InstallPrompt';
+import UpdateNotification from './components/UpdateNotification';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -46,6 +47,7 @@ function App() {
   return (
     <>
       <InstallPrompt />
+      <UpdateNotification />
       <Routes>
         <Route path="/" element={<Layout />}>
         {/* Public routes */}
