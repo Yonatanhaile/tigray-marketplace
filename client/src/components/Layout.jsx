@@ -206,33 +206,34 @@ const Layout = () => {
   return (
     <div className="min-h-screen bg-[color:var(--color-bg)] text-[color:var(--color-text)]">
       <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-          <Link to="/" className="flex items-baseline gap-2">
-            <span className="text-2xl font-semibold tracking-tight text-[color:var(--color-primary)]">YohaTrade</span>
-          </Link>
-
-          <div className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <Link to="/search" className="text-[color:var(--color-text)] transition-colors hover:text-[color:var(--color-primary)]">
-              {t('nav.browse')}
+        <div className="mx-auto max-w-7xl">
+          <div className="flex h-16 items-center justify-between px-4">
+            <Link to="/" className="flex items-baseline gap-2">
+              <span className="text-2xl font-semibold tracking-tight text-[color:var(--color-primary)]">YohaTrade</span>
             </Link>
-            {isSeller && (
-              <Link to="/seller-dashboard" className="text-[color:var(--color-text)] transition-colors hover:text-[color:var(--color-primary)]">
-                {t('nav.myListings')}
-              </Link>
-            )}
-            {isAuthenticated && (
-              <Link to="/orders" className="relative text-[color:var(--color-text)] transition-colors hover:text-[color:var(--color-primary)]">
-                {t('nav.myOrders')}
-                {isSeller && pendingOrdersCount > 0 && (
-                  <span className="absolute -top-3 -right-4 inline-flex h-5 min-w-[1.2rem] items-center justify-center rounded-full bg-[color:var(--color-accent)] px-1 text-[10px] font-semibold text-white">
-                    {pendingOrdersCount}
-                  </span>
-                )}
-              </Link>
-            )}
-          </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+            <div className="hidden md:flex items-center gap-6 text-sm font-medium">
+              <Link to="/search" className="text-[color:var(--color-text)] transition-colors hover:text-[color:var(--color-primary)]">
+                {t('nav.browse')}
+              </Link>
+              {isSeller && (
+                <Link to="/seller-dashboard" className="text-[color:var(--color-text)] transition-colors hover:text-[color:var(--color-primary)]">
+                  {t('nav.myListings')}
+                </Link>
+              )}
+              {isAuthenticated && (
+                <Link to="/orders" className="relative text-[color:var(--color-text)] transition-colors hover:text-[color:var(--color-primary)]">
+                  {t('nav.myOrders')}
+                  {isSeller && pendingOrdersCount > 0 && (
+                    <span className="absolute -top-3 -right-4 inline-flex h-5 min-w-[1.2rem] items-center justify-center rounded-full bg-[color:var(--color-accent)] px-1 text-[10px] font-semibold text-white">
+                      {pendingOrdersCount}
+                    </span>
+                  )}
+                </Link>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
             <LanguageSwitcher />
 
             {isAuthenticated && (
@@ -370,6 +371,7 @@ const Layout = () => {
                 )}
               </svg>
             </button>
+            </div>
           </div>
 
           {/* Mobile Menu */}

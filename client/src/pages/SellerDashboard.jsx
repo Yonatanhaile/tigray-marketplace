@@ -394,8 +394,8 @@ const ListingCard = ({ listing, onToggleSold, onDelete, markAsSoldMutation, dele
               disabled={markAsSoldMutation.isPending}
               title={listing.status === 'sold' ? 'Mark this item as available again' : 'Mark this item as sold'}
             >
-              {markAsSoldMutation.isPending ? '⏳ ' + t('sellerDashboard.updating') : (
-                listing.status === 'sold' ? '✅ ' + t('sellerDashboard.markAvailable') : '🔴 ' + t('sellerDashboard.markAsSold')
+              {markAsSoldMutation.isPending ? t('sellerDashboard.updating') : (
+                listing.status === 'sold' ? t('sellerDashboard.markAvailable') : t('sellerDashboard.markAsSold')
               )}
             </button>
           </div>
@@ -411,7 +411,7 @@ const ListingCard = ({ listing, onToggleSold, onDelete, markAsSoldMutation, dele
                 </svg>
               </div>
               <div className="ml-2">
-                <p className="font-semibold">⏳ {t('sellerDashboard.pendingAdminReview')}</p>
+                <p className="font-semibold">{t('sellerDashboard.pendingAdminReview')}</p>
                 <p className="text-xs mt-0.5">{t('sellerDashboard.pendingNotice')}</p>
               </div>
             </div>
@@ -425,7 +425,7 @@ const ListingCard = ({ listing, onToggleSold, onDelete, markAsSoldMutation, dele
             className="flex-1 text-center py-2 px-3 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-sm font-semibold transition-all"
             title="Edit listing details, price, images, etc."
           >
-            ✏️ {t('sellerDashboard.editListing')}
+            Edit
           </Link>
           <button 
             onClick={(e) => onDelete(e, listing._id)} 
@@ -433,7 +433,7 @@ const ListingCard = ({ listing, onToggleSold, onDelete, markAsSoldMutation, dele
             disabled={deleteMutation.isPending}
             title="Permanently delete this listing"
           >
-            {deleteMutation.isPending ? '⏳ ' + t('sellerDashboard.deleting') : '🗑️ ' + t('sellerDashboard.delete')}
+            {deleteMutation.isPending ? t('sellerDashboard.deleting') : t('sellerDashboard.delete')}
           </button>
         </div>
       </div>
