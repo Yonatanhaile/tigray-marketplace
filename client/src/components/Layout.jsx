@@ -204,284 +204,266 @@ const Layout = () => {
   }, [socket, isAuthenticated, user, queryClient]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
-      {/* Modern Navigation with Glass Morphism */}
-      <nav className="sticky top-0 z-50 glass border-b border-white/20 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-14 sm:h-16 md:h-20">
-            {/* Logo */}
-            <Link to="/" className="flex items-center space-x-1.5 sm:space-x-2 group">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                <span className="text-white text-lg sm:text-xl font-bold">Y</span>
-              </div>
-              <span className="text-lg sm:text-xl md:text-2xl font-bold text-gradient hidden sm:block">
-                YohaTrade
-              </span>
+    <div className="min-h-screen bg-[color:var(--color-bg)] text-[color:var(--color-text)]">
+      <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+          <Link to="/" className="flex items-baseline gap-2">
+            <span className="text-2xl font-semibold tracking-tight text-[color:var(--color-primary)]">YohaTrade</span>
+            <span className="hidden text-sm font-medium text-[color:var(--color-muted)] sm:block">
+              {t('nav.tagline', { defaultValue: 'Tigray markets, human connections' })}
+            </span>
+          </Link>
+
+          <div className="hidden md:flex items-center gap-6 text-sm font-medium">
+            <Link to="/search" className="text-[color:var(--color-text)] transition-colors hover:text-[color:var(--color-primary)]">
+              {t('nav.browse')}
             </Link>
-            
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center space-x-6">
-              <Link to="/search" className="nav-link text-gray-700 hover:text-purple-600 px-4 py-2 rounded-lg transition-colors font-medium">
-                🔍 {t('nav.browse')}
+            {isSeller && (
+              <Link to="/seller-dashboard" className="text-[color:var(--color-text)] transition-colors hover:text-[color:var(--color-primary)]">
+                {t('nav.myListings')}
               </Link>
-              {isSeller && (
-                <Link to="/seller-dashboard" className="nav-link text-gray-700 hover:text-purple-600 px-4 py-2 rounded-lg transition-colors font-medium">
-                  📦 {t('nav.myListings')}
-                </Link>
-              )}
-              {isAuthenticated && (
-                <Link to="/orders" className="nav-link text-gray-700 hover:text-purple-600 px-4 py-2 rounded-lg transition-colors font-medium relative">
-                  🛒 {t('nav.myOrders')}
-                  {isSeller && pendingOrdersCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                      {pendingOrdersCount}
-                    </span>
-                  )}
-                </Link>
-              )}
-            </div>
+            )}
+            {isAuthenticated && (
+              <Link to="/orders" className="relative text-[color:var(--color-text)] transition-colors hover:text-[color:var(--color-primary)]">
+                {t('nav.myOrders')}
+                {isSeller && pendingOrdersCount > 0 && (
+                  <span className="absolute -top-3 -right-4 inline-flex h-5 min-w-[1.2rem] items-center justify-center rounded-full bg-[color:var(--color-accent)] px-1 text-[10px] font-semibold text-white">
+                    {pendingOrdersCount}
+                  </span>
+                )}
+              </Link>
+            )}
+          </div>
 
-            <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
-              {/* Language Switcher */}
-              <LanguageSwitcher />
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+            <LanguageSwitcher />
 
-              {/* Socket connection indicator - Desktop only */}
-              {isAuthenticated && (
-                <div className="hidden md:flex items-center space-x-2 px-3 py-1.5 bg-white/50 rounded-full border border-gray-200">
-                  <div className={`w-2 h-2 rounded-full ${connected ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
-                  <span className="text-xs font-medium text-gray-600">{connected ? t('nav.live') : t('nav.offline')}</span>
-                </div>
-              )}
+            {isAuthenticated && (
+              <div className="hidden md:flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5">
+                <span className={`h-2 w-2 rounded-full ${connected ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                <span className="text-xs font-medium text-[color:var(--color-muted)]">
+                  {connected ? t('nav.live') : t('nav.offline')}
+                </span>
+              </div>
+            )}
 
-              {/* Unread Messages */}
-              {isAuthenticated && (
-                <Link
-                  to="/messages"
-                  className="relative p-1.5 sm:p-2 md:p-2.5 text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg sm:rounded-xl transition-all"
-                  title="Messages"
-                >
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                  </svg>
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 inline-flex items-center justify-center min-w-[18px] h-[18px] sm:min-w-[22px] sm:h-[22px] px-1 sm:px-1.5 text-[10px] sm:text-xs font-bold text-white bg-gradient-to-r from-red-500 to-pink-500 rounded-full shadow-lg animate-pulse">
-                      {unreadCount > 99 ? '99+' : unreadCount}
-                    </span>
-                  )}
-                </Link>
-              )}
+            {isAuthenticated && (
+              <Link
+                to="/messages"
+                className="relative rounded-lg p-2 text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-primary-soft)] hover:text-[color:var(--color-primary)]"
+                title={t('nav.messages', { defaultValue: 'Messages' })}
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 inline-flex min-h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[color:var(--color-accent)] px-1 text-[10px] font-semibold text-white">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </Link>
+            )}
 
-              {/* Pending Orders (Sellers Only) */}
-              {isAuthenticated && isSeller && (
-                <Link
-                  to="/seller-dashboard#recent-orders"
-                  className="relative p-1.5 sm:p-2 md:p-2.5 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg sm:rounded-xl transition-all"
-                  title="Order Requests"
-                >
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                  </svg>
-                  {pendingOrdersCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 inline-flex items-center justify-center min-w-[18px] h-[18px] sm:min-w-[22px] sm:h-[22px] px-1 sm:px-1.5 text-[10px] sm:text-xs font-bold text-white bg-gradient-to-r from-green-500 to-emerald-500 rounded-full shadow-lg animate-pulse">
-                      {pendingOrdersCount > 99 ? '99+' : pendingOrdersCount}
-                    </span>
-                  )}
-                </Link>
-              )}
+            {isAuthenticated && isSeller && (
+              <Link
+                to="/seller-dashboard#recent-orders"
+                className="relative rounded-lg p-2 text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-primary-soft)] hover:text-[color:var(--color-primary)]"
+                title={t('nav.orderRequests', { defaultValue: 'Order requests' })}
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                {pendingOrdersCount > 0 && (
+                  <span className="absolute -top-1 -right-1 inline-flex min-h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[color:var(--color-primary)] px-1 text-[10px] font-semibold text-white">
+                    {pendingOrdersCount > 99 ? '99+' : pendingOrdersCount}
+                  </span>
+                )}
+              </Link>
+            )}
 
-              {/* Notifications */}
-              {isAuthenticated && notifications.length > 0 && (
-                <div className="relative">
-                  <Link
-                    to="/orders"
-                    onClick={clearAllNotifications}
-                    className="relative p-1.5 sm:p-2 md:p-2.5 text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg sm:rounded-xl transition-all block"
-                    title="View notifications"
-                  >
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            {isAuthenticated && notifications.length > 0 && (
+              <Link
+                to="/orders"
+                onClick={clearAllNotifications}
+                className="relative rounded-lg p-2 text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-primary-soft)] hover:text-[color:var(--color-primary)]"
+                title={t('nav.notifications', { defaultValue: 'Notifications' })}
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                <span className="absolute -top-1 -right-1 inline-flex min-h-[18px] min-w-[18px] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-semibold text-white">
+                  {notifications.length}
+                </span>
+              </Link>
+            )}
+
+            {isAuthenticated ? (
+              <>
+                {isSeller && (
+                  <Link to="/create-listing" className="hidden md:inline-flex items-center gap-2 btn btn-primary">
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 5v14M5 12h14" />
                     </svg>
-                    <span className="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 text-[10px] sm:text-xs font-bold text-white bg-gradient-to-r from-red-500 to-pink-500 rounded-full shadow-lg">
-                      {notifications.length}
-                    </span>
+                    <span>{t('nav.createListing')}</span>
                   </Link>
-                </div>
-              )}
+                )}
 
-              {isAuthenticated ? (
-                <>
-                  {/* Create Listing - Desktop */}
-                  {isSeller && (
-                    <Link
-                      to="/create-listing"
-                      className="hidden md:inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-purple-500/50 hover:shadow-xl hover:scale-105 transform transition-all"
-                    >
-                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M12 5v14M5 12h14" />
-                      </svg>
-                      <span>{t('nav.createListing')}</span>
-                    </Link>
-                  )}
-                  
-                  {/* Admin Panel - Desktop */}
-                  {isAdmin && (
-                    <Link to="/admin" className="hidden md:inline-flex btn btn-secondary">
-                      ⚙️ {t('nav.admin')}
-                    </Link>
-                  )}
+                {isAdmin && (
+                  <Link to="/admin" className="hidden md:inline-flex btn btn-secondary">
+                    {t('nav.admin')}
+                  </Link>
+                )}
 
-                  {/* User Menu - Desktop */}
-                  <div className="hidden lg:flex items-center space-x-3 px-4 py-2 bg-white/50 rounded-xl border border-gray-200">
-                    <Link to="/profile" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-                      {user?.profileImage?.url ? (
-                        <img 
-                          src={user.profileImage.url} 
-                          alt={user?.name} 
-                          className="w-8 h-8 rounded-full object-cover border-2 border-purple-200"
-                        />
-                      ) : (
-                        <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                          {user?.name?.charAt(0).toUpperCase()}
-                        </div>
-                      )}
-                      <div className="text-sm">
-                        <div className="font-semibold text-gray-900">{user?.name}</div>
-                        <div className="text-gray-500 text-xs">
-                          {user?.roles?.join(', ')}
-                        </div>
+                <div className="hidden lg:flex items-center gap-3 rounded-full border border-slate-200 bg-white px-3 py-2">
+                  <Link to="/profile" className="flex items-center gap-3">
+                    {user?.profileImage?.url ? (
+                      <img
+                        src={user.profileImage.url}
+                        alt={user?.name}
+                        className="h-8 w-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--color-primary)] text-sm font-semibold text-white">
+                        {user?.name?.charAt(0).toUpperCase()}
                       </div>
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="ml-2 p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                      title="Logout"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                      </svg>
-                    </button>
-                  </div>
-                  
-                  {/* Mobile Logout Button */}
+                    )}
+                    <div className="text-left">
+                      <p className="text-sm font-semibold text-[color:var(--color-text)]">{user?.name}</p>
+                      {user?.roles?.length > 0 && (
+                        <p className="text-xs text-[color:var(--color-muted)]">{user.roles.join(', ')}</p>
+                      )}
+                    </div>
+                  </Link>
                   <button
                     onClick={handleLogout}
-                    className="lg:hidden p-1.5 sm:p-2 md:p-2.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg sm:rounded-xl transition-all"
-                    title="Logout"
+                    className="rounded-full p-2 text-[color:var(--color-muted)] transition-colors hover:bg-[color:var(--color-primary-soft)] hover:text-[color:var(--color-primary)]"
+                    title={t('nav.logout')}
                   >
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
                   </button>
-                </>
-              ) : (
-                <>
-                  <Link to="/login" className="hidden sm:inline-flex text-gray-700 hover:text-purple-600 px-3 sm:px-4 py-2 font-medium transition-colors text-sm sm:text-base">
-                    {t('nav.login')}
-                  </Link>
-                  <Link to="/register" className="btn btn-primary text-xs sm:text-sm md:text-base px-3 sm:px-4 py-1.5 sm:py-2">
-                    {t('nav.signup')}
-                  </Link>
-                </>
-              )}
+                </div>
 
-              {/* Mobile Menu Button */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-1.5 sm:p-2 md:p-2.5 text-gray-700 hover:bg-purple-50 rounded-lg sm:rounded-xl transition-all"
-                aria-label="Toggle menu"
-              >
-                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  {mobileMenuOpen ? (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  ) : (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  )}
-                </svg>
-              </button>
-            </div>
+                <button
+                  onClick={handleLogout}
+                  className="lg:hidden rounded-lg p-2 text-[color:var(--color-muted)] transition-colors hover:bg-rose-50 hover:text-rose-600"
+                  title={t('nav.logout')}
+                >
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="hidden sm:inline-flex text-sm font-medium text-[color:var(--color-text)] transition-colors hover:text-[color:var(--color-primary)]"
+                >
+                  {t('nav.login')}
+                </Link>
+                <Link to="/register" className="btn btn-primary text-sm">
+                  {t('nav.signup')}
+                </Link>
+              </>
+            )}
+
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden rounded-lg p-2 text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-primary-soft)] hover:text-[color:var(--color-primary)]"
+              aria-label={t('nav.toggleMenu', { defaultValue: 'Toggle menu' })}
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {mobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+          </div>
           </div>
 
           {/* Mobile Menu */}
           {mobileMenuOpen && (
-            <div className="lg:hidden py-4 border-t border-gray-200 space-y-2 animate-fadeIn">
-              <Link 
-                to="/search" 
-                className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors font-medium"
+            <div className="lg:hidden space-y-3 border-t border-slate-200 bg-white px-4 py-5">
+              <Link
+                to="/search"
+                className="block rounded-lg px-3 py-2 text-sm font-semibold text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-primary-soft)] hover:text-[color:var(--color-primary)]"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                🔍 {t('nav.browseListing')}
+                {t('nav.browseListing')}
               </Link>
               {isSeller && (
                 <>
-                  <Link 
-                    to="/seller-dashboard" 
-                    className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors font-medium"
+                  <Link
+                    to="/seller-dashboard"
+                    className="block rounded-lg px-3 py-2 text-sm font-semibold text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-primary-soft)] hover:text-[color:var(--color-primary)]"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    📦 {t('nav.myListings')}
+                    {t('nav.myListings')}
                   </Link>
-                  <Link 
-                    to="/create-listing" 
-                    className="block px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg text-center"
+                  <Link
+                    to="/create-listing"
+                    className="block rounded-lg bg-[color:var(--color-primary)] px-3 py-2 text-center text-sm font-semibold text-white transition-colors hover:bg-[color:var(--color-primary-strong)]"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    ➕ {t('nav.createNewListing')}
+                    {t('nav.createNewListing')}
                   </Link>
                 </>
               )}
               {isAuthenticated && (
                 <>
-                  <Link 
-                    to={isSeller ? "/seller-dashboard#recent-orders" : "/orders"}
-                    className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors font-medium relative"
+                  <Link
+                    to={isSeller ? '/seller-dashboard#recent-orders' : '/orders'}
+                    className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-primary-soft)] hover:text-[color:var(--color-primary)]"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <span className="flex items-center justify-between">
-                      <span>🛒 {t('nav.myOrders')}</span>
-                      {isSeller && pendingOrdersCount > 0 && (
-                        <span className="bg-green-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
-                          {pendingOrdersCount}
-                        </span>
-                      )}
-                    </span>
+                    <span>{t('nav.myOrders')}</span>
+                    {isSeller && pendingOrdersCount > 0 && (
+                      <span className="inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-[color:var(--color-primary)] px-1 text-xs font-semibold text-white">
+                        {pendingOrdersCount}
+                      </span>
+                    )}
                   </Link>
-                  <Link 
-                    to="/profile" 
-                    className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors font-medium"
+                  <Link
+                    to="/profile"
+                    className="block rounded-lg px-3 py-2 text-sm font-semibold text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-primary-soft)] hover:text-[color:var(--color-primary)]"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    👤 {t('nav.profile')}
+                    {t('nav.profile')}
                   </Link>
                 </>
               )}
               {isAdmin && (
-                <Link 
-                  to="/admin" 
-                  className="block px-4 py-3 bg-gray-100 text-gray-900 font-semibold rounded-xl hover:bg-gray-200 transition-colors"
+                <Link
+                  to="/admin"
+                  className="block rounded-lg px-3 py-2 text-sm font-semibold text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-primary-soft)] hover:text-[color:var(--color-primary)]"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  ⚙️ {t('nav.adminPanel')}
+                  {t('nav.adminPanel')}
                 </Link>
               )}
               {!isAuthenticated && (
-                <Link 
-                  to="/login" 
-                  className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors font-medium sm:hidden"
+                <Link
+                  to="/login"
+                  className="block rounded-lg px-3 py-2 text-sm font-semibold text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-primary-soft)] hover:text-[color:var(--color-primary)] sm:hidden"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  🔐 {t('nav.login')}
+                  {t('nav.login')}
                 </Link>
               )}
               {isAuthenticated && (
-                <div className="lg:hidden px-4 py-3 bg-white/50 rounded-xl border border-gray-200">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
-                      {user?.name?.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-semibold text-gray-900">{user?.name}</div>
-                      <div className="text-gray-500 text-xs">{user?.roles?.join(', ')}</div>
-                    </div>
+                <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-[color:var(--color-primary-soft)] px-3 py-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-primary)] text-base font-semibold text-white">
+                    {user?.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-[color:var(--color-text)]">{user?.name}</p>
+                    {user?.roles?.length > 0 && (
+                      <p className="text-xs text-[color:var(--color-muted)]">{user.roles.join(', ')}</p>
+                    )}
                   </div>
                 </div>
               )}
@@ -490,40 +472,32 @@ const Layout = () => {
         </div>
       </nav>
 
-      {/* Main content */}
       <main className="pb-16">
         <Outlet />
       </main>
 
-      {/* Modern Footer */}
-      <footer className="glass border-t border-white/20 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
-            {/* Disclaimer */}
-            <div className="text-center md:text-left">
-              <h3 className="font-bold text-gray-900 mb-3 flex items-center justify-center md:justify-start gap-2 text-lg">
-                <span className="text-2xl">⚠️</span>
+      <footer className="mt-16 border-t border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+          <div className="grid gap-10 sm:grid-cols-2">
+            <div className="space-y-3 text-sm text-[color:var(--color-muted)]">
+              <h3 className="text-base font-semibold text-[color:var(--color-text)]">
                 {t('footer.disclaimer')}
               </h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                {t('footer.disclaimerText')}
-              </p>
+              <p className="leading-relaxed">{t('footer.disclaimerText')}</p>
             </div>
 
-            {/* Contact Developer */}
-            <div className="text-center md:text-right">
-              <h3 className="font-bold text-gray-900 mb-3 flex items-center justify-center md:justify-end gap-2 text-lg">
-                <span className="text-2xl">💻</span>
+            <div className="space-y-3 text-sm text-[color:var(--color-muted)] sm:text-right">
+              <h3 className="text-base font-semibold text-[color:var(--color-text)]">
                 {t('footer.contactDeveloper')}
               </h3>
-              <div className="text-sm text-gray-600">
-                <a 
-                  href="https://personal-web-nine-tau.vercel.app" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all"
+              <div>
+                <a
+                  href="https://personal-web-nine-tau.vercel.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-[color:var(--color-text)] transition-colors hover:border-[color:var(--color-primary)] hover:text-[color:var(--color-primary)]"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                   </svg>
                   {t('footer.visitPortfolio')}
@@ -532,11 +506,8 @@ const Layout = () => {
             </div>
           </div>
 
-          {/* Copyright */}
-          <div className="text-center pt-6 border-t border-gray-200">
-            <p className="text-gray-500 text-sm">
-              &copy; {new Date().getFullYear()} YohaTrade. {t('footer.copyright')}
-            </p>
+          <div className="mt-10 border-t border-slate-200 pt-6 text-center text-sm text-[color:var(--color-muted)]">
+            &copy; {new Date().getFullYear()} YohaTrade. {t('footer.copyright')}
           </div>
         </div>
       </footer>
