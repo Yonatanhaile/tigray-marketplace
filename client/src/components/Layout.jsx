@@ -239,15 +239,6 @@ const Layout = () => {
             <LanguageSwitcher />
 
             {isAuthenticated && (
-              <div className="hidden md:flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5">
-                <span className={`h-2 w-2 rounded-full ${connected ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                <span className="text-xs font-medium text-[color:var(--color-muted)]">
-                  {connected ? t('nav.live') : t('nav.offline')}
-                </span>
-              </div>
-            )}
-
-            {isAuthenticated && (
               <Link
                 to="/messages"
                 className="relative rounded-lg p-2 text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-primary-soft)] hover:text-[color:var(--color-primary)]"
@@ -314,7 +305,7 @@ const Layout = () => {
                   </Link>
                 )}
 
-                <div className="hidden lg:flex items-center gap-3 rounded-full border border-slate-200 bg-white px-3 py-2">
+                <div className="hidden lg:flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2">
                   <Link to="/profile" className="flex items-center gap-3">
                     {user?.profileImage?.url ? (
                       <img

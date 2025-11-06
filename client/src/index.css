@@ -83,5 +83,14 @@ a {
   .stat-value {
     @apply text-3xl font-semibold text-[color:var(--color-primary)];
   }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 

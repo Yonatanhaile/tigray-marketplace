@@ -177,7 +177,7 @@ const Messages = () => {
         {/* Messages Container */}
         <div 
           ref={messagesContainerRef}
-          className="flex-1 overflow-y-auto p-2 sm:p-3 md:p-6 space-y-3 sm:space-y-4" 
+          className="flex-1 overflow-y-auto p-2 sm:p-3 md:p-6 space-y-3 sm:space-y-4 scrollbar-hide" 
           style={{ 
             backgroundImage: 'linear-gradient(to bottom, #f3f4f6 0%, #e5e7eb 100%)',
             backgroundAttachment: 'fixed'

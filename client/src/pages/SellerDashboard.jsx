@@ -171,62 +171,34 @@ const SellerDashboard = () => {
         </div>
         <div className="flex gap-3">
           <Link to="/profile" className="btn btn-secondary">
-            👤 {t('sellerDashboard.myProfile')}
+            {t('sellerDashboard.myProfile')}
           </Link>
           <Link to="/create-listing" className="btn btn-primary">
-            + {t('sellerDashboard.createListing')}
+            {t('sellerDashboard.createListing')}
           </Link>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="card bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-sm text-green-700 font-medium mb-1">{t('sellerDashboard.activeListings')}</h3>
-              <p className="text-3xl font-bold text-green-900">{activeListings.length}</p>
-            </div>
-            <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
-              <span className="text-2xl">✅</span>
-            </div>
-          </div>
+      <div className="grid grid-cols-4 gap-3 mb-6">
+        <div className="bg-white border border-green-200 rounded-lg p-3">
+          <h3 className="text-xs text-green-700 font-medium mb-1">{t('sellerDashboard.activeListings')}</h3>
+          <p className="text-2xl font-bold text-green-600">{activeListings.length}</p>
         </div>
         
-        <div className="card bg-gradient-to-br from-red-50 to-red-100 border-red-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-sm text-red-700 font-medium mb-1">{t('sellerDashboard.soldItems')}</h3>
-              <p className="text-3xl font-bold text-red-900">{soldListings.length}</p>
-            </div>
-            <div className="w-12 h-12 bg-red-200 rounded-full flex items-center justify-center">
-              <span className="text-2xl">🔴</span>
-            </div>
-          </div>
+        <div className="bg-white border border-red-200 rounded-lg p-3">
+          <h3 className="text-xs text-red-700 font-medium mb-1">{t('sellerDashboard.soldItems')}</h3>
+          <p className="text-2xl font-bold text-red-600">{soldListings.length}</p>
         </div>
         
-        <div className="card bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-sm text-yellow-700 font-medium mb-1">{t('sellerDashboard.pendingReview')}</h3>
-              <p className="text-3xl font-bold text-yellow-900">{pendingListings.length}</p>
-            </div>
-            <div className="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
-              <span className="text-2xl">⏳</span>
-            </div>
-          </div>
+        <div className="bg-white border border-yellow-200 rounded-lg p-3">
+          <h3 className="text-xs text-yellow-700 font-medium mb-1">{t('sellerDashboard.pendingReview')}</h3>
+          <p className="text-2xl font-bold text-yellow-600">{pendingListings.length}</p>
         </div>
 
-        <div className="card bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-sm text-purple-700 font-medium mb-1">{t('sellerDashboard.totalViews')}</h3>
-              <p className="text-3xl font-bold text-purple-900">{totalViews}</p>
-            </div>
-            <div className="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center">
-              <span className="text-2xl">👁️</span>
-            </div>
-          </div>
+        <div className="bg-white border border-purple-200 rounded-lg p-3">
+          <h3 className="text-xs text-purple-700 font-medium mb-1">{t('sellerDashboard.totalViews')}</h3>
+          <p className="text-2xl font-bold text-purple-600">{totalViews}</p>
         </div>
       </div>
 
