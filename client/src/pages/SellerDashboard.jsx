@@ -18,7 +18,7 @@ const SellerDashboard = () => {
     // Emit custom event to Layout component to clear notification
     window.dispatchEvent(new CustomEvent('clear-order-notifications'));
     
-    // Scroll to Recent Orders section if coming from notification
+    // Scroll to Buyers Request section if coming from notification
     if (window.location.hash === '#recent-orders') {
       setTimeout(() => {
         const element = document.getElementById('recent-orders');
@@ -301,7 +301,7 @@ const SellerDashboard = () => {
         )}
       </div>
 
-      {/* Recent Orders */}
+      {/* Buyers Request */}
       <div id="recent-orders" className="scroll-mt-20">
         <h2 className="text-2xl font-bold mb-4">{t('sellerDashboard.recentOrders')}</h2>
         {ordersLoading ? (
