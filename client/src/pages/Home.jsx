@@ -85,18 +85,12 @@ const Home = () => {
 
       {/* Search & Hero Section */}
       <section className="bg-white">
-        <div className="mx-auto flex max-w-6xl flex-col gap-12 px-4 py-16 md:flex-row md:items-center md:justify-between">
-          <div className="max-w-xl space-y-6">
-            <p className="text-sm font-semibold uppercase tracking-wide text-[color:var(--color-accent)]">
-              {t('home.subtitle')}
-            </p>
-            <h1 className="text-3xl font-bold tracking-tight text-[color:var(--color-primary)] md:text-4xl">
+        <div className="mx-auto max-w-6xl px-4 py-8">
+          <div className="max-w-2xl mx-auto space-y-4">
+            <h1 className="text-2xl font-bold text-center text-[color:var(--color-primary)] md:text-3xl">
               {t('home.title')}
             </h1>
-            <p className="text-base leading-relaxed text-[color:var(--color-muted)]">
-              {t('home.browseDescription')}
-            </p>
-            <form onSubmit={handleSearch} className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <form onSubmit={handleSearch} className="flex gap-2">
               <input
                 type="text"
                 value={searchQuery}
@@ -104,45 +98,21 @@ const Home = () => {
                 placeholder={t('home.searchPlaceholder')}
                 className="input"
               />
-              <button type="submit" className="btn btn-primary text-sm">
+              <button type="submit" className="btn btn-primary text-sm whitespace-nowrap">
                 {t('common.search')}
               </button>
             </form>
-            <p className="text-sm text-[color:var(--color-muted)]">
+            <p className="text-xs text-center text-[color:var(--color-muted)]">
               <Link to="/search" className="font-semibold text-[color:var(--color-primary)] underline">
                 {t('home.browseAllListings')}
               </Link>
             </p>
           </div>
-
-          <div className="relative flex-1 rounded-2xl border border-slate-200 bg-[color:var(--color-primary-soft)] p-6 text-sm text-[color:var(--color-text)]">
-            <h2 className="text-lg font-semibold text-[color:var(--color-primary)]">{t('home.howItWorks')}</h2>
-            <ul className="mt-6 space-y-4">
-              {[{
-                title: t('home.browseListing'),
-                description: t('home.browseDescription')
-              }, {
-                title: t('home.expressIntent'),
-                description: t('home.expressIntentDescription')
-              }, {
-                title: t('home.meetComplete'),
-                description: t('home.meetCompleteDescription')
-              }].map(({ title, description }, index) => (
-                <li key={index} className="flex gap-3">
-                  <span className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-[color:var(--color-accent)]" />
-                  <div>
-                    <p className="text-sm font-semibold text-[color:var(--color-primary)]">{title}</p>
-                    <p className="mt-1 text-[color:var(--color-muted)]">{description}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
       </section>
 
       {/* Featured Listings */}
-      <section className="bg-white py-16">
+      <section className="bg-white py-8">
         <div className="mx-auto max-w-6xl px-4">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
