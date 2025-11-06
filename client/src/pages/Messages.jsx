@@ -147,8 +147,8 @@ const Messages = () => {
   const isBuyer = String(order?.buyerId?._id || order?.buyerId || '') === currentUserId;
 
   return (
-    <div className="min-h-screen bg-[color:var(--color-bg)] overflow-x-hidden">
-      <div className="max-w-4xl mx-auto px-4 py-4">
+    <div className="min-h-screen bg-[color:var(--color-bg)] overflow-x-hidden w-full">
+      <div className="max-w-4xl mx-auto px-4 py-4 w-full">
         <div className="mb-4">
           <BackButton />
         </div>
@@ -177,7 +177,7 @@ const Messages = () => {
           )}
         </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-slate-200 flex flex-col overflow-hidden" style={{ height: 'calc(100vh - 280px)', minHeight: '350px', maxHeight: '600px' }}>
+      <div className="bg-white rounded-lg shadow-sm border border-slate-200 flex flex-col overflow-hidden w-full" style={{ height: 'calc(100vh - 280px)', minHeight: '350px', maxHeight: '600px' }}>
         {/* Messages Container */}
         <div 
           ref={messagesContainerRef}
@@ -207,8 +207,8 @@ const Messages = () => {
               const senderProfileImage = senderInfo?.profileImage?.url;
               
               return (
-                <div key={msg._id} className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} mb-3`}>
-                  <div className={`flex ${isMyMessage ? 'flex-row-reverse' : 'flex-row'} items-end gap-2 max-w-[85%] sm:max-w-[75%]`}>
+                <div key={msg._id} className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} mb-3 w-full`}>
+                  <div className={`flex ${isMyMessage ? 'flex-row-reverse' : 'flex-row'} items-end gap-2 max-w-[85%]`}>
                     {/* Profile Image */}
                     <div className="flex-shrink-0">
                       {senderProfileImage ? (
@@ -233,13 +233,13 @@ const Messages = () => {
                       )}
                     
                     {/* Message bubble */}
-                    <div className={`px-4 py-3 rounded-2xl shadow-sm ${
+                    <div className={`px-4 py-3 rounded-2xl shadow-sm max-w-full ${
                       isMyMessage 
                         ? 'bg-[color:var(--color-primary)] text-white' 
                         : 'bg-white text-[color:var(--color-text)] border border-gray-200'
                     }`}>
                       {/* Message text */}
-                      <p className="text-sm leading-relaxed break-words">
+                      <p className="text-sm leading-relaxed break-words overflow-wrap-anywhere">
                         {msg.text}
                       </p>
                       
@@ -270,13 +270,13 @@ const Messages = () => {
         </div>
 
         {/* Input Area */}
-        <form onSubmit={handleSend} className="bg-white border-t border-gray-200 p-4 flex-shrink-0">
-          <div className="flex items-center gap-2">
+        <form onSubmit={handleSend} className="bg-white border-t border-gray-200 p-4 flex-shrink-0 w-full">
+          <div className="flex items-center gap-2 w-full">
             <input 
               value={messageText} 
               onChange={e => setMessageText(e.target.value)} 
               placeholder="Type your message here..." 
-              className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-[color:var(--color-primary)] focus:ring-2 focus:ring-[color:var(--color-primary-soft)] text-sm" 
+              className="flex-1 min-w-0 px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-[color:var(--color-primary)] focus:ring-2 focus:ring-[color:var(--color-primary-soft)] text-sm" 
               disabled={!orderData?.order}
               ref={inputRef}
             />
