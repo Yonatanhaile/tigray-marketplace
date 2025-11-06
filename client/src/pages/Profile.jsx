@@ -284,18 +284,18 @@ const Profile = () => {
             <label className="block text-sm font-medium mb-2">Account Type</label>
             <div className="flex gap-2">
               {user?.roles?.includes('buyer') && (
-                <span className="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-800 rounded-lg text-sm">
-                  🛒 Buyer
+                <span className="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-800 rounded-lg text-sm font-semibold">
+                  Buyer
                 </span>
               )}
               {user?.roles?.includes('seller') && (
-                <span className="inline-flex items-center px-3 py-1.5 bg-green-100 text-green-800 rounded-lg text-sm">
-                  🏪 Seller
+                <span className="inline-flex items-center px-3 py-1.5 bg-green-100 text-green-800 rounded-lg text-sm font-semibold">
+                  Seller
                 </span>
               )}
               {user?.roles?.includes('admin') && (
-                <span className="inline-flex items-center px-3 py-1.5 bg-purple-100 text-purple-800 rounded-lg text-sm">
-                  👑 Admin
+                <span className="inline-flex items-center px-3 py-1.5 bg-purple-100 text-purple-800 rounded-lg text-sm font-semibold">
+                  Admin
                 </span>
               )}
             </div>
