@@ -154,23 +154,23 @@ const Messages = () => {
         </div>
         
         <div className="mb-4">
-          <h1 className="text-2xl font-bold mb-3 text-[color:var(--color-text)]">Order Messages</h1>
+          <h1 className="text-2xl font-bold mb-3 text-[color:var(--color-text)] break-words">Order Messages</h1>
           {order && (
-            <div className="bg-white rounded-lg p-4 shadow-sm">
+            <div className="bg-white rounded-lg p-4 shadow-sm overflow-hidden">
               <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
                 <div className="min-w-0 flex-1">
                   <p className="text-sm text-[color:var(--color-muted)] truncate">
                     <span className="font-semibold text-[color:var(--color-text)]">Order:</span> {order.listingId?.title || 'N/A'}
                   </p>
-                  <p className="text-sm text-[color:var(--color-muted)]">
+                  <p className="text-sm text-[color:var(--color-muted)] truncate">
                     <span className="font-semibold text-[color:var(--color-text)]">Price:</span> {order.price_agreed} {order.currency}
                   </p>
                 </div>
-                <div className="sm:text-right min-w-0">
+                <div className="sm:text-right min-w-0 flex-shrink-0">
                   <p className="text-sm font-semibold text-[color:var(--color-text)] truncate">
                     {isBuyer ? 'Seller' : 'Buyer'}: {isBuyer ? order.sellerId?.name : order.buyerId?.name}
                   </p>
-                  <p className="text-xs text-[color:var(--color-muted)]">Status: {order.status}</p>
+                  <p className="text-xs text-[color:var(--color-muted)] truncate">Status: {order.status}</p>
                 </div>
               </div>
             </div>
@@ -224,22 +224,22 @@ const Messages = () => {
                       )}
                     </div>
 
-                    <div className={`flex flex-col ${isMyMessage ? 'items-end' : 'items-start'}`}>
+                    <div className={`flex flex-col ${isMyMessage ? 'items-end' : 'items-start'} min-w-0 max-w-full`}>
                       {/* Sender name - only for received messages */}
                       {!isMyMessage && (
-                        <span className="text-xs font-semibold text-[color:var(--color-muted)] mb-1 ml-3">
+                        <span className="text-xs font-semibold text-[color:var(--color-muted)] mb-1 ml-3 truncate max-w-full">
                           {senderName || 'User'}
                         </span>
                       )}
                     
                     {/* Message bubble */}
-                    <div className={`px-4 py-3 rounded-2xl shadow-sm ${
+                    <div className={`px-4 py-3 rounded-2xl shadow-sm max-w-full ${
                       isMyMessage 
                         ? 'bg-[color:var(--color-primary)] text-white' 
                         : 'bg-white text-[color:var(--color-text)] border border-gray-200'
                     }`}>
                       {/* Message text */}
-                      <p className="text-sm leading-relaxed break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word', maxWidth: '100%' }}>
+                      <p className="text-sm leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                         {msg.text}
                       </p>
                       
@@ -256,7 +256,7 @@ const Messages = () => {
                     
                       {/* "You" label for sent messages */}
                       {isMyMessage && (
-                        <span className="text-xs text-[color:var(--color-muted)] mt-1 font-medium">
+                        <span className="text-xs text-[color:var(--color-muted)] mt-1 font-medium truncate max-w-full">
                           You
                         </span>
                       )}
