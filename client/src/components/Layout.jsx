@@ -312,7 +312,7 @@ const Layout = () => {
                         className="h-8 w-8 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--color-primary)] text-sm font-semibold text-white">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--color-primary-soft)] text-sm font-semibold text-[color:var(--color-primary)] border border-[color:var(--color-primary)]">
                         {user?.name?.charAt(0).toUpperCase()}
                       </div>
                     )}
@@ -444,8 +444,8 @@ const Layout = () => {
                 </Link>
               )}
               {isAuthenticated && (
-                <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-[color:var(--color-primary-soft)] px-3 py-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-primary)] text-base font-semibold text-white">
+                <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-primary-soft)] text-base font-semibold text-[color:var(--color-primary)] border border-[color:var(--color-primary)]">
                     {user?.name?.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1">

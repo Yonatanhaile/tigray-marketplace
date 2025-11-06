@@ -172,10 +172,10 @@ const Profile = () => {
               <img 
                 src={profileImage.url} 
                 alt={user?.name} 
-                className="w-24 h-24 rounded-full object-cover border-4 border-purple-200"
+                className="w-24 h-24 rounded-full object-cover border-4 border-[color:var(--color-primary-soft)]"
               />
             ) : (
-              <div className="w-24 h-24 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-3xl font-bold text-white border-4 border-purple-200">
+              <div className="w-24 h-24 bg-[color:var(--color-primary-soft)] rounded-full flex items-center justify-center text-3xl font-bold text-[color:var(--color-primary)] border-4 border-[color:var(--color-primary)]">
                 {user?.name?.charAt(0)?.toUpperCase()}
               </div>
             )}
@@ -183,11 +183,11 @@ const Profile = () => {
             {/* Upload Button - Always visible on hover */}
             <label 
               htmlFor="profile-image-upload" 
-              className="absolute bottom-0 right-0 bg-white border-2 border-purple-600 text-purple-600 rounded-full p-2 cursor-pointer hover:bg-purple-50 transition-all shadow-lg hover:scale-110"
+              className="absolute bottom-0 right-0 bg-white border-2 border-[color:var(--color-primary)] text-[color:var(--color-primary)] rounded-full p-2 cursor-pointer hover:bg-[color:var(--color-primary-soft)] transition-all shadow-lg hover:scale-110"
               title="Click to change profile picture"
             >
               {uploadingImage ? (
-                <div className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-2 border-[color:var(--color-primary)] border-t-transparent rounded-full animate-spin"></div>
               ) : (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
