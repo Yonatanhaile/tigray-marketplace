@@ -201,10 +201,10 @@ const Search = () => {
 
       {/* Results */}
       {isLoading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-6">
           {Array.from({ length: 12 }).map((_, i) => (
             <div key={i} className="card">
-              <div className="w-full h-48 skeleton mb-4" />
+              <div className="w-full h-32 skeleton mb-4" />
               <div className="h-4 skeleton w-3/4 mb-2" />
               <div className="h-3 skeleton w-full mb-2" />
               <div className="h-3 skeleton w-2/3" />
@@ -217,18 +217,18 @@ const Search = () => {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-6">
             {data?.listings?.map((listing) => (
               <Link
                 key={listing._id}
                 to={`/listings/${listing._id}`}
-                className="card hover:shadow-lg transition group"
+                className="card"
               >
                 {listing.images?.[0] && (
                   <img
                     src={listing.images[0].url}
                     alt={listing.title}
-                    className="w-full h-32 sm:h-48 object-contain bg-gray-50 rounded-lg mb-2 sm:mb-4 group-hover:scale-105 transition-transform"
+                    className="w-full h-32 sm:h-48 object-contain bg-gray-50 rounded-lg mb-2 sm:mb-4"
                   />
                 )}
                 <h3 className="font-semibold text-sm sm:text-lg mb-1 sm:mb-2 line-clamp-1">{listing.title}</h3>

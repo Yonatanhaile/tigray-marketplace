@@ -124,11 +124,11 @@ const Home = () => {
             </Link>
           </div>
 
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid gap-6 grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
             {isLoading
-              ? [...Array(9)].map((_, i) => (
+              ? [...Array(12)].map((_, i) => (
                   <div key={i} className="card animate-pulse">
-                    <div className="h-44 rounded-lg bg-slate-200" />
+                    <div className="h-32 rounded-lg bg-slate-200" />
                     <div className="mt-4 h-6 w-3/4 rounded bg-slate-200" />
                     <div className="mt-2 h-4 w-2/3 rounded bg-slate-200" />
                     <div className="mt-6 flex items-center justify-between">
@@ -141,21 +141,21 @@ const Home = () => {
                   <Link
                     key={listing._id}
                     to={`/listings/${listing._id}`}
-                    className="card h-full transition-transform duration-200 hover:-translate-y-1"
+                    className="card h-full"
                   >
                     {listing.images?.[0] && (
                       <img
                         src={listing.images[0].url}
                         alt={listing.title}
-                        className="h-44 w-full rounded-lg object-cover"
+                        className="h-32 w-full rounded-lg object-contain bg-gray-50"
                       />
                     )}
                     <div className="mt-4 space-y-3">
-                      <h3 className="text-base font-semibold text-[color:var(--color-text)] line-clamp-1">{listing.title}</h3>
-                      <p className="text-sm text-[color:var(--color-muted)] line-clamp-2">{listing.description}</p>
-                      <div className="flex items-center justify-between text-sm font-semibold text-[color:var(--color-primary)]">
+                      <h3 className="text-sm font-semibold text-[color:var(--color-text)] line-clamp-2">{listing.title}</h3>
+                      <p className="text-xs text-[color:var(--color-muted)] line-clamp-2">{listing.description}</p>
+                      <div className="flex flex-col gap-1 text-xs font-semibold text-[color:var(--color-primary)]">
                         <span>{listing.price} {listing.currency || 'ETB'}</span>
-                        <span className="text-[color:var(--color-muted)] capitalize">{listing.condition}</span>
+                        <span className="text-[color:var(--color-muted)] capitalize text-xs">{listing.condition}</span>
                       </div>
                     </div>
                   </Link>
