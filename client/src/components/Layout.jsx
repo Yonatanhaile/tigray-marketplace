@@ -383,7 +383,6 @@ const Layout = () => {
               </svg>
             </button>
           </div>
-          </div>
 
           {/* Mobile Menu */}
           {mobileMenuOpen && (
