@@ -147,41 +147,41 @@ const Messages = () => {
   const isBuyer = String(order?.buyerId?._id || order?.buyerId || '') === currentUserId;
 
   return (
-    <div className="min-h-screen bg-[color:var(--color-bg)] pb-20">
+    <div className="min-h-screen bg-[color:var(--color-bg)] overflow-x-hidden">
       <div className="max-w-4xl mx-auto px-4 py-4">
         <div className="mb-4">
           <BackButton />
         </div>
         
         <div className="mb-4">
-          <h1 className="text-2xl font-bold mb-3">Order Messages</h1>
+          <h1 className="text-2xl font-bold mb-3 text-[color:var(--color-text)]">Order Messages</h1>
           {order && (
             <div className="bg-white rounded-lg p-4 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
                 <div>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-semibold">Order:</span> {order.listingId?.title || 'N/A'}
+                  <p className="text-sm text-[color:var(--color-muted)]">
+                    <span className="font-semibold text-[color:var(--color-text)]">Order:</span> {order.listingId?.title || 'N/A'}
                   </p>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-semibold">Price:</span> {order.price_agreed} {order.currency}
+                  <p className="text-sm text-[color:var(--color-muted)]">
+                    <span className="font-semibold text-[color:var(--color-text)]">Price:</span> {order.price_agreed} {order.currency}
                   </p>
                 </div>
                 <div className="sm:text-right">
-                  <p className="text-sm font-semibold text-gray-700">
+                  <p className="text-sm font-semibold text-[color:var(--color-text)]">
                     {isBuyer ? 'Seller' : 'Buyer'}: {isBuyer ? order.sellerId?.name : order.buyerId?.name}
                   </p>
-                  <p className="text-xs text-gray-500">Status: {order.status}</p>
+                  <p className="text-xs text-[color:var(--color-muted)]">Status: {order.status}</p>
                 </div>
               </div>
             </div>
           )}
         </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-slate-200 flex flex-col" style={{ height: 'calc(100vh - 320px)', minHeight: '400px', maxHeight: '600px' }}>
+      <div className="bg-white rounded-lg shadow-sm border border-slate-200 flex flex-col overflow-hidden" style={{ height: 'calc(100vh - 280px)', minHeight: '350px', maxHeight: '600px' }}>
         {/* Messages Container */}
         <div 
           ref={messagesContainerRef}
-          className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide bg-gray-50" 
+          className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4 scrollbar-hide bg-gray-50" 
         >
           {messagesData?.messages?.length === 0 ? (
             <div className="flex items-center justify-center h-full">
@@ -218,7 +218,7 @@ const Messages = () => {
                           className="w-8 h-8 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                        <div className="w-8 h-8 bg-[color:var(--color-primary)] rounded-full flex items-center justify-center text-white font-bold text-xs">
                           {senderName?.charAt(0)?.toUpperCase() || 'U'}
                         </div>
                       )}
@@ -227,7 +227,7 @@ const Messages = () => {
                     <div className={`flex flex-col ${isMyMessage ? 'items-end' : 'items-start'}`}>
                       {/* Sender name - only for received messages */}
                       {!isMyMessage && (
-                        <span className="text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 ml-2 sm:ml-4">
+                        <span className="text-xs font-semibold text-[color:var(--color-muted)] mb-1 ml-3">
                           {senderName || 'User'}
                         </span>
                       )}
@@ -235,8 +235,8 @@ const Messages = () => {
                     {/* Message bubble */}
                     <div className={`px-4 py-3 rounded-2xl shadow-sm ${
                       isMyMessage 
-                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white' 
-                        : 'bg-white text-gray-900 border border-gray-200'
+                        ? 'bg-[color:var(--color-primary)] text-white' 
+                        : 'bg-white text-[color:var(--color-text)] border border-gray-200'
                     }`}>
                       {/* Message text */}
                       <p className="text-sm leading-relaxed break-words">
@@ -245,7 +245,7 @@ const Messages = () => {
                       
                       {/* Timestamp */}
                       <p className={`text-[11px] mt-2 ${
-                        isMyMessage ? 'text-purple-100' : 'text-gray-500'
+                        isMyMessage ? 'text-white opacity-80' : 'text-[color:var(--color-muted)]'
                       }`}>
                         {new Date(msg.createdAt).toLocaleTimeString([], { 
                           hour: '2-digit', 
@@ -256,7 +256,7 @@ const Messages = () => {
                     
                       {/* "You" label for sent messages */}
                       {isMyMessage && (
-                        <span className="text-[10px] sm:text-xs text-gray-600 mt-1 mr-2 sm:mr-4 font-medium">
+                        <span className="text-xs text-[color:var(--color-muted)] mt-1 font-medium">
                           You
                         </span>
                       )}
@@ -270,22 +270,22 @@ const Messages = () => {
         </div>
 
         {/* Input Area */}
-        <form onSubmit={handleSend} className="bg-white border-t border-gray-200 p-4">
+        <form onSubmit={handleSend} className="bg-white border-t border-gray-200 p-4 flex-shrink-0">
           <div className="flex items-center gap-2">
             <input 
               value={messageText} 
               onChange={e => setMessageText(e.target.value)} 
               placeholder="Type your message here..." 
-              className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 text-sm" 
+              className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-[color:var(--color-primary)] focus:ring-2 focus:ring-[color:var(--color-primary-soft)] text-sm" 
               disabled={!orderData?.order}
               ref={inputRef}
             />
             <button 
               type="submit" 
-              className={`px-4 py-2.5 rounded-lg font-semibold transition-all text-sm ${
+              className={`px-4 py-2.5 rounded-lg font-semibold transition-all text-sm whitespace-nowrap ${
                 !orderData?.order || !messageText.trim()
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg'
+                  : 'bg-[color:var(--color-primary)] text-white hover:bg-[color:var(--color-primary-strong)] hover:shadow-lg'
               }`}
               disabled={!orderData?.order || !messageText.trim()}
             >

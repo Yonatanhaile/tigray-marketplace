@@ -12,34 +12,34 @@ const BuyerOrders = () => {
   });
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="max-w-5xl mx-auto px-4 py-8 bg-[color:var(--color-bg)] min-h-screen">
       <div className="mb-4">
         <BackButton />
       </div>
-      <h1 className="text-3xl font-bold mb-6">{t('buyerOrders.title')}</h1>
+      <h1 className="text-3xl font-bold mb-6 text-[color:var(--color-text)]">{t('buyerOrders.title')}</h1>
 
       {isLoading ? (
-        <p>{t('buyerOrders.loading')}</p>
+        <p className="text-[color:var(--color-muted)]">{t('buyerOrders.loading')}</p>
       ) : data?.orders?.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500 mb-4">{t('buyerOrders.noOrders')}</p>
+          <p className="text-[color:var(--color-muted)] mb-4">{t('buyerOrders.noOrders')}</p>
           <Link to="/search" className="btn btn-primary">{t('buyerOrders.browseListings')}</Link>
         </div>
       ) : (
         <div className="space-y-4">
           {data?.orders?.map(order => (
-            <Link key={order._id} to={`/orders/${order._id}`} className="card flex items-center space-x-4 hover:shadow-lg">
+            <Link key={order._id} to={`/orders/${order._id}`} className="card flex items-center space-x-4">
               {order.listingId?.images?.[0] && (
                 <img src={order.listingId.images[0].url} alt="" className="w-24 h-24 object-contain bg-gray-50 rounded" />
               )}
               <div className="flex-1">
-                <h3 className="font-semibold text-lg">{order.listingId?.title}</h3>
-                <p className="text-gray-600">{t('buyerOrders.seller')} {order.sellerId?.name}</p>
-                <p className="text-sm text-gray-500">{t('buyerOrders.created')} {new Date(order.createdAt).toLocaleDateString()}</p>
+                <h3 className="font-semibold text-lg text-[color:var(--color-text)]">{order.listingId?.title}</h3>
+                <p className="text-[color:var(--color-muted)]">{t('buyerOrders.seller')} {order.sellerId?.name}</p>
+                <p className="text-sm text-[color:var(--color-muted)]">{t('buyerOrders.created')} {new Date(order.createdAt).toLocaleDateString()}</p>
               </div>
               <div className="text-right">
-                <p className="text-xl font-bold text-primary-600">{order.price_agreed} {order.currency}</p>
-                <span className={`inline-block px-3 py-1 rounded-full text-xs mt-2 ${
+                <p className="text-xl font-bold text-[color:var(--color-primary)]">{order.price_agreed} {order.currency}</p>
+                <span className={`inline-block px-3 py-1 rounded-full text-xs mt-2 font-semibold ${
                   order.status === 'delivered' ? 'bg-green-100 text-green-800' :
                   order.status === 'disputed' ? 'bg-red-100 text-red-800' :
                   'bg-yellow-100 text-yellow-800'

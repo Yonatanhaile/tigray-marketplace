@@ -362,9 +362,9 @@ const ListingCard = ({ listing, onToggleSold, onDelete, markAsSoldMutation, dele
       <div className="mt-2 mb-3">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-purple-600 font-bold text-xl">{listing.price} ETB</p>
+            <p className="text-[color:var(--color-primary)] font-bold text-xl">{listing.price} ETB</p>
             {listing.priceType && listing.priceType !== 'fixed' && (
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-xs text-[color:var(--color-muted)] mt-0.5">
                 {listing.priceType === 'per-hour' && t('sellerDashboard.perHour')}
                 {listing.priceType === 'per-day' && t('sellerDashboard.perDay')}
                 {listing.priceType === 'per-month' && t('sellerDashboard.perMonth')}
@@ -373,7 +373,7 @@ const ListingCard = ({ listing, onToggleSold, onDelete, markAsSoldMutation, dele
               </p>
             )}
           </div>
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-[color:var(--color-muted)]">
             <p>{listing.views || 0} {t('sellerDashboard.views')}</p>
           </div>
         </div>
