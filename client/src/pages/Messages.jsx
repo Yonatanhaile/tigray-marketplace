@@ -159,18 +159,24 @@ const Messages = () => {
             <div className="bg-white rounded-lg p-4 shadow-sm overflow-hidden">
               <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm text-[color:var(--color-muted)] truncate">
-                    <span className="font-semibold text-[color:var(--color-text)]">Order:</span> {order.listingId?.title || 'N/A'}
-                  </p>
-                  <p className="text-sm text-[color:var(--color-muted)] truncate">
-                    <span className="font-semibold text-[color:var(--color-text)]">Price:</span> {order.price_agreed} {order.currency}
-                  </p>
+                  <div className="flex gap-1 text-sm">
+                    <span className="font-semibold text-[color:var(--color-text)] flex-shrink-0">Order:</span>
+                    <span className="text-[color:var(--color-muted)] truncate">{order.listingId?.title || 'N/A'}</span>
+                  </div>
+                  <div className="flex gap-1 text-sm mt-1">
+                    <span className="font-semibold text-[color:var(--color-text)] flex-shrink-0">Price:</span>
+                    <span className="text-[color:var(--color-muted)] truncate">{order.price_agreed} {order.currency}</span>
+                  </div>
                 </div>
                 <div className="sm:text-right min-w-0 flex-shrink-0">
-                  <p className="text-sm font-semibold text-[color:var(--color-text)] truncate">
-                    {isBuyer ? 'Seller' : 'Buyer'}: {isBuyer ? order.sellerId?.name : order.buyerId?.name}
-                  </p>
-                  <p className="text-xs text-[color:var(--color-muted)] truncate">Status: {order.status}</p>
+                  <div className="flex sm:flex-row-reverse gap-1 text-sm">
+                    <span className="font-semibold text-[color:var(--color-text)] flex-shrink-0">{isBuyer ? 'Seller:' : 'Buyer:'}</span>
+                    <span className="truncate">{isBuyer ? order.sellerId?.name : order.buyerId?.name}</span>
+                  </div>
+                  <div className="flex sm:flex-row-reverse gap-1 text-xs mt-1">
+                    <span className="text-[color:var(--color-muted)] flex-shrink-0">Status:</span>
+                    <span className="text-[color:var(--color-muted)] truncate">{order.status}</span>
+                  </div>
                 </div>
               </div>
             </div>
