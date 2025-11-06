@@ -209,9 +209,6 @@ const Layout = () => {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
           <Link to="/" className="flex items-baseline gap-2">
             <span className="text-2xl font-semibold tracking-tight text-[color:var(--color-primary)]">YohaTrade</span>
-            <span className="hidden text-sm font-medium text-[color:var(--color-muted)] sm:block">
-              {t('nav.tagline', { defaultValue: 'Tigray markets, human connections' })}
-            </span>
           </Link>
 
           <div className="hidden md:flex items-center gap-6 text-sm font-medium">
