@@ -147,42 +147,41 @@ const Messages = () => {
   const isBuyer = String(order?.buyerId?._id || order?.buyerId || '') === currentUserId;
 
   return (
-    <div className="min-h-screen bg-[color:var(--color-bg)]">
-      <div className="w-full h-full">
-        <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4">
-          <div className="mb-4">
-            <BackButton />
-          </div>
-          
-          <div className="mb-4">
-            <h1 className="text-2xl font-bold mb-3 text-[color:var(--color-text)]">Order Messages</h1>
-            {order && (
-              <div className="bg-white rounded-lg p-3 sm:p-4 shadow-sm">
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="text-sm text-[color:var(--color-muted)] truncate">
-                      <span className="font-semibold text-[color:var(--color-text)]">Order:</span> {order.listingId?.title || 'N/A'}
-                    </p>
-                    <p className="text-sm text-[color:var(--color-muted)]">
-                      <span className="font-semibold text-[color:var(--color-text)]">Price:</span> {order.price_agreed} {order.currency}
-                    </p>
-                  </div>
-                  <div className="sm:text-right min-w-0">
-                    <p className="text-sm font-semibold text-[color:var(--color-text)] truncate">
-                      {isBuyer ? 'Seller' : 'Buyer'}: {isBuyer ? order.sellerId?.name : order.buyerId?.name}
-                    </p>
-                    <p className="text-xs text-[color:var(--color-muted)]">Status: {order.status}</p>
-                  </div>
+    <div className="bg-[color:var(--color-bg)]">
+      <div className="mx-auto max-w-4xl px-4 py-4">
+        <div className="mb-4">
+          <BackButton />
+        </div>
+        
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold mb-3 text-[color:var(--color-text)]">Order Messages</h1>
+          {order && (
+            <div className="bg-white rounded-lg p-4 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm text-[color:var(--color-muted)] truncate">
+                    <span className="font-semibold text-[color:var(--color-text)]">Order:</span> {order.listingId?.title || 'N/A'}
+                  </p>
+                  <p className="text-sm text-[color:var(--color-muted)]">
+                    <span className="font-semibold text-[color:var(--color-text)]">Price:</span> {order.price_agreed} {order.currency}
+                  </p>
+                </div>
+                <div className="sm:text-right min-w-0">
+                  <p className="text-sm font-semibold text-[color:var(--color-text)] truncate">
+                    {isBuyer ? 'Seller' : 'Buyer'}: {isBuyer ? order.sellerId?.name : order.buyerId?.name}
+                  </p>
+                  <p className="text-xs text-[color:var(--color-muted)]">Status: {order.status}</p>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-slate-200 flex flex-col" style={{ height: 'calc(100vh - 280px)', minHeight: '350px', maxHeight: '600px' }}>
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200 flex flex-col" style={{ height: 'calc(100vh - 280px)', minHeight: '350px', maxHeight: '600px' }}>
         {/* Messages Container */}
         <div 
           ref={messagesContainerRef}
-          className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4 space-y-3 sm:space-y-4 scrollbar-hide bg-gray-50" 
+          className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4 scrollbar-hide bg-gray-50" 
         >
           {messagesData?.messages?.length === 0 ? (
             <div className="flex items-center justify-center h-full">
@@ -234,13 +233,13 @@ const Messages = () => {
                       )}
                     
                     {/* Message bubble */}
-                    <div className={`px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl shadow-sm ${
+                    <div className={`px-4 py-3 rounded-2xl shadow-sm ${
                       isMyMessage 
                         ? 'bg-[color:var(--color-primary)] text-white' 
                         : 'bg-white text-[color:var(--color-text)] border border-gray-200'
                     }`}>
                       {/* Message text */}
-                      <p className="text-sm leading-relaxed break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                      <p className="text-sm leading-relaxed break-words" style={{ wordBreak: 'break-word', overflowWrap: 'break-word', maxWidth: '100%' }}>
                         {msg.text}
                       </p>
                       
@@ -271,19 +270,19 @@ const Messages = () => {
         </div>
 
         {/* Input Area */}
-        <form onSubmit={handleSend} className="bg-white border-t border-gray-200 p-3 sm:p-4 flex-shrink-0">
+        <form onSubmit={handleSend} className="bg-white border-t border-gray-200 p-4 flex-shrink-0">
           <div className="flex items-center gap-2">
             <input 
               value={messageText} 
               onChange={e => setMessageText(e.target.value)} 
               placeholder="Type your message here..." 
-              className="flex-1 min-w-0 px-3 sm:px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-[color:var(--color-primary)] focus:ring-2 focus:ring-[color:var(--color-primary-soft)] text-sm" 
+              className="flex-1 min-w-0 px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-[color:var(--color-primary)] focus:ring-2 focus:ring-[color:var(--color-primary-soft)] text-sm" 
               disabled={!orderData?.order}
               ref={inputRef}
             />
             <button 
               type="submit" 
-              className={`px-3 sm:px-4 py-2.5 rounded-lg font-semibold transition-all text-sm whitespace-nowrap flex-shrink-0 ${
+              className={`px-4 py-2.5 rounded-lg font-semibold transition-all text-sm whitespace-nowrap flex-shrink-0 ${
                 !orderData?.order || !messageText.trim()
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-[color:var(--color-primary)] text-white hover:bg-[color:var(--color-primary-strong)] hover:shadow-lg'
@@ -294,7 +293,6 @@ const Messages = () => {
             </button>
           </div>
         </form>
-          </div>
         </div>
       </div>
     </div>
