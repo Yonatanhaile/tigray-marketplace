@@ -218,7 +218,7 @@ const Messages = () => {
                           className="w-8 h-8 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="w-8 h-8 bg-[color:var(--color-primary)] rounded-full flex items-center justify-center text-white font-bold text-xs">
+                        <div className="w-8 h-8 bg-[color:var(--color-primary-soft)] rounded-full flex items-center justify-center text-[color:var(--color-primary)] font-bold text-xs border border-[color:var(--color-primary)]">
                           {senderName?.charAt(0)?.toUpperCase() || 'U'}
                         </div>
                       )}
