@@ -141,37 +141,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Highlights */}
-      <section className="bg-[color:var(--color-bg)] py-12">
-        <div className="mx-auto max-w-6xl px-4">
-          <h2 className="text-center text-2xl font-semibold text-[color:var(--color-primary)]">{t('home.howItWorks')}</h2>
-          <p className="mt-3 text-center text-sm text-[color:var(--color-muted)]">{t('home.subtitle')}</p>
-          <div className="mt-10 grid gap-4 sm:grid-cols-3">
-            {[{
-              step: '01',
-              title: t('home.browseListing'),
-              description: t('home.browseDescription')
-            }, {
-              step: '02',
-              title: t('home.expressIntent'),
-              description: t('home.expressIntentDescription')
-            }, {
-              step: '03',
-              title: t('home.meetComplete'),
-              description: t('home.meetCompleteDescription')
-            }].map(({ step, title, description }) => (
-              <div key={step} className="card space-y-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--color-primary-soft)] text-sm font-semibold text-[color:var(--color-primary)]">
-                  {step}
-                </span>
-                <h3 className="text-base font-semibold text-[color:var(--color-text)]">{title}</h3>
-                <p className="text-sm text-[color:var(--color-muted)]">{description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Featured Listings */}
       <section className="bg-white py-16">
         <div className="mx-auto max-w-6xl px-4">
