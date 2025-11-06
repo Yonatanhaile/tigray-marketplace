@@ -405,7 +405,7 @@ const Layout = () => {
               {isAuthenticated && (
                 <>
                   <Link
-                    to={isSeller ? '/seller-dashboard#recent-orders' : '/orders'}
+                    to="/orders"
                     className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-primary-soft)] hover:text-[color:var(--color-primary)]"
                     onClick={() => setMobileMenuOpen(false)}
                   >
