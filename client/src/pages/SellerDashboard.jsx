@@ -218,7 +218,7 @@ const SellerDashboard = () => {
                 : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
-            ✅ {t('sellerDashboard.active')} ({activeListings.length})
+            {t('sellerDashboard.active')} ({activeListings.length})
           </button>
           <button
             onClick={() => setActiveTab('pending')}
@@ -228,7 +228,7 @@ const SellerDashboard = () => {
                 : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
-            ⏳ {t('sellerDashboard.pending')} ({pendingListings.length})
+            {t('sellerDashboard.pending')} ({pendingListings.length})
           </button>
           <button
             onClick={() => setActiveTab('sold')}
@@ -238,7 +238,7 @@ const SellerDashboard = () => {
                 : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
-            🔴 {t('sellerDashboard.sold')} ({soldListings.length})
+            {t('sellerDashboard.sold')} ({soldListings.length})
           </button>
         </div>
 
@@ -253,10 +253,9 @@ const SellerDashboard = () => {
             {/* Active Listings */}
             {activeTab === 'active' && (
               activeListings.length === 0 ? (
-                <div className="text-center py-12 card">
-                  <div className="text-6xl mb-4">📦</div>
-                  <p className="text-gray-500 text-lg mb-2">{t('sellerDashboard.noActiveListings')}</p>
-                  <p className="text-sm text-gray-400">{t('sellerDashboard.noActiveListingsHint')}</p>
+                <div className="text-center py-12 card border-2 border-green-200 bg-green-50">
+                  <p className="text-green-700 font-semibold text-lg mb-2">{t('sellerDashboard.noActiveListings')}</p>
+                  <p className="text-sm text-green-600">{t('sellerDashboard.noActiveListingsHint')}</p>
                 </div>
               ) : (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -270,10 +269,9 @@ const SellerDashboard = () => {
             {/* Pending Listings */}
             {activeTab === 'pending' && (
               pendingListings.length === 0 ? (
-                <div className="text-center py-12 card">
-                  <div className="text-6xl mb-4">⏳</div>
-                  <p className="text-gray-500 text-lg mb-2">{t('sellerDashboard.noPendingListings')}</p>
-                  <p className="text-sm text-gray-400">{t('sellerDashboard.noPendingListingsHint')}</p>
+                <div className="text-center py-12 card border-2 border-yellow-200 bg-yellow-50">
+                  <p className="text-yellow-700 font-semibold text-lg mb-2">{t('sellerDashboard.noPendingListings')}</p>
+                  <p className="text-sm text-yellow-600">{t('sellerDashboard.noPendingListingsHint')}</p>
                 </div>
               ) : (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -287,10 +285,9 @@ const SellerDashboard = () => {
             {/* Sold Listings */}
             {activeTab === 'sold' && (
               soldListings.length === 0 ? (
-                <div className="text-center py-12 card">
-                  <div className="text-6xl mb-4">🔴</div>
-                  <p className="text-gray-500 text-lg mb-2">{t('sellerDashboard.noSoldItems')}</p>
-                  <p className="text-sm text-gray-400">{t('sellerDashboard.noSoldItemsHint')}</p>
+                <div className="text-center py-12 card border-2 border-red-200 bg-red-50">
+                  <p className="text-red-700 font-semibold text-lg mb-2">{t('sellerDashboard.noSoldItems')}</p>
+                  <p className="text-sm text-red-600">{t('sellerDashboard.noSoldItemsHint')}</p>
                 </div>
               ) : (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -345,9 +342,6 @@ const ListingCard = ({ listing, onToggleSold, onDelete, markAsSoldMutation, dele
           listing.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
           'bg-gray-100 text-gray-800'
         }`}>
-          {listing.status === 'sold' && '🔴 '}
-          {listing.status === 'active' && '✅ '}
-          {listing.status === 'pending' && '⏳ '}
           {listing.status.toUpperCase()}
         </span>
       </div>
