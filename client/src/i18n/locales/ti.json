@@ -3,7 +3,7 @@
     "browse": "ድለ",
     "myListings": "ዝርዝረይ",
     "myOrders": "ትእዛዛተይ",
-    "createListing": "ዝርዝር ፍጠር",
+    "createListing": "ሽጥ",
     "admin": "አስተዳዳሪ",
     "profile": "መገለጺ",
     "login": "ኣቱ",
@@ -15,7 +15,7 @@
     "orderRequests": "ሕቶታት ትእዛዝ",
     "adminPanel": "ፓነል አስተዳዳሪ",
     "browseListing": "ዝርዝራት ርአ",
-    "createNewListing": "ሓድሽ ዝርዝር ፍጠር"
+    "createNewListing": "ሽጥ"
   },
   "home": {
     "title": "እተደልዩ ነገር ረኽቡ",

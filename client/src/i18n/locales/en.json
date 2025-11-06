@@ -3,7 +3,7 @@
     "browse": "Browse",
     "myListings": "My Listings",
     "myOrders": "My Orders",
-    "createListing": "Create Listing",
+    "createListing": "Sell",
     "admin": "Admin",
     "profile": "My Profile",
     "login": "Login",
@@ -15,7 +15,7 @@
     "orderRequests": "Order Requests",
     "adminPanel": "Admin Panel",
     "browseListing": "Browse Listings",
-    "createNewListing": "Create New Listing"
+    "createNewListing": "Sell"
   },
   "home": {
     "title": "Find what you're looking for",

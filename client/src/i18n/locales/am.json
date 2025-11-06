@@ -3,7 +3,7 @@
     "browse": "ፈልግ",
     "myListings": "የኔ ዝርዝር",
     "myOrders": "የኔ ትዕዛዞች",
-    "createListing": "ዝርዝር ፍጠር",
+    "createListing": "ሽጥ",
     "admin": "አስተዳዳሪ",
     "profile": "የኔ መገለጫ",
     "login": "ግባ",
@@ -15,7 +15,7 @@
     "orderRequests": "የትዕዛዝ ጥያቄዎች",
     "adminPanel": "የአስተዳዳሪ ፓነል",
     "browseListing": "ዝርዝሮችን አስስ",
-    "createNewListing": "አዲስ ዝርዝር ፍጠር"
+    "createNewListing": "ሽጥ"
   },
   "home": {
     "title": "የሚፈልጉትን ያግኙ",
