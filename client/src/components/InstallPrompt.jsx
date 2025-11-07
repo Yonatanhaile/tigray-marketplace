@@ -194,7 +194,7 @@ const InstallPrompt = () => {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-2xl animate-slideUp">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-[#1f4c3d] to-[#163a2d] text-white shadow-2xl animate-slideUp">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
         <div className="flex items-start justify-between gap-2 sm:gap-3">
           <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
@@ -207,7 +207,7 @@ const InstallPrompt = () => {
               <h3 className="text-sm sm:text-base md:text-lg font-bold mb-1">
                 {isIOS ? '📱 Add YohaTrade to Home Screen' : '📲 Install YohaTrade'}
               </h3>
-              <p className="text-xs sm:text-sm text-purple-100 mb-2">
+              <p className="text-xs sm:text-sm text-green-100 mb-2">
                 {isIOS 
                   ? browserType === 'safari'
                     ? 'Get the app experience with offline access and notifications!'
@@ -218,14 +218,14 @@ const InstallPrompt = () => {
               
               {isIOS ? (
                 browserType === 'safari' ? (
-                  <div className="bg-white/95 text-purple-900 px-3 py-2.5 rounded-lg text-xs sm:text-sm space-y-2">
+                  <div className="bg-white/95 text-[#1f4c3d] px-3 py-2.5 rounded-lg text-xs sm:text-sm space-y-2">
                     <div className="flex items-start gap-2">
                       <span className="text-2xl">⬇️</span>
                       <div>
                         <p className="font-bold mb-1">How to install:</p>
                       </div>
                     </div>
-                    <ol className="space-y-2 text-purple-800">
+                    <ol className="space-y-2 text-[#163a2d]">
                       <li className="flex items-start gap-2">
                         <span className="font-bold">1.</span>
                         <span>Tap the <strong>Share button</strong> 
@@ -249,15 +249,15 @@ const InstallPrompt = () => {
                     </ol>
                   </div>
                 ) : (
-                  <div className="bg-white/95 text-purple-900 px-3 py-2.5 rounded-lg text-xs sm:text-sm space-y-2">
+                  <div className="bg-white/95 text-[#1f4c3d] px-3 py-2.5 rounded-lg text-xs sm:text-sm space-y-2">
                     <div className="flex items-start gap-2">
                       <span className="text-base sm:text-lg">ℹ️</span>
                       <div>
                         <p className="font-bold mb-1">Apple requires Safari for installation</p>
-                        <p className="text-purple-700">To add YohaTrade to your home screen:</p>
+                        <p className="text-[#163a2d]">To add YohaTrade to your home screen:</p>
                       </div>
                     </div>
-                    <ol className="space-y-1 ml-6 text-purple-800">
+                    <ol className="space-y-1 ml-6 text-[#163a2d]">
                       <li className="flex items-start gap-2">
                         <span className="font-bold">1.</span>
                         <span>Copy this URL or tap the share icon in your browser</span>
@@ -277,7 +277,7 @@ const InstallPrompt = () => {
                 deferredPrompt && (
                   <button
                     onClick={handleInstallClick}
-                    className="bg-white text-purple-600 px-4 sm:px-6 py-2 rounded-lg font-bold hover:bg-purple-50 transition-all transform hover:scale-105 shadow-lg text-xs sm:text-sm md:text-base w-full sm:w-auto"
+                    className="bg-white text-[#1f4c3d] px-4 sm:px-6 py-2 rounded-lg font-bold hover:bg-[#e8f0ec] transition-all transform hover:scale-105 shadow-lg text-xs sm:text-sm md:text-base w-full sm:w-auto"
                   >
                     ⬇️ Install Now
                   </button>
@@ -288,7 +288,7 @@ const InstallPrompt = () => {
           
           <button
             onClick={handleDismiss}
-            className="flex-shrink-0 text-white hover:text-purple-200 transition-colors p-1"
+            className="flex-shrink-0 text-white hover:text-green-200 transition-colors p-1"
             aria-label="Close"
           >
             <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
