@@ -117,7 +117,7 @@ if ('caches' in window) {
   caches.keys().then(cacheNames => {
     cacheNames.forEach(cacheName => {
       // Delete old cache versions
-      if (cacheName.startsWith('yohatrade-') && !cacheName.includes('v2.1.0')) {
+      if (cacheName.startsWith('yohatrade-') && !cacheName.includes('v2.2.0')) {
         console.log('🗑️ Deleting old cache:', cacheName);
         caches.delete(cacheName);
       }
