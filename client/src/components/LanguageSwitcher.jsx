@@ -64,7 +64,7 @@ const LanguageSwitcher = () => {
                 onClick={() => handleLanguageChange(language.code)}
                 className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${
                   i18n.language === language.code
-                    ? 'bg-purple-50 text-purple-700'
+                    ? 'bg-[color:var(--color-primary-soft)] text-[color:var(--color-primary)]'
                     : 'hover:bg-gray-50 text-gray-700'
                 }`}
               >
@@ -74,7 +74,7 @@ const LanguageSwitcher = () => {
                   <div className="text-xs text-gray-500">{language.name}</div>
                 </div>
                 {i18n.language === language.code && (
-                  <svg className="w-5 h-5 text-purple-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-[color:var(--color-primary)] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 )}

@@ -347,9 +347,9 @@ const EditListing = () => {
 
           {/* Dynamic Payment Instructions */}
           {selectedPaymentMethods.length > 0 && (
-            <div className="space-y-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h4 className="font-semibold text-blue-900">Payment Instructions *</h4>
-              <p className="text-sm text-blue-700">Provide specific details for each selected payment method</p>
+            <div className="space-y-3 p-4 bg-[color:var(--color-primary-soft)] border border-[color:var(--color-primary)]/20 rounded-lg">
+              <h4 className="font-semibold text-[color:var(--color-primary)]">Payment Instructions *</h4>
+              <p className="text-sm text-[color:var(--color-primary)]">Provide specific details for each selected payment method</p>
               
               {selectedPaymentMethods.includes('Cash') && (
                 <div>
@@ -428,8 +428,8 @@ const EditListing = () => {
           </p>
           {uploading && (
             <div className="flex items-center gap-2 mt-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
-              <p className="text-purple-600 font-medium">Uploading images...</p>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[color:var(--color-primary)]"></div>
+              <p className="text-[color:var(--color-primary)] font-medium">Uploading images...</p>
             </div>
           )}
           {images.length > 0 && (

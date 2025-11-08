@@ -100,7 +100,7 @@ const OrderDetail = () => {
           <div className="space-y-2 text-sm">
             <p><strong>{t('orderDetail.orderId')}</strong> {order._id.slice(-8).toUpperCase()}</p>
             <p><strong>{t('orderDetail.status')}</strong> <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded">{order.status}</span></p>
-            <p><strong>{t('orderDetail.paymentMethod')}</strong> <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">{order.payment_status}</span></p>
+            <p><strong>{t('orderDetail.paymentMethod')}</strong> <span className="px-2 py-1 bg-[color:var(--color-primary-soft)] text-[color:var(--color-primary)] rounded">{order.payment_status}</span></p>
             <p><strong>{t('orderDetail.price')}</strong> {order.price_agreed} {order.currency}</p>
             <p><strong>{t('orderDetail.paymentMethod')}</strong> {order.selected_payment_method}</p>
             <p><strong>{t('orderDetail.created')}</strong> {new Date(order.createdAt).toLocaleString()}</p>
@@ -183,10 +183,10 @@ const OrderDetail = () => {
               <img 
                 src={order.buyerId.profileImage.url} 
                 alt={order.buyerId?.name} 
-                className="w-12 h-12 rounded-full object-cover border-2 border-purple-200"
+                className="w-12 h-12 rounded-full object-cover border-2 border-[color:var(--color-primary)]/20"
               />
             ) : (
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
+              <div className="w-12 h-12 bg-gradient-to-br from-[color:var(--color-primary)] to-[color:var(--color-primary-strong)] rounded-full flex items-center justify-center text-white font-bold">
                 {order.buyerId?.name?.charAt(0)?.toUpperCase()}
               </div>
             )}
@@ -206,10 +206,10 @@ const OrderDetail = () => {
               <img 
                 src={order.sellerId.profileImage.url} 
                 alt={order.sellerId?.name} 
-                className="w-12 h-12 rounded-full object-cover border-2 border-purple-200"
+                className="w-12 h-12 rounded-full object-cover border-2 border-[color:var(--color-primary)]/20"
               />
             ) : (
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
+              <div className="w-12 h-12 bg-gradient-to-br from-[color:var(--color-primary)] to-[color:var(--color-primary-strong)] rounded-full flex items-center justify-center text-white font-bold">
                 {order.sellerId?.name?.charAt(0)?.toUpperCase()}
               </div>
             )}
@@ -311,7 +311,7 @@ const OrderDetail = () => {
                 {order.status === 'disputed' && '⚠️ This order is under dispute. Please wait for admin resolution.'}
               </p>
               {order.status === 'disputed' && (
-                <Link to={`/disputes?orderId=${order._id}`} className="text-purple-600 hover:underline text-sm">
+                <Link to={`/disputes?orderId=${order._id}`} className="text-[color:var(--color-primary)] hover:underline text-sm">
                   View Dispute Details →
                 </Link>
               )}

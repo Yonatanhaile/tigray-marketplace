@@ -196,9 +196,9 @@ const SellerDashboard = () => {
           <p className="text-2xl font-bold text-yellow-600">{pendingListings.length}</p>
         </div>
 
-        <div className="bg-white border border-purple-200 rounded-lg p-3">
-          <h3 className="text-xs text-purple-700 font-medium mb-1">{t('sellerDashboard.totalViews')}</h3>
-          <p className="text-2xl font-bold text-purple-600">{totalViews}</p>
+        <div className="bg-white border border-[color:var(--color-primary)]/20 rounded-lg p-3">
+          <h3 className="text-xs text-[color:var(--color-primary)] font-medium mb-1">{t('sellerDashboard.totalViews')}</h3>
+          <p className="text-2xl font-bold text-[color:var(--color-primary)]">{totalViews}</p>
         </div>
       </div>
 
@@ -245,7 +245,7 @@ const SellerDashboard = () => {
         {/* Listings Grid */}
         {listingsLoading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[color:var(--color-primary)]"></div>
             <p className="ml-3 text-gray-600">{t('sellerDashboard.loadingListings')}</p>
           </div>
         ) : (
@@ -422,7 +422,7 @@ const ListingCard = ({ listing, onToggleSold, onDelete, markAsSoldMutation, dele
         <div className="flex gap-2">
           <Link 
             to={`/listings/${listing._id}/edit`} 
-            className="flex-1 text-center py-2 px-3 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-sm font-semibold transition-all"
+            className="flex-1 text-center py-2 px-3 bg-[color:var(--color-primary-soft)] text-[color:var(--color-primary)] hover:bg-[color:var(--color-primary)]/10 rounded-lg text-sm font-semibold transition-all"
             title="Edit listing details, price, images, etc."
           >
             Edit

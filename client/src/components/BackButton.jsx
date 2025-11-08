@@ -6,7 +6,7 @@ const BackButton = ({ className = '' }) => {
   return (
     <button
       onClick={() => navigate(-1)}
-      className={`inline-flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all font-medium ${className}`}
+      className={`inline-flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-[color:var(--color-primary)] hover:bg-[color:var(--color-primary-soft)] rounded-lg transition-all font-medium ${className}`}
       title="Go back"
     >
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

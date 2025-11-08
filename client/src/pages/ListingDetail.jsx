@@ -232,7 +232,7 @@ const ListingDetail = () => {
           </div>
 
           {/* Location */}
-          <div className="mb-6 card bg-blue-50">
+          <div className="mb-6 card bg-[color:var(--color-primary-soft)]">
             <h3 className="font-semibold mb-3 flex items-center gap-2">
               <span>📍</span> {t('listing.location')}
             </h3>
@@ -331,10 +331,10 @@ const ListingDetail = () => {
                 <img 
                   src={listing.listing.sellerId.profileImage.url} 
                   alt={listing.listing.sellerId.name} 
-                  className="w-12 h-12 rounded-full object-cover border-2 border-purple-200"
+                  className="w-12 h-12 rounded-full object-cover border-2 border-[color:var(--color-primary)]/20"
                 />
               ) : (
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                <div className="w-12 h-12 bg-gradient-to-br from-[color:var(--color-primary)] to-[color:var(--color-primary-strong)] rounded-full flex items-center justify-center text-white font-bold text-lg">
                   {listing.listing.sellerId.name.charAt(0).toUpperCase()}
                 </div>
               )}
@@ -358,13 +358,13 @@ const ListingDetail = () => {
           </div>
 
           {/* Safety Notice */}
-          <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 border-l-4 border-purple-500 p-4 rounded-lg">
+          <div className="mb-6 bg-gradient-to-r from-[color:var(--color-primary-soft)] to-[color:var(--color-primary)]/10 border-l-4 border-[color:var(--color-accent)] p-4 rounded-lg">
             <p className="text-sm text-gray-700">
               <strong>🛡️ {t('listingDetail.safetyNotice')}</strong> {t('listingDetail.safetyShort')}
             </p>
             <button
               onClick={() => setShowSafetyModal(true)}
-              className="text-purple-600 text-sm mt-1 hover:underline font-medium"
+              className="text-[color:var(--color-primary)] text-sm mt-1 hover:underline font-medium"
             >
               {t('listingDetail.readSafetyGuidelines')}
             </button>

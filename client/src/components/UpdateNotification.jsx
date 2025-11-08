@@ -64,25 +64,25 @@ const UpdateNotification = () => {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 shadow-lg animate-slideUp">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-[color:var(--color-primary)] to-[color:var(--color-primary-strong)] text-white p-4 shadow-lg animate-slideUp">
       <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
           <div>
             <p className="font-semibold">🔄 Update Available</p>
-            <p className="text-sm text-purple-100">A new version is ready. The page will refresh automatically.</p>
+            <p className="text-sm text-white/80">A new version is ready. The page will refresh automatically.</p>
           </div>
         </div>
         <div className="flex gap-2">
           <button
             onClick={handleRefresh}
-            className="bg-white text-purple-600 px-4 py-2 rounded-lg font-semibold hover:bg-purple-50 transition-colors"
+            className="bg-white text-[color:var(--color-primary)] px-4 py-2 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
           >
             Refresh Now
           </button>
           <button
             onClick={() => setShowUpdateBanner(false)}
-            className="text-white hover:text-purple-100 px-3 py-2 rounded-lg transition-colors"
+            className="text-white hover:text-white/80 px-3 py-2 rounded-lg transition-colors"
           >
             ✕
           </button>

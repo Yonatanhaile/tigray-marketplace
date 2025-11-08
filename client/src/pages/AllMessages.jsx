@@ -118,7 +118,7 @@ const AllMessages = () => {
                 key={order._id}
                 to={`/orders/${order._id}/messages`}
                 className={`card flex items-start space-x-4 hover:shadow-lg transition-shadow ${
-                  hasUnread ? 'bg-blue-50 border-l-4 border-blue-600' : ''
+                  hasUnread ? 'bg-[color:var(--color-primary-soft)] border-l-4 border-[color:var(--color-primary)]' : ''
                 }`}
               >
                 {/* Avatar/Image - User Profile Picture */}
@@ -130,7 +130,7 @@ const AllMessages = () => {
                       className="w-16 h-16 object-cover rounded-full border-2 border-gray-200" 
                     />
                   ) : (
-                    <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-2xl border-2 border-gray-200">
+                    <div className="w-16 h-16 bg-gradient-to-br from-[color:var(--color-primary)] to-[color:var(--color-primary-strong)] rounded-full flex items-center justify-center text-white font-bold text-2xl border-2 border-gray-200">
                       {otherPerson?.name?.charAt(0)?.toUpperCase() || 'U'}
                     </div>
                   )}
@@ -141,7 +141,7 @@ const AllMessages = () => {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       {/* Other person's name */}
-                      <h3 className={`font-semibold text-lg mb-1 ${hasUnread ? 'text-blue-900' : 'text-gray-900'}`}>
+                      <h3 className={`font-semibold text-lg mb-1 ${hasUnread ? 'text-[color:var(--color-primary)]' : 'text-gray-900'}`}>
                         {otherPerson?.name || t('allMessages.unknownUser')}
                       </h3>
                       
@@ -152,7 +152,7 @@ const AllMessages = () => {
 
                       {/* Role badge */}
                       <span className={`inline-block px-2 py-1 rounded-full text-xs mt-2 ${
-                        isBuyer ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'
+                        isBuyer ? 'bg-[color:var(--color-primary-soft)] text-[color:var(--color-primary)]' : 'bg-green-100 text-green-800'
                       }`}>
                         {isBuyer ? t('allMessages.youAreTheBuyer') : t('allMessages.youAreTheSeller')}
                       </span>
@@ -171,7 +171,7 @@ const AllMessages = () => {
                       <span className={`inline-block px-2 py-1 rounded-full text-xs ${
                         order.status === 'delivered' ? 'bg-green-100 text-green-800' :
                         order.status === 'disputed' ? 'bg-red-100 text-red-800' :
-                        order.status === 'confirmed' ? 'bg-blue-100 text-blue-800' :
+                        order.status === 'confirmed' ? 'bg-[color:var(--color-primary-soft)] text-[color:var(--color-primary)]' :
                         'bg-yellow-100 text-yellow-800'
                       }`}>
                         {order.status}

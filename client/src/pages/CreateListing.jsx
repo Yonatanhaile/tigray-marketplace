@@ -262,7 +262,7 @@ const CreateListing = () => {
         </div>
 
         {/* Listing Type Selector */}
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border-2 border-blue-200">
+        <div className="bg-gradient-to-r from-[color:var(--color-primary-soft)] to-[color:var(--color-primary)]/10 p-6 rounded-lg border-2 border-[color:var(--color-primary)]/20">
           <label className="block text-lg font-semibold mb-3 text-gray-800">What are you listing? *</label>
           <div className="grid md:grid-cols-2 gap-4">
             <button
@@ -270,8 +270,8 @@ const CreateListing = () => {
               onClick={() => setListingType('product')}
               className={`p-4 rounded-lg border-2 transition-all ${
                 listingType === 'product'
-                  ? 'border-blue-500 bg-blue-100 shadow-md'
-                  : 'border-gray-300 bg-white hover:border-blue-300'
+                  ? 'border-[color:var(--color-primary)] bg-[color:var(--color-primary-soft)] shadow-md'
+                  : 'border-gray-300 bg-white hover:border-[color:var(--color-primary)]/30'
               }`}
             >
               <div className="text-3xl mb-2">📦</div>
@@ -283,8 +283,8 @@ const CreateListing = () => {
               onClick={() => setListingType('service')}
               className={`p-4 rounded-lg border-2 transition-all ${
                 listingType === 'service'
-                  ? 'border-purple-500 bg-purple-100 shadow-md'
-                  : 'border-gray-300 bg-white hover:border-purple-300'
+                  ? 'border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/20 shadow-md'
+                  : 'border-gray-300 bg-white hover:border-[color:var(--color-accent)]/30'
               }`}
             >
               <div className="text-3xl mb-2">💼</div>
@@ -345,7 +345,7 @@ const CreateListing = () => {
               ))}
             </select>
             {listingType === 'service' && (
-              <p className="text-xs text-blue-600 mt-1">
+              <p className="text-xs text-[color:var(--color-primary)] mt-1">
                 💡 Recommended: Services, Repair & Construction, Beauty & Personal Care, Jobs
               </p>
             )}
@@ -501,9 +501,9 @@ const CreateListing = () => {
 
           {/* Dynamic Payment Instructions */}
           {selectedPaymentMethods.length > 0 && (
-            <div className="space-y-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h4 className="font-semibold text-blue-900">Payment Instructions *</h4>
-              <p className="text-sm text-blue-700">Provide specific details for each selected payment method</p>
+            <div className="space-y-3 p-4 bg-[color:var(--color-primary-soft)] border border-[color:var(--color-primary)]/20 rounded-lg">
+              <h4 className="font-semibold text-[color:var(--color-primary)]">Payment Instructions *</h4>
+              <p className="text-sm text-[color:var(--color-primary)]">Provide specific details for each selected payment method</p>
               
               {selectedPaymentMethods.includes('Cash') && (
                 <div>
@@ -583,8 +583,8 @@ const CreateListing = () => {
             <span className="block sm:inline"> Supported: JPG, PNG, WebP, HEIC</span>
           </p>
           {listingType === 'service' && (
-            <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded">
-              <p className="text-sm text-blue-800">
+            <div className="mt-2 p-3 bg-[color:var(--color-primary-soft)] border border-[color:var(--color-primary)]/20 rounded">
+              <p className="text-sm text-[color:var(--color-primary)]">
                 <strong>💼 For service providers:</strong> Upload images of your previous work, portfolio samples, 
                 certificates, completed projects, or anything that showcases your skills!
               </p>
@@ -597,8 +597,8 @@ const CreateListing = () => {
           )}
           {uploading && (
             <div className="flex items-center gap-2 mt-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
-              <p className="text-purple-600 font-medium">Uploading images...</p>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[color:var(--color-primary)]"></div>
+              <p className="text-[color:var(--color-primary)] font-medium">Uploading images...</p>
             </div>
           )}
           {images.length > 0 && (

@@ -219,7 +219,7 @@ const Profile = () => {
             {user?.roles && (
               <div className="flex gap-2 mt-2">
                 {user.roles.map((role) => (
-                  <span key={role} className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
+                  <span key={role} className="text-xs bg-[color:var(--color-primary-soft)] text-[color:var(--color-primary)] px-2 py-1 rounded-full">
                     {role}
                   </span>
                 ))}
@@ -284,7 +284,7 @@ const Profile = () => {
             <label className="block text-sm font-medium mb-2">Account Type</label>
             <div className="flex gap-2">
               {user?.roles?.includes('buyer') && (
-                <span className="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-800 rounded-lg text-sm font-semibold">
+                <span className="inline-flex items-center px-3 py-1.5 bg-[color:var(--color-primary-soft)] text-[color:var(--color-primary)] rounded-lg text-sm font-semibold">
                   Buyer
                 </span>
               )}
@@ -294,7 +294,7 @@ const Profile = () => {
                 </span>
               )}
               {user?.roles?.includes('admin') && (
-                <span className="inline-flex items-center px-3 py-1.5 bg-purple-100 text-purple-800 rounded-lg text-sm font-semibold">
+                <span className="inline-flex items-center px-3 py-1.5 bg-[color:var(--color-accent)]/20 text-[color:var(--color-accent)] rounded-lg text-sm font-semibold">
                   Admin
                 </span>
               )}

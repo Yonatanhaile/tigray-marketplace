@@ -36,10 +36,10 @@ const SellerProfile = () => {
                   <img 
                     src={seller.profileImage.url} 
                     alt={seller?.name} 
-                    className="w-16 h-16 rounded-full object-cover border-2 border-purple-200"
+                    className="w-16 h-16 rounded-full object-cover border-2 border-[color:var(--color-primary)]/20"
                   />
                 ) : (
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-xl font-bold text-white">
+                  <div className="w-16 h-16 bg-gradient-to-br from-[color:var(--color-primary)] to-[color:var(--color-primary-strong)] rounded-full flex items-center justify-center text-xl font-bold text-white">
                     {seller?.name?.charAt(0)?.toUpperCase()}
                   </div>
                 )}
@@ -66,7 +66,7 @@ const SellerProfile = () => {
             
             {/* Seller Location */}
             {listings.length > 0 && listings[0].location && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="bg-[color:var(--color-primary-soft)] border border-[color:var(--color-primary)]/20 rounded-lg p-4">
                 <h3 className="font-semibold mb-2 flex items-center gap-2">
                   <span>📍</span> Seller Location
                 </h3>

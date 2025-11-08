@@ -61,7 +61,7 @@ a {
   }
 
   .input {
-    @apply w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-base transition-shadow duration-200 placeholder:text-slate-400 focus:border-[color:var(--color-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-200;
+    @apply w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-base transition-shadow duration-200 placeholder:text-slate-400 focus:border-[color:var(--color-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)]/20;
   }
 
   .card {
