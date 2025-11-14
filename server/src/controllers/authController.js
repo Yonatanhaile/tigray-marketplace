@@ -1,6 +1,7 @@
 const { User } = require('../models');
 const { generateToken } = require('../services/jwt');
 const { generateOTP, verifyOTP } = require('../services/otp');
+const { trackReferral } = require('./referralController');
 const logger = require('../services/logger');
 
 /**
@@ -33,6 +34,29 @@ const register = async (req, res) => {
       passwordHash,
       roles: roles || ['buyer', 'seller'], // All users are both buyers and sellers by default
     });
+
+    // Track referral if present
+    const referralCode = req.body.referralCode;
+    if (referralCode) {
+      const registrationData = {
+        ipAddress: req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+        deviceFingerprint: req.headers['user-agent'] || 'unknown',
+      };
+
+      // Update user with referral info
+      user.referredBy = referralCode;
+      user.registrationMetadata = {
+        ...registrationData,
+        userAgent: req.headers['user-agent'],
+        registeredAt: new Date(),
+      };
+      await user.save();
+
+      // Track in referral system (async, don't wait)
+      trackReferral(referralCode, user._id, registrationData).catch(err => 
+        logger.error('Failed to track referral:', err)
+      );
+    }
 
     // Generate token
     const token = generateToken(user._id);

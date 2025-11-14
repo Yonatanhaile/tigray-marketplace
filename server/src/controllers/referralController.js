@@ -1,0 +1,538 @@
+const { Referral, User } = require('../models');
+const crypto = require('crypto');
+const logger = require('../services/logger');
+
+// Constants
+const WITHDRAWAL_THRESHOLD = 25; // Minimum referrals for withdrawal
+const EARNINGS_PER_REFERRAL = 5; // 5 birr per referral
+const MAX_REGISTRATIONS_PER_IP = 3;
+const MAX_REGISTRATIONS_PER_DEVICE = 3;
+const SUSPICIOUS_TIME_WINDOW = 3600000; // 1 hour in ms
+
+/**
+ * Generate unique referral code
+ */
+const generateReferralCode = (userId) => {
+  const hash = crypto.createHash('sha256').update(userId.toString()).digest('hex');
+  return hash.substring(0, 8).toUpperCase();
+};
+
+/**
+ * Fraud detection: Check for suspicious patterns
+ */
+const detectFraud = async (referralCode, registrationData) => {
+  const referral = await Referral.findOne({ referralCode });
+  if (!referral) return { suspicious: false, reasons: [] };
+
+  const { ipAddress, deviceFingerprint } = registrationData;
+  const reasons = [];
+  
+  // Check 1: Multiple registrations from same IP
+  const ipCount = referral.referredUsers.filter(r => 
+    r.ipAddress === ipAddress
+  ).length;
+  
+  if (ipCount >= MAX_REGISTRATIONS_PER_IP) {
+    reasons.push(`Too many registrations from IP: ${ipAddress}`);
+  }
+
+  // Check 2: Multiple registrations from same device
+  const deviceCount = referral.referredUsers.filter(r => 
+    r.deviceFingerprint === deviceFingerprint
+  ).length;
+  
+  if (deviceCount >= MAX_REGISTRATIONS_PER_DEVICE) {
+    reasons.push(`Too many registrations from device: ${deviceFingerprint}`);
+  }
+
+  // Check 3: Rapid registrations
+  const recentRegistrations = referral.referredUsers.filter(r => 
+    Date.now() - new Date(r.registeredAt).getTime() < SUSPICIOUS_TIME_WINDOW
+  );
+  
+  if (recentRegistrations.length >= 5) {
+    reasons.push('Too many registrations in short time period');
+  }
+
+  // Check 4: Same IP as referrer
+  const referrer = await User.findById(referral.userId);
+  if (referrer?.registrationMetadata?.ipAddress === ipAddress) {
+    reasons.push('Registration IP matches referrer IP');
+  }
+
+  return {
+    suspicious: reasons.length > 0,
+    reasons,
+  };
+};
+
+/**
+ * Create or get referral program for user
+ */
+const createReferralProgram = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    let referral = await Referral.findOne({ userId });
+
+    if (!referral) {
+      const referralCode = generateReferralCode(userId);
+      
+      referral = await Referral.create({
+        userId,
+        referralCode,
+      });
+
+      logger.info(`Referral program created for user: ${userId}`);
+    }
+
+    // Calculate current balance
+    referral.calculateAvailableBalance();
+    await referral.save();
+
+    res.status(200).json({
+      error: false,
+      referral: {
+        referralCode: referral.referralCode,
+        referralLink: `${process.env.CLIENT_URL || 'http://localhost:5173'}/register?ref=${referral.referralCode}`,
+        totalReferrals: referral.referredUsers.length,
+        availableBalance: referral.availableBalance,
+        totalEarnings: referral.totalEarnings,
+        totalWithdrawn: referral.totalWithdrawn,
+        canWithdraw: referral.canWithdraw(),
+        withdrawalThreshold: WITHDRAWAL_THRESHOLD,
+        paymentMethod: referral.paymentMethod,
+        flagged: referral.suspiciousActivity?.flagged || false,
+      },
+    });
+  } catch (error) {
+    logger.error('Create referral program error:', error);
+    res.status(500).json({
+      error: true,
+      message: 'Failed to create referral program',
+      details: error.message,
+    });
+  }
+};
+
+/**
+ * Update payment method
+ */
+const updatePaymentMethod = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { paymentType, paymentDetails } = req.body;
+
+    if (!['bank_transfer', 'telebirr', 'mpesa'].includes(paymentType)) {
+      return res.status(400).json({
+        error: true,
+        message: 'Invalid payment method',
+      });
+    }
+
+    const referral = await Referral.findOne({ userId });
+    
+    if (!referral) {
+      return res.status(404).json({
+        error: true,
+        message: 'Referral program not found. Create one first.',
+      });
+    }
+
+    referral.paymentMethod = {
+      type: paymentType,
+      details: paymentDetails,
+    };
+
+    await referral.save();
+
+    logger.info(`Payment method updated for user: ${userId}`);
+
+    res.status(200).json({
+      error: false,
+      message: 'Payment method updated successfully',
+      paymentMethod: referral.paymentMethod,
+    });
+  } catch (error) {
+    logger.error('Update payment method error:', error);
+    res.status(500).json({
+      error: true,
+      message: 'Failed to update payment method',
+      details: error.message,
+    });
+  }
+};
+
+/**
+ * Get referral statistics
+ */
+const getReferralStats = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    const referral = await Referral.findOne({ userId })
+      .populate('referredUsers.userId', 'name email createdAt');
+
+    if (!referral) {
+      return res.status(404).json({
+        error: true,
+        message: 'Referral program not found',
+      });
+    }
+
+    // Calculate balance
+    referral.calculateAvailableBalance();
+    await referral.save();
+
+    const availableReferrals = referral.getAvailableReferrals();
+
+    res.status(200).json({
+      error: false,
+      stats: {
+        referralCode: referral.referralCode,
+        referralLink: `${process.env.CLIENT_URL || 'http://localhost:5173'}/register?ref=${referral.referralCode}`,
+        totalReferrals: referral.referredUsers.length,
+        availableReferrals: availableReferrals.length,
+        availableBalance: referral.availableBalance,
+        totalEarnings: referral.totalEarnings,
+        totalWithdrawn: referral.totalWithdrawn,
+        canWithdraw: referral.canWithdraw(),
+        withdrawalThreshold: WITHDRAWAL_THRESHOLD,
+        earningsPerReferral: EARNINGS_PER_REFERRAL,
+        paymentMethod: referral.paymentMethod,
+        referredUsers: referral.referredUsers.map(r => ({
+          name: r.userId?.name || 'Anonymous',
+          registeredAt: r.registeredAt,
+          withdrawn: !!r.includeInWithdrawal,
+        })),
+        withdrawalHistory: referral.withdrawalRequests.map(w => ({
+          id: w.requestId,
+          amount: w.amount,
+          referralCount: w.referralCount,
+          status: w.status,
+          requestedAt: w.requestedAt,
+          processedAt: w.processedAt,
+          rejectionReason: w.rejectionReason,
+        })),
+        flagged: referral.suspiciousActivity?.flagged || false,
+        flagReasons: referral.suspiciousActivity?.reasons || [],
+      },
+    });
+  } catch (error) {
+    logger.error('Get referral stats error:', error);
+    res.status(500).json({
+      error: true,
+      message: 'Failed to get referral statistics',
+      details: error.message,
+    });
+  }
+};
+
+/**
+ * Request withdrawal
+ */
+const requestWithdrawal = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    const referral = await Referral.findOne({ userId });
+    
+    if (!referral) {
+      return res.status(404).json({
+        error: true,
+        message: 'Referral program not found',
+      });
+    }
+
+    // Check if account is flagged
+    if (referral.suspiciousActivity?.flagged) {
+      return res.status(403).json({
+        error: true,
+        message: 'Your account is flagged for suspicious activity. Withdrawals are not allowed.',
+      });
+    }
+
+    // Check if payment method is set
+    if (!referral.paymentMethod || !referral.paymentMethod.type) {
+      return res.status(400).json({
+        error: true,
+        message: 'Please set up your payment method before requesting withdrawal',
+      });
+    }
+
+    // Check minimum threshold
+    if (!referral.canWithdraw()) {
+      const availableReferrals = referral.getAvailableReferrals();
+      return res.status(400).json({
+        error: true,
+        message: `Minimum ${WITHDRAWAL_THRESHOLD} referrals required for withdrawal. You have ${availableReferrals.length} available referrals.`,
+        required: WITHDRAWAL_THRESHOLD,
+        current: availableReferrals.length,
+      });
+    }
+
+    // Check for pending withdrawal
+    const hasPendingWithdrawal = referral.withdrawalRequests.some(
+      w => w.status === 'pending'
+    );
+
+    if (hasPendingWithdrawal) {
+      return res.status(400).json({
+        error: true,
+        message: 'You already have a pending withdrawal request. Please wait for it to be processed.',
+      });
+    }
+
+    // Get available referrals for this withdrawal
+    const availableReferrals = referral.getAvailableReferrals();
+    const withdrawalCount = Math.floor(availableReferrals.length / WITHDRAWAL_THRESHOLD) * WITHDRAWAL_THRESHOLD;
+    const withdrawalAmount = withdrawalCount * EARNINGS_PER_REFERRAL;
+
+    // Create withdrawal request
+    const withdrawalRequest = {
+      amount: withdrawalAmount,
+      referralCount: withdrawalCount,
+      status: 'pending',
+      requestedAt: new Date(),
+      paymentMethodSnapshot: {
+        type: referral.paymentMethod.type,
+        details: referral.paymentMethod.details,
+      },
+    };
+
+    referral.withdrawalRequests.push(withdrawalRequest);
+
+    // Mark referrals as included in withdrawal (using the withdrawal request ID)
+    const newWithdrawalId = referral.withdrawalRequests[referral.withdrawalRequests.length - 1].requestId;
+    
+    for (let i = 0; i < withdrawalCount; i++) {
+      availableReferrals[i].includeInWithdrawal = newWithdrawalId;
+    }
+
+    // Update balance
+    referral.calculateAvailableBalance();
+
+    await referral.save();
+
+    logger.info(`Withdrawal requested by user ${userId}: ${withdrawalAmount} Birr for ${withdrawalCount} referrals`);
+
+    res.status(200).json({
+      error: false,
+      message: 'Withdrawal request submitted successfully. You will be notified when it is processed.',
+      withdrawal: {
+        amount: withdrawalAmount,
+        referralCount: withdrawalCount,
+        status: 'pending',
+        requestedAt: withdrawalRequest.requestedAt,
+      },
+    });
+  } catch (error) {
+    logger.error('Request withdrawal error:', error);
+    res.status(500).json({
+      error: true,
+      message: 'Failed to request withdrawal',
+      details: error.message,
+    });
+  }
+};
+
+/**
+ * Track referral (called during registration)
+ */
+const trackReferral = async (referralCode, newUserId, registrationData) => {
+  try {
+    const referral = await Referral.findOne({ referralCode });
+    
+    if (!referral) {
+      logger.warn(`Invalid referral code used: ${referralCode}`);
+      return;
+    }
+
+    // Fraud detection
+    const fraudCheck = await detectFraud(referralCode, registrationData);
+
+    // Add referred user
+    referral.referredUsers.push({
+      userId: newUserId,
+      ipAddress: registrationData.ipAddress,
+      deviceFingerprint: registrationData.deviceFingerprint,
+      registeredAt: new Date(),
+    });
+
+    // Update balance
+    referral.calculateAvailableBalance();
+
+    // Flag if suspicious
+    if (fraudCheck.suspicious) {
+      referral.suspiciousActivity = {
+        flagged: true,
+        reasons: fraudCheck.reasons,
+        flaggedAt: new Date(),
+      };
+      
+      logger.warn(`Suspicious referral activity detected for code ${referralCode}:`, fraudCheck.reasons);
+    }
+
+    await referral.save();
+    
+    logger.info(`Referral tracked: ${referralCode} -> User ${newUserId}`);
+  } catch (error) {
+    logger.error('Track referral error:', error);
+  }
+};
+
+/**
+ * Admin: Get all withdrawal requests
+ */
+const getAllWithdrawals = async (req, res) => {
+  try {
+    const { status } = req.query;
+
+    const query = {};
+    if (status) {
+      query['withdrawalRequests.status'] = status;
+    }
+
+    const referrals = await Referral.find(query)
+      .populate('userId', 'name email phone')
+      .select('userId withdrawalRequests paymentMethod');
+
+    // Flatten withdrawal requests
+    const withdrawals = [];
+    referrals.forEach(referral => {
+      referral.withdrawalRequests.forEach(withdrawal => {
+        if (!status || withdrawal.status === status) {
+          withdrawals.push({
+            withdrawalId: withdrawal.requestId,
+            referralId: referral._id,
+            user: referral.userId,
+            amount: withdrawal.amount,
+            referralCount: withdrawal.referralCount,
+            status: withdrawal.status,
+            requestedAt: withdrawal.requestedAt,
+            processedAt: withdrawal.processedAt,
+            paymentMethod: withdrawal.paymentMethodSnapshot,
+            rejectionReason: withdrawal.rejectionReason,
+          });
+        }
+      });
+    });
+
+    // Sort by requested date (newest first)
+    withdrawals.sort((a, b) => new Date(b.requestedAt) - new Date(a.requestedAt));
+
+    res.status(200).json({
+      error: false,
+      withdrawals,
+    });
+  } catch (error) {
+    logger.error('Get all withdrawals error:', error);
+    res.status(500).json({
+      error: true,
+      message: 'Failed to get withdrawals',
+      details: error.message,
+    });
+  }
+};
+
+/**
+ * Admin: Process withdrawal (approve/reject)
+ */
+const processWithdrawal = async (req, res) => {
+  try {
+    const { referralId, withdrawalId } = req.params;
+    const { action, paymentProof, rejectionReason } = req.body;
+    const adminId = req.userId;
+
+    if (!['approve', 'reject', 'paid'].includes(action)) {
+      return res.status(400).json({
+        error: true,
+        message: 'Invalid action. Use: approve, reject, or paid',
+      });
+    }
+
+    const referral = await Referral.findById(referralId);
+    
+    if (!referral) {
+      return res.status(404).json({
+        error: true,
+        message: 'Referral not found',
+      });
+    }
+
+    const withdrawal = referral.withdrawalRequests.id(withdrawalId);
+    
+    if (!withdrawal) {
+      return res.status(404).json({
+        error: true,
+        message: 'Withdrawal request not found',
+      });
+    }
+
+    if (withdrawal.status !== 'pending' && action !== 'paid') {
+      return res.status(400).json({
+        error: true,
+        message: 'Can only process pending withdrawals',
+      });
+    }
+
+    // Update withdrawal status
+    if (action === 'approve') {
+      withdrawal.status = 'approved';
+      withdrawal.processedAt = new Date();
+      withdrawal.processedBy = adminId;
+    } else if (action === 'paid') {
+      withdrawal.status = 'paid';
+      withdrawal.processedAt = new Date();
+      withdrawal.processedBy = adminId;
+      withdrawal.paymentProof = paymentProof;
+      
+      // Update totals
+      referral.totalEarnings += withdrawal.amount;
+      referral.totalWithdrawn += withdrawal.amount;
+    } else if (action === 'reject') {
+      withdrawal.status = 'rejected';
+      withdrawal.processedAt = new Date();
+      withdrawal.processedBy = adminId;
+      withdrawal.rejectionReason = rejectionReason;
+      
+      // Release referrals back to available pool
+      referral.referredUsers.forEach(r => {
+        if (r.includeInWithdrawal && r.includeInWithdrawal.toString() === withdrawalId) {
+          r.includeInWithdrawal = null;
+        }
+      });
+    }
+
+    // Recalculate balance
+    referral.calculateAvailableBalance();
+
+    await referral.save();
+
+    logger.info(`Withdrawal ${action}d: ${withdrawalId} by admin ${adminId}`);
+
+    res.status(200).json({
+      error: false,
+      message: `Withdrawal ${action}d successfully`,
+      withdrawal,
+    });
+  } catch (error) {
+    logger.error('Process withdrawal error:', error);
+    res.status(500).json({
+      error: true,
+      message: 'Failed to process withdrawal',
+      details: error.message,
+    });
+  }
+};
+
+module.exports = {
+  createReferralProgram,
+  updatePaymentMethod,
+  getReferralStats,
+  requestWithdrawal,
+  trackReferral,
+  getAllWithdrawals,
+  processWithdrawal,
+};
+

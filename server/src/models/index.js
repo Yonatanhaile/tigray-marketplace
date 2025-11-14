@@ -9,6 +9,7 @@ const Dispute = require('./Dispute');
 const Invoice = require('./Invoice');
 const Message = require('./Message');
 const OTP = require('./OTP');
+const Referral = require('./Referral');
 
 module.exports = {
   User,
@@ -18,5 +19,6 @@ module.exports = {
   Invoice,
   Message,
   OTP,
+  Referral,
 };
 

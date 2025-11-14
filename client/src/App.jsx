@@ -19,6 +19,7 @@ import Profile from './pages/Profile';
 import AdminPanel from './pages/AdminPanel';
 import Search from './pages/Search';
 import NotFound from './pages/NotFound';
+import ReferralDashboard from './pages/ReferralDashboard';
 
 // Protected route wrapper
 const ProtectedRoute = ({ children, requireAdmin = false, requireSeller = false }) => {
@@ -120,6 +121,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="referral-dashboard"
+          element={
+            <ProtectedRoute>
+              <ReferralDashboard />
             </ProtectedRoute>
           }
         />

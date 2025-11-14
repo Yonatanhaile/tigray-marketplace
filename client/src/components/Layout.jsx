@@ -216,6 +216,11 @@ const Layout = () => {
               <Link to="/search" className="text-[color:var(--color-text)] transition-colors hover:text-[color:var(--color-primary)]">
                 {t('nav.browse')}
               </Link>
+              {isAuthenticated && (
+                <Link to="/referral-dashboard" className="text-[color:var(--color-text)] transition-colors hover:text-[color:var(--color-primary)]">
+                  💰 {t('nav.makeMoney')}
+                </Link>
+              )}
               {isSeller && (
                 <Link to="/seller-dashboard" className="text-[color:var(--color-text)] transition-colors hover:text-[color:var(--color-primary)]">
                   {t('nav.myListings')}
@@ -404,6 +409,13 @@ const Layout = () => {
               )}
               {isAuthenticated && (
                 <>
+                  <Link
+                    to="/referral-dashboard"
+                    className="block rounded-lg px-3 py-2 text-sm font-semibold text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-primary-soft)] hover:text-[color:var(--color-primary)]"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    💰 {t('nav.makeMoney')}
+                  </Link>
                   <Link
                     to="/orders"
                     className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-primary-soft)] hover:text-[color:var(--color-primary)]"

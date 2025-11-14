@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
@@ -8,6 +8,8 @@ const Register = () => {
   const navigate = useNavigate();
   const { register: registerUser } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [searchParams] = useSearchParams();
+  const referralCode = searchParams.get('ref');
 
   const {
     register,
@@ -15,6 +17,15 @@ const Register = () => {
     watch,
     formState: { errors },
   } = useForm();
+
+  // Show toast if user came from referral link
+  useEffect(() => {
+    if (referralCode) {
+      toast.success(`🎉 Registering with referral code: ${referralCode}`, {
+        duration: 4000,
+      });
+    }
+  }, [referralCode]);
 
   const password = watch('password');
 
@@ -43,6 +54,11 @@ const Register = () => {
       
       // Normalize phone number to international format
       registerData.phone = normalizePhoneNumber(registerData.phone);
+      
+      // Add referral code if present
+      if (referralCode) {
+        registerData.referralCode = referralCode;
+      }
       
       // All users are both buyers and sellers by default
       await registerUser(registerData);

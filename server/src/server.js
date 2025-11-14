@@ -32,6 +32,7 @@ const messageRoutes = require('./routes/messages');
 const uploadRoutes = require('./routes/uploads');
 const disputeRoutes = require('./routes/disputes');
 const adminRoutes = require('./routes/admin');
+const referralRoutes = require('./routes/referrals');
 
 // Import socket handlers
 const { initializeSocketHandlers } = require('./sockets');
@@ -120,6 +121,7 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/uploads', uploadRoutes);
 app.use('/api/disputes', disputeRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/referrals', referralRoutes);
 
 // 404 handler
 app.use((req, res) => {

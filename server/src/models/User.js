@@ -63,6 +63,19 @@ const userSchema = new mongoose.Schema({
     default: true,
   },
   lastLogin: Date,
+  referredBy: {
+    type: String, // Referral code of the person who referred this user
+    index: true,
+  },
+  registrationMetadata: {
+    ipAddress: String,
+    deviceFingerprint: String,
+    userAgent: String,
+    registeredAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
   createdAt: {
     type: Date,
     default: Date.now,
