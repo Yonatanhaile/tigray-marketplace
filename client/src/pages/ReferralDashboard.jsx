@@ -22,15 +22,30 @@ const ReferralDashboard = () => {
   const fetchReferralData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/referrals/stats`, {
+      
+      // First, ensure referral program exists (creates if doesn't exist)
+      const programResponse = await fetch(`${API_URL}/api/referrals/program`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
 
-      if (!response.ok) throw new Error('Failed to fetch');
+      if (!programResponse.ok) {
+        throw new Error('Failed to create/fetch referral program');
+      }
 
-      const data = await response.json();
+      // Then fetch detailed stats
+      const statsResponse = await fetch(`${API_URL}/api/referrals/stats`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!statsResponse.ok) {
+        throw new Error('Failed to fetch referral stats');
+      }
+
+      const data = await statsResponse.json();
       setReferralData(data.stats);
       
       if (data.stats.paymentMethod) {
@@ -39,7 +54,8 @@ const ReferralDashboard = () => {
       }
     } catch (error) {
       console.error('Error fetching referral data:', error);
-      toast.error(t('referral.fetchError'));
+      console.error('Error details:', error.message);
+      toast.error(error.message || t('referral.fetchError'));
     } finally {
       setLoading(false);
     }
