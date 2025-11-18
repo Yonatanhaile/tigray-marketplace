@@ -24,6 +24,13 @@ const AdminPanel = () => {
     enabled: activeTab === 'kyc',
   });
 
+  // All users for user management tab
+  const { data: allUsers, isLoading: loadingAllUsers } = useQuery({
+    queryKey: ['admin', 'all-users'],
+    queryFn: () => adminAPI.getAllUsers({}),
+    enabled: activeTab === 'users',
+  });
+
   const { data: disputes } = useQuery({
     queryKey: ['admin', 'disputes'],
     queryFn: () => adminAPI.getAllDisputes({ status: 'open' }),
@@ -144,6 +151,38 @@ const AdminPanel = () => {
     }
   });
 
+  // Delete user mutation
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId) => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to delete user');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['admin', 'all-users']);
+      queryClient.invalidateQueries(['admin', 'stats']);
+      toast.success('User deleted successfully');
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to delete user');
+    },
+  });
+
+  const handleDeleteUser = (user) => {
+    if (window.confirm(`Are you sure you want to permanently delete user "${user.name}"? This action cannot be undone!`)) {
+      deleteUserMutation.mutate(user._id);
+    }
+  };
+
   // Real-time updates for admin panel
   useEffect(() => {
     const handleListingCreated = (data) => {
@@ -191,7 +230,7 @@ const AdminPanel = () => {
 
       {/* Tabs */}
       <div className="flex flex-wrap sm:space-x-2 md:space-x-4 mb-4 sm:mb-6 border-b overflow-x-auto">
-        {['stats', 'kyc', 'disputes', 'moderation', 'referrals'].map(tab => (
+        {['stats', 'users', 'kyc', 'disputes', 'moderation', 'referrals'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -290,6 +329,76 @@ const AdminPanel = () => {
             </div>
           )}
         </>
+      )}
+
+      {/* Users Tab - User Management */}
+      {activeTab === 'users' && (
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-semibold">User Management</h2>
+            <p className="text-sm text-gray-600">Total Users: {allUsers?.users?.length || 0}</p>
+          </div>
+
+          {loadingAllUsers ? (
+            <div className="text-center py-8">Loading users...</div>
+          ) : (
+            <div className="space-y-3">
+              {allUsers?.users?.map(user => (
+                <div key={user._id} className="card p-4 hover:shadow-md transition-shadow">
+                  <div className="flex flex-col sm:flex-row justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="font-semibold text-base">{user.name}</h3>
+                        {user.roles?.includes('admin') && (
+                          <span className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded-full font-medium">
+                            Admin
+                          </span>
+                        )}
+                        {!user.isActive && (
+                          <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-full font-medium">
+                            Suspended
+                          </span>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-sm text-gray-600">
+                        <p>📧 {user.email}</p>
+                        <p>📱 {user.phone}</p>
+                        <p>🆔 ID: {user._id.slice(-8)}</p>
+                        <p>📅 Joined: {new Date(user.createdAt).toLocaleDateString()}</p>
+                        {user.registrationMetadata?.ipAddress && (
+                          <p>🌐 IP: {user.registrationMetadata.ipAddress}</p>
+                        )}
+                        <p>✅ KYC: {user.kyc?.status || 'pending'}</p>
+                      </div>
+                      {user.referredBy && (
+                        <p className="text-xs text-purple-600 mt-1">
+                          🎁 Referred by: {user.referredBy}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex sm:flex-col gap-2">
+                      <button
+                        onClick={() => handleDeleteUser(user)}
+                        disabled={deleteUserMutation.isLoading || user.roles?.includes('admin')}
+                        className={`btn btn-sm px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                          user.roles?.includes('admin')
+                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                            : 'bg-red-500 hover:bg-red-600 text-white'
+                        }`}
+                        title={user.roles?.includes('admin') ? 'Cannot delete admin users' : 'Delete user permanently'}
+                      >
+                        🗑️ Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {allUsers?.users?.length === 0 && (
+                <p className="text-center text-gray-500 py-8">No users found</p>
+              )}
+            </div>
+          )}
+        </div>
       )}
 
       {/* KYC Tab */}

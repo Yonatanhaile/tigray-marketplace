@@ -8,6 +8,7 @@ const {
   getAllUsers,
   getStats,
   toggleUserStatus,
+  deleteUser,
 } = require('../controllers/adminController');
 const { getPendingListings, approveListing, rejectListing } = require('../controllers/adminController');
 const { authenticateJWT } = require('../middleware/auth');
@@ -33,6 +34,7 @@ router.patch('/disputes/:id', mongoIdValidation, updateDispute);
 // Users
 router.get('/users', paginationValidation, getAllUsers);
 router.patch('/users/:userId/status', toggleUserStatus);
+router.delete('/users/:userId', mongoIdValidation, deleteUser);
 
 // KYC
 router.patch('/kyc/:userId', updateKYC);

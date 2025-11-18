@@ -445,6 +445,57 @@ const toggleUserStatus = async (req, res) => {
   }
 };
 
+/**
+ * Delete user permanently (admin only)
+ */
+const deleteUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const adminId = req.userId;
+
+    // Prevent admin from deleting themselves
+    if (userId === adminId) {
+      return res.status(403).json({
+        error: true,
+        message: 'You cannot delete your own account',
+      });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        error: true,
+        message: 'User not found',
+      });
+    }
+
+    // Store user info for logging before deletion
+    const userEmail = user.email;
+    const userName = user.name;
+
+    // Delete the user
+    await User.findByIdAndDelete(userId);
+
+    logger.warn(`🗑️ USER DELETED by admin ${adminId}`);
+    logger.warn(`   Deleted User ID: ${userId}`);
+    logger.warn(`   Deleted User Name: ${userName}`);
+    logger.warn(`   Deleted User Email: ${userEmail}`);
+
+    res.status(200).json({
+      error: false,
+      message: `User ${userName} has been permanently deleted`,
+    });
+  } catch (error) {
+    logger.error('Delete user error:', error);
+    res.status(500).json({
+      error: true,
+      message: 'Failed to delete user',
+      details: error.message,
+    });
+  }
+};
+
 module.exports = {
   getAllOrders,
   getAllDisputes,
@@ -453,6 +504,7 @@ module.exports = {
   getAllUsers,
   getStats,
   toggleUserStatus,
+  deleteUser,
   getPendingListings,
   approveListing,
   rejectListing,
