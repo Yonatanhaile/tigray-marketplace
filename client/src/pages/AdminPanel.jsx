@@ -53,7 +53,8 @@ const AdminPanel = () => {
       if (!response.ok) throw new Error('Failed to fetch withdrawal requests');
       return response.json();
     },
-    enabled: activeTab === 'referrals',
+    enabled: activeTab === 'referrals' || activeTab === 'stats', // Fetch on both tabs
+    refetchInterval: 30000, // Auto-refresh every 30 seconds for new withdrawal notifications
   });
 
   const kycMutation = useMutation({
@@ -193,33 +194,68 @@ const AdminPanel = () => {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-3 sm:px-4 py-2 font-medium text-xs sm:text-sm md:text-base whitespace-nowrap ${activeTab === tab ? 'border-b-2 border-primary-600 text-primary-600' : 'text-gray-600'}`}
+            className={`px-3 sm:px-4 py-2 font-medium text-xs sm:text-sm md:text-base whitespace-nowrap relative ${activeTab === tab ? 'border-b-2 border-primary-600 text-primary-600' : 'text-gray-600'}`}
           >
             {tab.toUpperCase()}
+            {/* Notification Badge for Pending Withdrawals */}
+            {tab === 'referrals' && withdrawalRequests?.withdrawals?.filter(w => w.withdrawal.status === 'pending').length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                {withdrawalRequests.withdrawals.filter(w => w.withdrawal.status === 'pending').length}
+              </span>
+            )}
           </button>
         ))}
       </div>
 
       {/* Stats Tab */}
       {activeTab === 'stats' && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-          <div className="card p-3 sm:p-4">
-            <h3 className="text-xs sm:text-sm text-gray-500 mb-1 sm:mb-0">Total Users</h3>
-            <p className="text-xl sm:text-2xl md:text-3xl font-bold">{stats?.stats?.users?.total || 0}</p>
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+            <div className="card p-3 sm:p-4">
+              <h3 className="text-xs sm:text-sm text-gray-500 mb-1 sm:mb-0">Total Users</h3>
+              <p className="text-xl sm:text-2xl md:text-3xl font-bold">{stats?.stats?.users?.total || 0}</p>
+            </div>
+            <div className="card p-3 sm:p-4">
+              <h3 className="text-xs sm:text-sm text-gray-500 mb-1 sm:mb-0">Active Listings</h3>
+              <p className="text-xl sm:text-2xl md:text-3xl font-bold">{stats?.stats?.listings?.active || 0}</p>
+            </div>
+            <div className="card p-3 sm:p-4">
+              <h3 className="text-xs sm:text-sm text-gray-500 mb-1 sm:mb-0">Total Orders</h3>
+              <p className="text-xl sm:text-2xl md:text-3xl font-bold">{stats?.stats?.orders?.total || 0}</p>
+            </div>
+            <div className="card p-3 sm:p-4">
+              <h3 className="text-xs sm:text-sm text-gray-500 mb-1 sm:mb-0">Open Disputes</h3>
+              <p className="text-xl sm:text-2xl md:text-3xl font-bold">{stats?.stats?.disputes?.open || 0}</p>
+            </div>
           </div>
-          <div className="card p-3 sm:p-4">
-            <h3 className="text-xs sm:text-sm text-gray-500 mb-1 sm:mb-0">Active Listings</h3>
-            <p className="text-xl sm:text-2xl md:text-3xl font-bold">{stats?.stats?.listings?.active || 0}</p>
-          </div>
-          <div className="card p-3 sm:p-4">
-            <h3 className="text-xs sm:text-sm text-gray-500 mb-1 sm:mb-0">Total Orders</h3>
-            <p className="text-xl sm:text-2xl md:text-3xl font-bold">{stats?.stats?.orders?.total || 0}</p>
-          </div>
-          <div className="card p-3 sm:p-4">
-            <h3 className="text-xs sm:text-sm text-gray-500 mb-1 sm:mb-0">Open Disputes</h3>
-            <p className="text-xl sm:text-2xl md:text-3xl font-bold">{stats?.stats?.disputes?.open || 0}</p>
-          </div>
-        </div>
+
+          {/* Pending Withdrawals Alert */}
+          {withdrawalRequests?.withdrawals?.filter(w => w.withdrawal.status === 'pending').length > 0 && (
+            <div className="mt-6 bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg shadow-md">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <svg className="h-6 w-6 text-orange-500 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-sm font-semibold text-orange-900">
+                    Pending Withdrawal Requests
+                  </h3>
+                  <p className="text-sm text-orange-800 mt-1">
+                    You have <span className="font-bold">{withdrawalRequests.withdrawals.filter(w => w.withdrawal.status === 'pending').length}</span> pending withdrawal request(s) waiting for your review.
+                  </p>
+                  <button
+                    onClick={() => setActiveTab('referrals')}
+                    className="mt-3 text-sm font-medium text-orange-700 hover:text-orange-900 underline"
+                  >
+                    View Withdrawals →
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* KYC Tab */}
@@ -296,6 +332,29 @@ const AdminPanel = () => {
       {/* Referrals Tab */}
       {activeTab === 'referrals' && (
         <div className="space-y-6">
+          {/* Pending Withdrawals Alert */}
+          {withdrawalRequests?.withdrawals?.filter(w => w.withdrawal.status === 'pending').length > 0 && (
+            <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border-2 border-orange-400 rounded-lg p-5 shadow-lg">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex-shrink-0">
+                  <div className="h-12 w-12 rounded-full bg-orange-500 flex items-center justify-center animate-pulse">
+                    <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-orange-900">
+                    💰 Action Required: Pending Withdrawal Requests
+                  </h3>
+                  <p className="text-sm text-orange-800 mt-1">
+                    <span className="font-bold text-lg">{withdrawalRequests.withdrawals.filter(w => w.withdrawal.status === 'pending').length}</span> user(s) waiting for withdrawal approval. Review and process payments below.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Summary Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             <div className="bg-white rounded-lg border border-gray-200 p-4">
