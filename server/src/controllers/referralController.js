@@ -1,6 +1,7 @@
 const { Referral, User } = require('../models');
 const crypto = require('crypto');
 const logger = require('../services/logger');
+const geoip = require('geoip-lite');
 
 // Constants
 const WITHDRAWAL_THRESHOLD = 25; // Minimum referrals for withdrawal
@@ -30,6 +31,41 @@ const detectFraud = async (referralCode, registrationData) => {
   
   logger.info(`Running fraud detection for referral ${referralCode}`);
   logger.info(`Checking IP: ${ipAddress}, Device: ${deviceFingerprint}`);
+  
+  // Check 0: IP Location - Only allow Ethiopian IPs for referrals
+  let geo = null;
+  let isEthiopianIP = false;
+  
+  // Skip geolocation check for local/private IPs (development)
+  if (!ipAddress.includes('127.0.0.1') && 
+      !ipAddress.includes('localhost') && 
+      !ipAddress.includes('::1') &&
+      !ipAddress.startsWith('192.168.') &&
+      !ipAddress.startsWith('10.') &&
+      !ipAddress.startsWith('172.')) {
+    
+    geo = geoip.lookup(ipAddress);
+    
+    if (geo) {
+      logger.info(`IP geolocation: ${geo.country} - ${geo.region} - ${geo.city}`);
+      isEthiopianIP = geo.country === 'ET'; // Ethiopia country code
+      
+      if (!isEthiopianIP) {
+        reasons.push(`Referrals only allowed from Ethiopia. IP location: ${geo.country} (${geo.city || 'Unknown city'})`);
+        logger.error(`🚨 NON-ETHIOPIAN IP BLOCKED: ${ipAddress} from ${geo.country}`);
+      } else {
+        logger.info(`✅ Ethiopian IP confirmed: ${ipAddress} from ${geo.region}, ${geo.city}`);
+      }
+    } else {
+      // IP lookup failed - could be proxy/VPN
+      warnings.push('IP geolocation lookup failed - possible VPN or proxy detected');
+      logger.warn(`⚠️ Geolocation lookup failed for IP: ${ipAddress}`);
+    }
+  } else {
+    // Local IP - allow in development mode
+    logger.info(`Local/Private IP detected (development mode): ${ipAddress}`);
+    isEthiopianIP = true; // Allow local IPs for testing
+  }
   
   // Check 1: Multiple registrations from same IP
   const ipCount = referral.referredUsers.filter(r => 
@@ -394,7 +430,36 @@ const trackReferral = async (referralCode, newUserId, registrationData) => {
     // Fraud detection
     const fraudCheck = await detectFraud(referralCode, registrationData);
 
-    // Add referred user with metadata
+    // Check if this is a non-Ethiopian IP (critical fraud - reject completely)
+    const hasLocationViolation = fraudCheck.reasons.some(reason => 
+      reason.includes('Referrals only allowed from Ethiopia')
+    );
+
+    if (hasLocationViolation) {
+      // DO NOT ADD the referral - completely reject
+      logger.error(`🚫 REFERRAL REJECTED - Non-Ethiopian IP: ${registrationData.ipAddress}`);
+      logger.error(`   User ${newUserId} attempted to use referral code ${referralCode} from outside Ethiopia`);
+      
+      // Flag the referrer's account for attempting to get referrals from outside Ethiopia
+      if (referral.suspiciousActivity && referral.suspiciousActivity.flagged) {
+        referral.suspiciousActivity.reasons = [
+          ...new Set([...referral.suspiciousActivity.reasons, ...fraudCheck.reasons])
+        ];
+      } else {
+        referral.suspiciousActivity = {
+          flagged: true,
+          reasons: fraudCheck.reasons,
+          flaggedAt: new Date(),
+        };
+      }
+      
+      await referral.save();
+      
+      logger.error(`⚠️ ADMIN ALERT: Referral account ${referral.userId} received registration from outside Ethiopia and has been flagged`);
+      return; // Exit without adding the referral
+    }
+
+    // Add referred user with metadata (only if passed location check)
     referral.referredUsers.push({
       userId: newUserId,
       ipAddress: registrationData.ipAddress,
@@ -405,7 +470,7 @@ const trackReferral = async (referralCode, newUserId, registrationData) => {
     // Update balance
     referral.calculateAvailableBalance();
 
-    // Flag if suspicious
+    // Flag if suspicious (for other fraud types)
     if (fraudCheck.suspicious) {
       // Update or create suspicious activity record
       if (referral.suspiciousActivity && referral.suspiciousActivity.flagged) {
