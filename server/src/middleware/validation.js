@@ -181,6 +181,16 @@ const mongoIdValidation = [
 ];
 
 /**
+ * Validation for MongoDB ObjectId userId params
+ */
+const userIdValidation = [
+  param('userId')
+    .isMongoId()
+    .withMessage('Invalid user ID format'),
+  validate,
+];
+
+/**
  * Validation for pagination queries
  */
 const paginationValidation = [
@@ -205,6 +215,7 @@ module.exports = {
   createOrderValidation,
   createDisputeValidation,
   mongoIdValidation,
+  userIdValidation,
   paginationValidation,
 };
 

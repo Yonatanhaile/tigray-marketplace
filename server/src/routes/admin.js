@@ -15,6 +15,7 @@ const { authenticateJWT } = require('../middleware/auth');
 const { requireAdmin } = require('../middleware/rbac');
 const {
   mongoIdValidation,
+  userIdValidation,
   paginationValidation,
 } = require('../middleware/validation');
 
@@ -33,11 +34,11 @@ router.patch('/disputes/:id', mongoIdValidation, updateDispute);
 
 // Users
 router.get('/users', paginationValidation, getAllUsers);
-router.patch('/users/:userId/status', toggleUserStatus);
-router.delete('/users/:userId', mongoIdValidation, deleteUser);
+router.patch('/users/:userId/status', userIdValidation, toggleUserStatus);
+router.delete('/users/:userId', userIdValidation, deleteUser);
 
 // KYC
-router.patch('/kyc/:userId', updateKYC);
+router.patch('/kyc/:userId', userIdValidation, updateKYC);
 
 // Listings moderation
 router.get('/listings/pending', paginationValidation, getPendingListings);
