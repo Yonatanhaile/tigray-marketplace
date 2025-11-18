@@ -7,6 +7,8 @@ const {
   requestWithdrawal,
   getAllWithdrawals,
   processWithdrawal,
+  getAllReferralPrograms,
+  updateReferralFlag,
 } = require('../controllers/referralController');
 const { authenticateJWT } = require('../middleware/auth');
 const { requireAdmin } = require('../middleware/rbac');
@@ -20,8 +22,10 @@ router.get('/stats', getReferralStats);
 router.post('/withdraw', requestWithdrawal);
 
 // Admin routes
+router.get('/admin/programs', requireAdmin, getAllReferralPrograms);
 router.get('/admin/withdrawals', requireAdmin, getAllWithdrawals);
 router.patch('/admin/withdrawals/:referralId/:withdrawalId', requireAdmin, processWithdrawal);
+router.patch('/admin/programs/:referralId/flag', requireAdmin, updateReferralFlag);
 
 module.exports = router;
 

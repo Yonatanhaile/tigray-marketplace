@@ -8,7 +8,10 @@ import BackButton from '../components/BackButton';
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('stats');
+  const [selectedReferral, setSelectedReferral] = useState(null);
   const queryClient = useQueryClient();
+
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   const { data: stats } = useQuery({
     queryKey: ['admin', 'stats'],
@@ -27,6 +30,32 @@ const AdminPanel = () => {
     enabled: activeTab === 'disputes',
   });
 
+  const { data: referralPrograms, isLoading: loadingReferrals } = useQuery({
+    queryKey: ['admin', 'referrals'],
+    queryFn: async () => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/referrals/admin/programs`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error('Failed to fetch referral programs');
+      return response.json();
+    },
+    enabled: activeTab === 'referrals',
+  });
+
+  const { data: withdrawalRequests, isLoading: loadingWithdrawals } = useQuery({
+    queryKey: ['admin', 'withdrawals'],
+    queryFn: async () => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/referrals/admin/withdrawals`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error('Failed to fetch withdrawal requests');
+      return response.json();
+    },
+    enabled: activeTab === 'referrals',
+  });
+
   const kycMutation = useMutation({
     mutationFn: ({ userId, status }) => adminAPI.updateKYC(userId, { status }),
     onSuccess: () => {
@@ -40,6 +69,47 @@ const AdminPanel = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(['admin', 'disputes']);
       toast.success('Dispute updated');
+    },
+  });
+
+  const processWithdrawalMutation = useMutation({
+    mutationFn: async ({ referralId, withdrawalId, status, rejectionReason }) => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/referrals/admin/withdrawals/${referralId}/${withdrawalId}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status, rejectionReason }),
+      });
+      if (!response.ok) throw new Error('Failed to process withdrawal');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['admin', 'withdrawals']);
+      queryClient.invalidateQueries(['admin', 'referrals']);
+      toast.success('Withdrawal processed');
+    },
+  });
+
+  const toggleFlagMutation = useMutation({
+    mutationFn: async ({ referralId, flagged, reasons }) => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/referrals/admin/programs/${referralId}/flag`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ flagged, reasons }),
+      });
+      if (!response.ok) throw new Error('Failed to update flag status');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['admin', 'referrals']);
+      toast.success('Flag status updated');
     },
   });
 
@@ -119,7 +189,7 @@ const AdminPanel = () => {
 
       {/* Tabs */}
       <div className="flex flex-wrap sm:space-x-2 md:space-x-4 mb-4 sm:mb-6 border-b overflow-x-auto">
-        {['stats', 'kyc', 'disputes', 'moderation'].map(tab => (
+        {['stats', 'kyc', 'disputes', 'moderation', 'referrals'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -220,6 +290,274 @@ const AdminPanel = () => {
             </div>
           ))}
           {pendingListings?.listings?.length === 0 && <p className="text-center text-gray-500 py-8 text-sm sm:text-base">No pending listings.</p>}
+        </div>
+      )}
+
+      {/* Referrals Tab */}
+      {activeTab === 'referrals' && (
+        <div className="space-y-6">
+          {/* Summary Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <p className="text-xs sm:text-sm text-gray-600">Total Programs</p>
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">
+                {referralPrograms?.programs?.length || 0}
+              </p>
+            </div>
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <p className="text-xs sm:text-sm text-gray-600">Flagged Accounts</p>
+              <p className="text-xl sm:text-2xl font-semibold text-red-600">
+                {referralPrograms?.programs?.filter(p => p.suspiciousActivity?.flagged).length || 0}
+              </p>
+            </div>
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <p className="text-xs sm:text-sm text-gray-600">Pending Withdrawals</p>
+              <p className="text-xl sm:text-2xl font-semibold text-orange-600">
+                {withdrawalRequests?.withdrawals?.filter(w => w.withdrawal.status === 'pending').length || 0}
+              </p>
+            </div>
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <p className="text-xs sm:text-sm text-gray-600">Total Withdrawn</p>
+              <p className="text-xl sm:text-2xl font-semibold text-green-600">
+                {referralPrograms?.programs?.reduce((sum, p) => sum + (p.totalWithdrawn || 0), 0) || 0} Birr
+              </p>
+            </div>
+          </div>
+
+          {loadingReferrals ? (
+            <div className="text-center py-8">Loading referral programs...</div>
+          ) : (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-gray-900">Referral Programs</h2>
+              
+              {referralPrograms?.programs?.map((program) => (
+                <div key={program._id} className="bg-white rounded-lg border border-gray-200 p-4 sm:p-5">
+                  {/* User Info Header */}
+                  <div className="flex flex-col sm:flex-row justify-between gap-3 mb-4 pb-4 border-b">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-base sm:text-lg text-gray-900">
+                        {program.userId?.name}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-gray-600">
+                        {program.userId?.email} · {program.userId?.phone}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Code: <span className="font-mono font-semibold">{program.referralCode}</span>
+                      </p>
+                    </div>
+                    
+                    {/* Flag Status */}
+                    {program.suspiciousActivity?.flagged && (
+                      <div className="flex items-start gap-2">
+                        <span className="text-xs px-3 py-1 bg-red-100 text-red-700 rounded-full font-medium">
+                          Flagged
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Stats Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                    <div>
+                      <p className="text-xs text-gray-600">Total Referrals</p>
+                      <p className="text-lg font-semibold text-gray-900">{program.totalReferrals}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-600">Available</p>
+                      <p className="text-lg font-semibold text-gray-900">{program.availableReferrals}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-600">Balance</p>
+                      <p className="text-lg font-semibold text-green-600">{program.availableBalance} Birr</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-600">Withdrawn</p>
+                      <p className="text-lg font-semibold text-gray-900">{program.totalWithdrawn} Birr</p>
+                    </div>
+                  </div>
+
+                  {/* Payment Method */}
+                  {program.paymentMethod && (
+                    <div className="bg-gray-50 rounded p-3 mb-4">
+                      <p className="text-xs font-medium text-gray-700 mb-1">Payment Method</p>
+                      <p className="text-sm text-gray-900">
+                        <span className="font-semibold capitalize">{program.paymentMethod.type}</span>: {program.paymentMethod.details}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Flagged Reasons */}
+                  {program.suspiciousActivity?.flagged && (
+                    <div className="bg-red-50 border border-red-200 rounded p-3 mb-4">
+                      <p className="text-xs font-semibold text-red-900 mb-2">Fraud Detection Reasons:</p>
+                      <ul className="text-xs text-red-800 space-y-1">
+                        {program.suspiciousActivity.reasons.map((reason, i) => (
+                          <li key={i}>• {reason}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Expandable Details */}
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => setSelectedReferral(selectedReferral === program._id ? null : program._id)}
+                      className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      {selectedReferral === program._id ? 'Hide Details' : 'Show Details'}
+                    </button>
+
+                    {selectedReferral === program._id && (
+                      <div className="space-y-4 pt-3 border-t">
+                        {/* Referred Users */}
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                            Referred Users ({program.referredUsers?.length || 0})
+                          </h4>
+                          <div className="space-y-2 max-h-60 overflow-y-auto">
+                            {program.referredUsers?.map((ref, i) => (
+                              <div key={i} className="bg-gray-50 rounded p-3 text-xs">
+                                <div className="flex justify-between items-start">
+                                  <div>
+                                    <p className="font-medium text-gray-900">{ref.userId?.name || 'User deleted'}</p>
+                                    <p className="text-gray-600">{ref.userId?.email}</p>
+                                    <p className="text-gray-500 mt-1">
+                                      Registered: {new Date(ref.registeredAt).toLocaleDateString()}
+                                    </p>
+                                  </div>
+                                  <span className={`px-2 py-1 rounded text-xs ${ref.withdrawn ? 'bg-gray-200 text-gray-700' : 'bg-green-100 text-green-700'}`}>
+                                    {ref.withdrawn ? 'Withdrawn' : 'Available'}
+                                  </span>
+                                </div>
+                                {ref.ipAddress && (
+                                  <p className="text-gray-500 mt-2">IP: {ref.ipAddress}</p>
+                                )}
+                              </div>
+                            ))}
+                            {program.referredUsers?.length === 0 && (
+                              <p className="text-gray-500 text-center py-4">No referrals yet</p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Withdrawal History */}
+                        {program.withdrawalRequests?.length > 0 && (
+                          <div>
+                            <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                              Withdrawal History ({program.withdrawalRequests.length})
+                            </h4>
+                            <div className="space-y-2 max-h-60 overflow-y-auto">
+                              {program.withdrawalRequests.map((wd) => (
+                                <div key={wd._id} className="bg-gray-50 rounded p-3 text-xs">
+                                  <div className="flex justify-between items-start">
+                                    <div>
+                                      <p className="font-medium text-gray-900">{wd.amount} Birr</p>
+                                      <p className="text-gray-600">
+                                        Requested: {new Date(wd.requestedAt).toLocaleDateString()}
+                                      </p>
+                                      {wd.rejectionReason && (
+                                        <p className="text-red-600 mt-1">Reason: {wd.rejectionReason}</p>
+                                      )}
+                                    </div>
+                                    <span className={`px-2 py-1 rounded text-xs ${
+                                      wd.status === 'paid' ? 'bg-green-100 text-green-700' :
+                                      wd.status === 'approved' ? 'bg-blue-100 text-blue-700' :
+                                      wd.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                                      'bg-yellow-100 text-yellow-700'
+                                    }`}>
+                                      {wd.status}
+                                    </span>
+                                  </div>
+                                  {wd.status === 'pending' && (
+                                    <div className="flex gap-2 mt-3">
+                                      <button
+                                        onClick={() => processWithdrawalMutation.mutate({
+                                          referralId: program._id,
+                                          withdrawalId: wd._id,
+                                          status: 'approved'
+                                        })}
+                                        className="btn btn-primary btn-sm text-xs flex-1"
+                                      >
+                                        Approve
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          const reason = prompt('Rejection reason:');
+                                          if (reason) {
+                                            processWithdrawalMutation.mutate({
+                                              referralId: program._id,
+                                              withdrawalId: wd._id,
+                                              status: 'rejected',
+                                              rejectionReason: reason
+                                            });
+                                          }
+                                        }}
+                                        className="btn btn-danger btn-sm text-xs flex-1"
+                                      >
+                                        Reject
+                                      </button>
+                                    </div>
+                                  )}
+                                  {wd.status === 'approved' && (
+                                    <button
+                                      onClick={() => processWithdrawalMutation.mutate({
+                                        referralId: program._id,
+                                        withdrawalId: wd._id,
+                                        status: 'paid'
+                                      })}
+                                      className="btn btn-primary btn-sm text-xs mt-3 w-full"
+                                    >
+                                      Mark as Paid
+                                    </button>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Admin Actions */}
+                  <div className="flex gap-2 mt-4 pt-4 border-t">
+                    {program.suspiciousActivity?.flagged ? (
+                      <button
+                        onClick={() => toggleFlagMutation.mutate({
+                          referralId: program._id,
+                          flagged: false,
+                          reasons: []
+                        })}
+                        className="btn btn-secondary btn-sm text-xs flex-1"
+                      >
+                        Unflag Account
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          const reason = prompt('Reason for flagging:');
+                          if (reason) {
+                            toggleFlagMutation.mutate({
+                              referralId: program._id,
+                              flagged: true,
+                              reasons: [reason]
+                            });
+                          }
+                        }}
+                        className="btn btn-danger btn-sm text-xs flex-1"
+                      >
+                        Flag Account
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {referralPrograms?.programs?.length === 0 && (
+                <p className="text-center text-gray-500 py-8">No referral programs yet</p>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -652,6 +652,111 @@ const processWithdrawal = async (req, res) => {
   }
 };
 
+/**
+ * Admin: Get all referral programs with detailed stats
+ */
+const getAllReferralPrograms = async (req, res) => {
+  try {
+    const { flagged, hasWithdrawals } = req.query;
+
+    const query = {};
+    if (flagged === 'true') {
+      query['suspiciousActivity.flagged'] = true;
+    }
+    if (hasWithdrawals === 'true') {
+      query['withdrawalRequests.0'] = { $exists: true };
+    }
+
+    const referrals = await Referral.find(query)
+      .populate('userId', 'name email phone registrationMetadata')
+      .populate('referredUsers.userId', 'name email phone')
+      .sort({ createdAt: -1 });
+
+    const programs = referrals.map(ref => {
+      const totalReferrals = ref.referredUsers.length;
+      const withdrawnReferrals = ref.referredUsers.filter(r => r.withdrawn).length;
+      const availableReferrals = totalReferrals - withdrawnReferrals;
+      const availableBalance = availableReferrals * EARNINGS_PER_REFERRAL;
+      const totalWithdrawn = ref.withdrawalRequests
+        .filter(w => w.status === 'paid')
+        .reduce((sum, w) => sum + w.amount, 0);
+
+      return {
+        _id: ref._id,
+        userId: ref.userId,
+        referralCode: ref.referralCode,
+        totalReferrals,
+        availableReferrals,
+        withdrawnReferrals,
+        availableBalance,
+        totalWithdrawn,
+        paymentMethod: ref.paymentMethod,
+        suspiciousActivity: ref.suspiciousActivity,
+        referredUsers: ref.referredUsers,
+        withdrawalRequests: ref.withdrawalRequests,
+        createdAt: ref.createdAt,
+      };
+    });
+
+    res.json({
+      success: true,
+      programs,
+      total: programs.length,
+    });
+  } catch (error) {
+    logger.error('Get all referral programs error:', error);
+    res.status(500).json({
+      error: 'Failed to fetch referral programs',
+      message: error.message,
+    });
+  }
+};
+
+/**
+ * Admin: Update referral program flagged status
+ */
+const updateReferralFlag = async (req, res) => {
+  try {
+    const { referralId } = req.params;
+    const { flagged, reasons } = req.body;
+
+    const referral = await Referral.findById(referralId);
+    if (!referral) {
+      return res.status(404).json({ error: 'Referral program not found' });
+    }
+
+    if (flagged) {
+      referral.suspiciousActivity = {
+        flagged: true,
+        reasons: reasons || [],
+        flaggedAt: new Date(),
+      };
+    } else {
+      referral.suspiciousActivity = {
+        flagged: false,
+        reasons: [],
+        flaggedAt: null,
+      };
+    }
+
+    await referral.save();
+
+    logger.info(`Admin ${flagged ? 'flagged' : 'unflagged'} referral program ${referralId}`);
+
+    res.json({
+      success: true,
+      message: `Referral program ${flagged ? 'flagged' : 'unflagged'} successfully`,
+      referral,
+    });
+  } catch (error) {
+    logger.error('Update referral flag error:', error);
+    res.status(500).json({
+      error: 'Failed to update referral flag',
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createReferralProgram,
   updatePaymentMethod,
@@ -660,5 +765,7 @@ module.exports = {
   trackReferral,
   getAllWithdrawals,
   processWithdrawal,
+  getAllReferralPrograms,
+  updateReferralFlag,
 };
 
