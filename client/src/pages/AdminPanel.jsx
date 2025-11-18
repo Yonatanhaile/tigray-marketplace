@@ -118,7 +118,8 @@ const AdminPanel = () => {
   const { data: pendingListings, isLoading: loadingPending } = useQuery({
     queryKey: ['admin', 'pending-listings'],
     queryFn: () => api.get('/admin/listings/pending'),
-    enabled: activeTab === 'moderation',
+    enabled: activeTab === 'moderation' || activeTab === 'stats', // Fetch on both tabs
+    refetchInterval: 30000, // Auto-refresh every 30 seconds for new listing notifications
   });
   const approveListing = useMutation({
     mutationFn: (id) => api.patch(`/admin/listings/${id}/approve`),
@@ -203,6 +204,12 @@ const AdminPanel = () => {
                 {withdrawalRequests.withdrawals.filter(w => w.withdrawal.status === 'pending').length}
               </span>
             )}
+            {/* Notification Badge for Pending Moderation */}
+            {tab === 'moderation' && pendingListings?.listings?.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                {pendingListings.listings.length}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -228,6 +235,33 @@ const AdminPanel = () => {
               <p className="text-xl sm:text-2xl md:text-3xl font-bold">{stats?.stats?.disputes?.open || 0}</p>
             </div>
           </div>
+
+          {/* Pending Moderation Alert */}
+          {pendingListings?.listings?.length > 0 && (
+            <div className="mt-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg shadow-md">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <svg className="h-6 w-6 text-blue-500 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-sm font-semibold text-blue-900">
+                    Pending Listing Reviews
+                  </h3>
+                  <p className="text-sm text-blue-800 mt-1">
+                    You have <span className="font-bold">{pendingListings.listings.length}</span> listing(s) waiting for approval or rejection.
+                  </p>
+                  <button
+                    onClick={() => setActiveTab('moderation')}
+                    className="mt-3 text-sm font-medium text-blue-700 hover:text-blue-900 underline"
+                  >
+                    Review Listings →
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Pending Withdrawals Alert */}
           {withdrawalRequests?.withdrawals?.filter(w => w.withdrawal.status === 'pending').length > 0 && (
@@ -297,7 +331,30 @@ const AdminPanel = () => {
       )}
 
       {activeTab === 'moderation' && (
-        <div className="space-y-3 sm:space-y-4">
+        <div className="space-y-6">
+          {/* Pending Listings Alert */}
+          {pendingListings?.listings?.length > 0 && (
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-400 rounded-lg p-5 shadow-lg">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex-shrink-0">
+                  <div className="h-12 w-12 rounded-full bg-blue-500 flex items-center justify-center animate-pulse">
+                    <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-blue-900">
+                    🔍 Action Required: Pending Listing Reviews
+                  </h3>
+                  <p className="text-sm text-blue-800 mt-1">
+                    <span className="font-bold text-lg">{pendingListings.listings.length}</span> listing(s) waiting for your approval or rejection. Review and moderate below.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {loadingPending ? (
             <div className="text-center py-8 text-sm sm:text-base">Loading...</div>
           ) : (pendingListings?.listings || []).map((l) => (
