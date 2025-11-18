@@ -5,7 +5,7 @@ const geoip = require('geoip-lite');
 
 // Constants
 const WITHDRAWAL_THRESHOLD = 25; // Minimum referrals for withdrawal
-const EARNINGS_PER_REFERRAL = 5; // 5 birr per referral
+const EARNINGS_PER_REFERRAL = 10; // 10 birr per referral
 const MAX_REGISTRATIONS_PER_IP = 2; // Only 2 users per IP address (same network)
 const MAX_REGISTRATIONS_PER_DEVICE = 1; // Only 1 user per device fingerprint
 const SUSPICIOUS_TIME_WINDOW = 3600000; // 1 hour in ms

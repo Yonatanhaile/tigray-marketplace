@@ -539,7 +539,7 @@
   },
   "referral": {
     "title": "Referral Program - Earn Money",
-    "subtitle": "Earn 5 Birr for every person who registers with your referral code",
+    "subtitle": "Earn 10 Birr for every person who registers with your referral code",
     "totalReferrals": "Total Referrals",
     "availableReferrals": "Available",
     "availableBalance": "Available Balance",
@@ -568,7 +568,7 @@
     "noReferrals": "No referrals yet. Share your code to start earning!",
     "howItWorks": "How It Works",
     "step1": "Share your unique referral code with friends and family",
-    "step2": "When someone registers using your code, you earn 5 Birr",
+    "step2": "When someone registers using your code, you earn 10 Birr",
     "step3": "Track your earnings in real-time on this dashboard",
     "step4": "Once you reach 25 referrals, you can request a withdrawal",
     "step5": "Get paid to your preferred payment method after admin approval",

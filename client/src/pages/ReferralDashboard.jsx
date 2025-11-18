@@ -156,7 +156,7 @@ const ReferralDashboard = () => {
     (referralData?.availableReferrals || 0) / (referralData?.withdrawalThreshold || 25)
   ) * (referralData?.withdrawalThreshold || 25);
   
-  const withdrawableAmount = withdrawableReferrals * (referralData?.earningsPerReferral || 5);
+  const withdrawableAmount = withdrawableReferrals * (referralData?.earningsPerReferral || 10);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -453,7 +453,7 @@ const ReferralDashboard = () => {
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-semibold text-gray-900">
-                    5 {t('referral.birr')}
+                    {referralData?.earningsPerReferral || 10} {t('referral.birr')}
                   </p>
                   <p className="text-xs text-gray-600">
                     {user.withdrawn ? t('referral.withdrawn') : t('referral.available')}
