@@ -485,6 +485,23 @@ const ReferralDashboard = () => {
             </div>
           </div>
 
+          {/* Strict Limits Warning */}
+          <div className="mb-4 bg-orange-50 border-2 border-orange-400 rounded-lg p-3">
+            <div className="flex items-start gap-2">
+              <span className="text-2xl">🔒</span>
+              <div>
+                <p className="font-bold text-orange-900 mb-1">Strict Account Limits</p>
+                <div className="text-sm text-orange-800 space-y-1">
+                  <p>• <strong>ONE account per device</strong> - Each device can only be used to register ONE account</p>
+                  <p>• <strong>TWO accounts per network</strong> - Maximum 2 accounts can register from the same internet connection</p>
+                  <p className="text-xs mt-2 text-orange-700">
+                    ⚠️ These limits are strictly enforced. Registration will be blocked if limits are exceeded.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <p className="text-sm text-gray-900 mb-3">
             Any attempt to manipulate, abuse, or cheat the referral system is strictly forbidden. This includes but is not limited to:
           </p>

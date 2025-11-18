@@ -6,8 +6,8 @@ const geoip = require('geoip-lite');
 // Constants
 const WITHDRAWAL_THRESHOLD = 25; // Minimum referrals for withdrawal
 const EARNINGS_PER_REFERRAL = 5; // 5 birr per referral
-const MAX_REGISTRATIONS_PER_IP = 3;
-const MAX_REGISTRATIONS_PER_DEVICE = 3;
+const MAX_REGISTRATIONS_PER_IP = 2; // Only 2 users per IP address (same network)
+const MAX_REGISTRATIONS_PER_DEVICE = 1; // Only 1 user per device fingerprint
 const SUSPICIOUS_TIME_WINDOW = 3600000; // 1 hour in ms
 
 /**
@@ -67,30 +67,28 @@ const detectFraud = async (referralCode, registrationData) => {
     isEthiopianIP = true; // Allow local IPs for testing
   }
   
-  // Check 1: Multiple registrations from same IP
+  // Check 1: Multiple registrations from same IP (strict: max 2 per IP)
   const ipCount = referral.referredUsers.filter(r => 
     r.ipAddress === ipAddress
   ).length;
   
-  logger.info(`IP ${ipAddress} has ${ipCount} existing registrations`);
+  logger.info(`IP ${ipAddress} has ${ipCount} existing registrations for this referral code`);
   
   if (ipCount >= MAX_REGISTRATIONS_PER_IP) {
-    reasons.push(`Too many registrations from IP: ${ipAddress} (${ipCount + 1} total)`);
-  } else if (ipCount >= 2) {
-    warnings.push(`Multiple registrations from same IP detected (${ipCount + 1} total)`);
+    reasons.push(`Maximum ${MAX_REGISTRATIONS_PER_IP} registrations per IP exceeded. IP: ${ipAddress} has ${ipCount + 1} total`);
+  } else if (ipCount >= 1) {
+    warnings.push(`Second registration from same IP detected: ${ipAddress}`);
   }
 
-  // Check 2: Multiple registrations from same device
+  // Check 2: Multiple registrations from same device (strict: max 1 per device)
   const deviceCount = referral.referredUsers.filter(r => 
     r.deviceFingerprint === deviceFingerprint
   ).length;
   
-  logger.info(`Device ${deviceFingerprint} has ${deviceCount} existing registrations`);
+  logger.info(`Device ${deviceFingerprint} has ${deviceCount} existing registrations for this referral code`);
   
   if (deviceCount >= MAX_REGISTRATIONS_PER_DEVICE) {
-    reasons.push(`Too many registrations from device fingerprint (${deviceCount + 1} total)`);
-  } else if (deviceCount >= 2) {
-    warnings.push(`Multiple registrations from same device detected (${deviceCount + 1} total)`);
+    reasons.push(`Device already used for a referral. Only ${MAX_REGISTRATIONS_PER_DEVICE} registration per device allowed`);
   }
 
   // Check 3: Rapid registrations (5+ within 1 hour)
@@ -118,12 +116,14 @@ const detectFraud = async (referralCode, registrationData) => {
   }
 
   // Check 6: Check for duplicate device across all referrals (global check)
+  // With strict 1 device = 1 user policy, this should never happen legitimately
   const globalDeviceCheck = await Referral.countDocuments({
     'referredUsers.deviceFingerprint': deviceFingerprint
   });
   
-  if (globalDeviceCheck >= 5) {
-    reasons.push(`Device fingerprint used across multiple referral programs (${globalDeviceCheck} times)`);
+  if (globalDeviceCheck >= 2) {
+    reasons.push(`Device fingerprint used across multiple referral programs (${globalDeviceCheck} times) - IMPOSSIBLE with 1 device per user policy`);
+    logger.error(`🚨 CRITICAL: Device fingerprint appears in ${globalDeviceCheck} different referral accounts - system bypass detected!`);
   }
 
   // Check 7: Check for suspicious IP patterns (e.g., VPN detection - basic)

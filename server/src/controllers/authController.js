@@ -23,15 +23,64 @@ const register = async (req, res) => {
       });
     }
 
-    // Hash password
-    const passwordHash = await User.hashPassword(password);
-
     // Capture IP address (handle various proxy scenarios)
     const ipAddress = req.headers['x-forwarded-for']?.split(',')[0].trim() || 
                      req.headers['x-real-ip'] || 
                      req.ip || 
                      req.connection.remoteAddress || 
                      'unknown';
+
+    // STRICT DEVICE AND IP LIMIT CHECKS
+    // Only allow registration if limits are not exceeded
+    const MAX_USERS_PER_IP = 2;
+    const MAX_USERS_PER_DEVICE = 1;
+
+    // Skip these checks for local/development IPs
+    const isLocalIP = ipAddress.includes('127.0.0.1') || 
+                      ipAddress.includes('localhost') || 
+                      ipAddress.includes('::1') ||
+                      ipAddress.startsWith('192.168.') ||
+                      ipAddress.startsWith('10.') ||
+                      ipAddress.startsWith('172.');
+
+    if (!isLocalIP && deviceFingerprint && deviceFingerprint !== 'unknown') {
+      // Check 1: Device fingerprint limit (GLOBAL - across entire platform)
+      const deviceCount = await User.countDocuments({
+        'registrationMetadata.deviceFingerprint': deviceFingerprint
+      });
+
+      if (deviceCount >= MAX_USERS_PER_DEVICE) {
+        logger.error(`Registration blocked: Device fingerprint already used (${deviceCount} users)`);
+        logger.error(`Device: ${deviceFingerprint}, IP: ${ipAddress}`);
+        return res.status(403).json({
+          error: true,
+          message: 'This device has already been used to register an account. Only one account per device is allowed.',
+          code: 'DEVICE_LIMIT_EXCEEDED'
+        });
+      }
+
+      // Check 2: IP address limit (GLOBAL - across entire platform)
+      const ipCount = await User.countDocuments({
+        'registrationMetadata.ipAddress': ipAddress
+      });
+
+      if (ipCount >= MAX_USERS_PER_IP) {
+        logger.error(`Registration blocked: IP address limit exceeded (${ipCount} users)`);
+        logger.error(`IP: ${ipAddress}, Device: ${deviceFingerprint}`);
+        return res.status(403).json({
+          error: true,
+          message: 'Maximum number of accounts from this network has been reached. Only 2 accounts per network are allowed.',
+          code: 'IP_LIMIT_EXCEEDED'
+        });
+      }
+
+      logger.info(`✅ Device and IP limits check passed - Device: ${deviceCount}, IP: ${ipCount}`);
+    } else if (isLocalIP) {
+      logger.info(`⚠️ Local IP detected - skipping device/IP limits for development: ${ipAddress}`);
+    }
+
+    // Hash password
+    const passwordHash = await User.hashPassword(password);
 
     // Create user
     const user = await User.create({
