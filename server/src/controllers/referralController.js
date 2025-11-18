@@ -26,14 +26,22 @@ const detectFraud = async (referralCode, registrationData) => {
 
   const { ipAddress, deviceFingerprint } = registrationData;
   const reasons = [];
+  const warnings = [];
+  
+  logger.info(`Running fraud detection for referral ${referralCode}`);
+  logger.info(`Checking IP: ${ipAddress}, Device: ${deviceFingerprint}`);
   
   // Check 1: Multiple registrations from same IP
   const ipCount = referral.referredUsers.filter(r => 
     r.ipAddress === ipAddress
   ).length;
   
+  logger.info(`IP ${ipAddress} has ${ipCount} existing registrations`);
+  
   if (ipCount >= MAX_REGISTRATIONS_PER_IP) {
-    reasons.push(`Too many registrations from IP: ${ipAddress}`);
+    reasons.push(`Too many registrations from IP: ${ipAddress} (${ipCount + 1} total)`);
+  } else if (ipCount >= 2) {
+    warnings.push(`Multiple registrations from same IP detected (${ipCount + 1} total)`);
   }
 
   // Check 2: Multiple registrations from same device
@@ -41,28 +49,65 @@ const detectFraud = async (referralCode, registrationData) => {
     r.deviceFingerprint === deviceFingerprint
   ).length;
   
+  logger.info(`Device ${deviceFingerprint} has ${deviceCount} existing registrations`);
+  
   if (deviceCount >= MAX_REGISTRATIONS_PER_DEVICE) {
-    reasons.push(`Too many registrations from device: ${deviceFingerprint}`);
+    reasons.push(`Too many registrations from device fingerprint (${deviceCount + 1} total)`);
+  } else if (deviceCount >= 2) {
+    warnings.push(`Multiple registrations from same device detected (${deviceCount + 1} total)`);
   }
 
-  // Check 3: Rapid registrations
+  // Check 3: Rapid registrations (5+ within 1 hour)
   const recentRegistrations = referral.referredUsers.filter(r => 
     Date.now() - new Date(r.registeredAt).getTime() < SUSPICIOUS_TIME_WINDOW
   );
   
+  logger.info(`Found ${recentRegistrations.length} registrations in the last hour`);
+  
   if (recentRegistrations.length >= 5) {
-    reasons.push('Too many registrations in short time period');
+    reasons.push(`Too many registrations in short time period (${recentRegistrations.length + 1} in 1 hour)`);
+  } else if (recentRegistrations.length >= 3) {
+    warnings.push(`Multiple recent registrations detected (${recentRegistrations.length + 1} in 1 hour)`);
   }
 
   // Check 4: Same IP as referrer
   const referrer = await User.findById(referral.userId);
   if (referrer?.registrationMetadata?.ipAddress === ipAddress) {
-    reasons.push('Registration IP matches referrer IP');
+    reasons.push('Registration IP matches referrer IP - possible self-referral');
+  }
+
+  // Check 5: Same device fingerprint as referrer
+  if (referrer?.registrationMetadata?.deviceFingerprint === deviceFingerprint) {
+    reasons.push('Device fingerprint matches referrer - possible self-referral');
+  }
+
+  // Check 6: Check for duplicate device across all referrals (global check)
+  const globalDeviceCheck = await Referral.countDocuments({
+    'referredUsers.deviceFingerprint': deviceFingerprint
+  });
+  
+  if (globalDeviceCheck >= 5) {
+    reasons.push(`Device fingerprint used across multiple referral programs (${globalDeviceCheck} times)`);
+  }
+
+  // Check 7: Check for suspicious IP patterns (e.g., VPN detection - basic)
+  if (ipAddress.includes('10.') || ipAddress.includes('192.168.') || ipAddress === '127.0.0.1') {
+    warnings.push('Private/Local IP address detected - may indicate VPN or proxy');
+  }
+
+  // Log results
+  if (reasons.length > 0) {
+    logger.warn(`🚨 FRAUD DETECTED for referral ${referralCode}:`, reasons);
+  } else if (warnings.length > 0) {
+    logger.warn(`⚠️ Suspicious activity warnings for referral ${referralCode}:`, warnings);
+  } else {
+    logger.info(`✅ No fraud detected for referral ${referralCode}`);
   }
 
   return {
     suspicious: reasons.length > 0,
     reasons,
+    warnings,
   };
 };
 
@@ -349,7 +394,7 @@ const trackReferral = async (referralCode, newUserId, registrationData) => {
     // Fraud detection
     const fraudCheck = await detectFraud(referralCode, registrationData);
 
-    // Add referred user
+    // Add referred user with metadata
     referral.referredUsers.push({
       userId: newUserId,
       ipAddress: registrationData.ipAddress,
@@ -362,20 +407,38 @@ const trackReferral = async (referralCode, newUserId, registrationData) => {
 
     // Flag if suspicious
     if (fraudCheck.suspicious) {
-      referral.suspiciousActivity = {
-        flagged: true,
-        reasons: fraudCheck.reasons,
-        flaggedAt: new Date(),
-      };
+      // Update or create suspicious activity record
+      if (referral.suspiciousActivity && referral.suspiciousActivity.flagged) {
+        // Append new reasons to existing ones
+        referral.suspiciousActivity.reasons = [
+          ...new Set([...referral.suspiciousActivity.reasons, ...fraudCheck.reasons])
+        ];
+      } else {
+        referral.suspiciousActivity = {
+          flagged: true,
+          reasons: fraudCheck.reasons,
+          flaggedAt: new Date(),
+        };
+      }
       
-      logger.warn(`Suspicious referral activity detected for code ${referralCode}:`, fraudCheck.reasons);
+      logger.error(`🚨 FRAUD ALERT - Referral ${referralCode} flagged:`, fraudCheck.reasons);
+      logger.error(`   User: ${newUserId}, IP: ${registrationData.ipAddress}, Device: ${registrationData.deviceFingerprint}`);
+    } else if (fraudCheck.warnings && fraudCheck.warnings.length > 0) {
+      logger.warn(`⚠️ WARNING - Suspicious patterns detected for referral ${referralCode}:`, fraudCheck.warnings);
+    } else {
+      logger.info(`✅ Referral tracked successfully: ${referralCode} -> User ${newUserId}`);
     }
 
     await referral.save();
     
-    logger.info(`Referral tracked: ${referralCode} -> User ${newUserId}`);
+    // Send notification to admin if account was flagged
+    if (fraudCheck.suspicious) {
+      logger.error(`⚠️ ADMIN ALERT: Referral account ${referral.userId} has been flagged for fraud`);
+    }
+    
   } catch (error) {
     logger.error('Track referral error:', error);
+    logger.error('Stack:', error.stack);
   }
 };
 

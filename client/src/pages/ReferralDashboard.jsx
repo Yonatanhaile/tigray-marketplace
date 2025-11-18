@@ -167,15 +167,38 @@ const ReferralDashboard = () => {
 
       {/* Warning if flagged */}
       {referralData?.flagged && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-          <h3 className="font-semibold text-red-800 mb-2">
-            ⚠️ {t('referral.accountFlagged')}
-          </h3>
-          <ul className="text-sm text-red-700 space-y-1">
-            {referralData.flagReasons.map((reason, i) => (
-              <li key={i}>• {reason}</li>
-            ))}
-          </ul>
+        <div className="bg-red-50 border-2 border-red-500 rounded-lg p-6 mb-6 shadow-lg">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 text-3xl">🚨</div>
+            <div className="flex-1">
+              <h3 className="font-bold text-red-900 text-lg mb-2">
+                {t('referral.accountFlagged')}
+              </h3>
+              <p className="text-sm text-red-800 mb-3">
+                Your referral account has been flagged due to suspicious activity. Withdrawals are blocked until this is resolved.
+              </p>
+              <div className="bg-red-100 rounded p-3 mb-3">
+                <p className="text-xs font-semibold text-red-900 mb-2">Fraud Detection Reasons:</p>
+                <ul className="text-sm text-red-800 space-y-1.5">
+                  {referralData.flagReasons.map((reason, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <span className="text-red-600">▪</span>
+                      <span>{reason}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="bg-yellow-50 border border-yellow-300 rounded p-3">
+                <p className="text-xs font-semibold text-yellow-900 mb-1">⚠️ What This Means:</p>
+                <ul className="text-xs text-yellow-800 space-y-1">
+                  <li>• You cannot request withdrawals while flagged</li>
+                  <li>• Your referrals are still counted but earnings are on hold</li>
+                  <li>• An admin will review your account</li>
+                  <li>• If this was a mistake, contact support</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

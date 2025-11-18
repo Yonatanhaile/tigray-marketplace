@@ -3,6 +3,7 @@ import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
+import { getDeviceInfo } from '../utils/deviceFingerprint';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -62,6 +63,18 @@ const Register = () => {
         registerData.referralCode = registerData.referralCode.trim().toUpperCase();
       } else {
         delete registerData.referralCode;
+      }
+      
+      // Collect device fingerprint for fraud detection
+      try {
+        const deviceInfo = await getDeviceInfo();
+        registerData.deviceFingerprint = deviceInfo.fingerprint;
+        registerData.deviceInfo = deviceInfo;
+        console.log('Device fingerprint collected for fraud detection');
+      } catch (fpError) {
+        console.error('Failed to collect device fingerprint:', fpError);
+        // Continue registration even if fingerprinting fails
+        registerData.deviceFingerprint = 'unknown';
       }
       
       // All users are both buyers and sellers by default

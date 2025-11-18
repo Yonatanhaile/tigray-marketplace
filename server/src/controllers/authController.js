@@ -9,7 +9,7 @@ const logger = require('../services/logger');
  */
 const register = async (req, res) => {
   try {
-    const { name, email, phone, password, roles } = req.body;
+    const { name, email, phone, password, roles, deviceFingerprint, deviceInfo } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({
@@ -26,6 +26,13 @@ const register = async (req, res) => {
     // Hash password
     const passwordHash = await User.hashPassword(password);
 
+    // Capture IP address (handle various proxy scenarios)
+    const ipAddress = req.headers['x-forwarded-for']?.split(',')[0].trim() || 
+                     req.headers['x-real-ip'] || 
+                     req.ip || 
+                     req.connection.remoteAddress || 
+                     'unknown';
+
     // Create user
     const user = await User.create({
       name,
@@ -38,24 +45,36 @@ const register = async (req, res) => {
     // Track referral if present
     const referralCode = req.body.referralCode;
     if (referralCode) {
+      // Prepare comprehensive registration data for fraud detection
       const registrationData = {
-        ipAddress: req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-        deviceFingerprint: req.headers['user-agent'] || 'unknown',
-      };
-
-      // Update user with referral info
-      user.referredBy = referralCode;
-      user.registrationMetadata = {
-        ...registrationData,
-        userAgent: req.headers['user-agent'],
+        ipAddress: ipAddress,
+        deviceFingerprint: deviceFingerprint || req.headers['user-agent'] || 'unknown',
+        userAgent: req.headers['user-agent'] || 'unknown',
+        deviceInfo: deviceInfo || {},
         registeredAt: new Date(),
       };
+
+      // Update user with referral info and metadata
+      user.referredBy = referralCode;
+      user.registrationMetadata = registrationData;
       await user.save();
 
-      // Track in referral system (async, don't wait)
+      // Track in referral system with fraud detection
+      logger.info(`Tracking referral for user ${user._id} with code ${referralCode}`);
+      logger.info(`IP: ${registrationData.ipAddress}, Fingerprint: ${registrationData.deviceFingerprint}`);
+      
       trackReferral(referralCode, user._id, registrationData).catch(err => 
         logger.error('Failed to track referral:', err)
       );
+    } else {
+      // Even without referral, store basic registration metadata
+      user.registrationMetadata = {
+        ipAddress: ipAddress,
+        deviceFingerprint: deviceFingerprint || req.headers['user-agent'] || 'unknown',
+        userAgent: req.headers['user-agent'] || 'unknown',
+        registeredAt: new Date(),
+      };
+      await user.save();
     }
 
     // Generate token
@@ -65,7 +84,7 @@ const register = async (req, res) => {
     user.lastLogin = new Date();
     await user.save();
 
-    logger.info(`User registered: ${user.email}`);
+    logger.info(`User registered: ${user.email} from IP: ${ipAddress}`);
 
     res.status(201).json({
       error: false,
