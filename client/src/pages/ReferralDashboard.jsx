@@ -302,57 +302,97 @@ const ReferralDashboard = () => {
         <h2 className="text-lg font-semibold mb-4 text-gray-900">
           {t('referral.paymentMethod')}
         </h2>
-        <form onSubmit={handleUpdatePayment} className="space-y-4">
+        
+        {referralData?.paymentMethod ? (
+          // Display saved payment method (read-only)
           <div>
-            <label className="block text-sm font-medium mb-2">
-              {t('referral.selectPaymentMethod')}
-            </label>
-            <select
-              value={paymentType}
-              onChange={(e) => setPaymentType(e.target.value)}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg"
-              required
+            <div className="bg-gray-50 rounded-lg p-4 mb-4">
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Payment Type</p>
+                  <p className="text-base font-semibold text-gray-900 capitalize">
+                    {referralData.paymentMethod.type === 'bank_transfer' 
+                      ? t('referral.bankTransfer') 
+                      : referralData.paymentMethod.type}
+                  </p>
+                </div>
+                <span className="text-xs px-3 py-1 bg-green-100 text-green-700 rounded-full font-medium">
+                  Set
+                </span>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Payment Details</p>
+                <p className="text-base text-gray-900 whitespace-pre-wrap">
+                  {referralData.paymentMethod.details}
+                </p>
+              </div>
+            </div>
+            <p className="text-xs text-gray-600 bg-gray-100 p-3 rounded">
+              Your payment method has been saved. The admin will use these details to transfer your earnings. 
+              If you need to change this information, please contact support.
+            </p>
+          </div>
+        ) : (
+          // Show form to set payment method (first time only)
+          <form onSubmit={handleUpdatePayment} className="space-y-4">
+            <p className="text-sm text-gray-600 mb-4">
+              Please provide your payment details. This will be used to transfer your referral earnings.
+            </p>
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                {t('referral.selectPaymentMethod')}
+              </label>
+              <select
+                value={paymentType}
+                onChange={(e) => setPaymentType(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                required
+              >
+                <option value="">{t('referral.chooseMethod')}</option>
+                <option value="telebirr">Telebirr</option>
+                <option value="mpesa">M-Pesa</option>
+                <option value="bank_transfer">{t('referral.bankTransfer')}</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                {t('referral.paymentDetails')}
+              </label>
+              {paymentType === 'bank_transfer' ? (
+                <textarea
+                  value={paymentDetails}
+                  onChange={(e) => setPaymentDetails(e.target.value)}
+                  placeholder={t('referral.bankPlaceholder')}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  rows="4"
+                  required
+                />
+              ) : (
+                <input
+                  type="text"
+                  value={paymentDetails}
+                  onChange={(e) => setPaymentDetails(e.target.value)}
+                  placeholder={t('referral.phonePlaceholder')}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  required
+                />
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={updating}
+              className="btn btn-primary w-full"
             >
-              <option value="">{t('referral.chooseMethod')}</option>
-              <option value="telebirr">Telebirr</option>
-              <option value="mpesa">M-Pesa</option>
-              <option value="bank_transfer">{t('referral.bankTransfer')}</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              {t('referral.paymentDetails')}
-            </label>
-            {paymentType === 'bank_transfer' ? (
-              <textarea
-                value={paymentDetails}
-                onChange={(e) => setPaymentDetails(e.target.value)}
-                placeholder={t('referral.bankPlaceholder')}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg"
-                rows="4"
-                required
-              />
-            ) : (
-              <input
-                type="text"
-                value={paymentDetails}
-                onChange={(e) => setPaymentDetails(e.target.value)}
-                placeholder={t('referral.phonePlaceholder')}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg"
-                required
-              />
-            )}
-          </div>
-
-          <button
-            type="submit"
-            disabled={updating}
-            className="btn btn-primary w-full"
-          >
-            {updating ? t('common.saving') : t('referral.updatePayment')}
-          </button>
-        </form>
+              {updating ? t('common.saving') : 'Save Payment Method'}
+            </button>
+            
+            <p className="text-xs text-gray-600 text-center">
+              Make sure your details are correct. You won't be able to change them later.
+            </p>
+          </form>
+        )}
       </div>
 
       {/* Withdrawal History */}

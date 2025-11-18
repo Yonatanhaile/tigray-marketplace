@@ -196,7 +196,7 @@ const createReferralProgram = async (req, res) => {
 };
 
 /**
- * Update payment method
+ * Set payment method (can only be set once)
  */
 const updatePaymentMethod = async (req, res) => {
   try {
@@ -219,6 +219,14 @@ const updatePaymentMethod = async (req, res) => {
       });
     }
 
+    // Check if payment method is already set
+    if (referral.paymentMethod && referral.paymentMethod.type) {
+      return res.status(403).json({
+        error: true,
+        message: 'Payment method already set. Contact support to change it.',
+      });
+    }
+
     referral.paymentMethod = {
       type: paymentType,
       details: paymentDetails,
@@ -226,15 +234,15 @@ const updatePaymentMethod = async (req, res) => {
 
     await referral.save();
 
-    logger.info(`Payment method updated for user: ${userId}`);
+    logger.info(`Payment method set for user: ${userId} - ${paymentType}`);
 
     res.status(200).json({
       error: false,
-      message: 'Payment method updated successfully',
+      message: 'Payment method saved successfully',
       paymentMethod: referral.paymentMethod,
     });
   } catch (error) {
-    logger.error('Update payment method error:', error);
+    logger.error('Set payment method error:', error);
     res.status(500).json({
       error: true,
       message: 'Failed to update payment method',
