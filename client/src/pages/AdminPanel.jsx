@@ -24,10 +24,10 @@ const AdminPanel = () => {
     enabled: activeTab === 'kyc',
   });
 
-  // All users for user management tab
+  // All users for user management tab (fetch ALL users, no pagination limit)
   const { data: allUsers, isLoading: loadingAllUsers } = useQuery({
     queryKey: ['admin', 'all-users'],
-    queryFn: () => adminAPI.getAllUsers({}),
+    queryFn: () => adminAPI.getAllUsers({ limit: 999999 }), // Fetch ALL users
     enabled: activeTab === 'users',
   });
 
@@ -334,13 +334,22 @@ const AdminPanel = () => {
       {/* Users Tab - User Management */}
       {activeTab === 'users' && (
         <div className="space-y-6">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold">User Management</h2>
-            <p className="text-sm text-gray-600">Total Users: {allUsers?.users?.length || 0}</p>
+            <div className="text-right">
+              <p className="text-sm font-medium text-gray-900">
+                Showing All Users: <span className="text-primary-600 font-bold">{allUsers?.users?.length || 0}</span>
+              </p>
+              {allUsers?.pagination?.total && (
+                <p className="text-xs text-gray-500">
+                  Total in database: {allUsers.pagination.total}
+                </p>
+              )}
+            </div>
           </div>
 
           {loadingAllUsers ? (
-            <div className="text-center py-8">Loading users...</div>
+            <div className="text-center py-8">Loading all users...</div>
           ) : (
             <div className="space-y-3">
               {allUsers?.users?.map(user => (
