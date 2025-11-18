@@ -376,15 +376,41 @@ const AdminPanel = () => {
                     </div>
                   </div>
 
-                  {/* Payment Method */}
-                  {program.paymentMethod && (
-                    <div className="bg-gray-50 rounded p-3 mb-4">
-                      <p className="text-xs font-medium text-gray-700 mb-1">Payment Method</p>
-                      <p className="text-sm text-gray-900">
-                        <span className="font-semibold capitalize">{program.paymentMethod.type}</span>: {program.paymentMethod.details}
-                      </p>
+                  {/* Payment Method - Always Visible */}
+                  <div className={`rounded-lg p-4 mb-4 border-2 ${
+                    program.paymentMethod 
+                      ? 'bg-blue-50 border-blue-200' 
+                      : 'bg-yellow-50 border-yellow-300'
+                  }`}>
+                    <div className="flex items-start justify-between mb-2">
+                      <p className="text-sm font-bold text-gray-900">💳 Payment Method</p>
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                        program.paymentMethod 
+                          ? 'bg-green-100 text-green-700' 
+                          : 'bg-red-100 text-red-700'
+                      }`}>
+                        {program.paymentMethod ? 'Set' : 'Not Set'}
+                      </span>
                     </div>
-                  )}
+                    {program.paymentMethod ? (
+                      <div className="space-y-1">
+                        <p className="text-sm text-gray-900">
+                          <span className="font-semibold">Type:</span>{' '}
+                          <span className="capitalize">{program.paymentMethod.type.replace('_', ' ')}</span>
+                        </p>
+                        <p className="text-sm text-gray-900">
+                          <span className="font-semibold">Details:</span>{' '}
+                          <span className="font-mono bg-white px-2 py-1 rounded">
+                            {program.paymentMethod.details}
+                          </span>
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-yellow-800">
+                        ⚠️ User has not set up payment method yet. Cannot process withdrawals.
+                      </p>
+                    )}
+                  </div>
 
                   {/* Flagged Reasons */}
                   {program.suspiciousActivity?.flagged && (
