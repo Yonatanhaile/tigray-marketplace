@@ -66,22 +66,44 @@ const Register = () => {
       }
       
       // Collect ADVANCED device fingerprint for fraud detection (20+ methods)
+      // CRITICAL: Fingerprint is REQUIRED for registration (fraud prevention)
       try {
+        console.log('🔍 Collecting advanced device fingerprint...');
         const deviceInfo = await getAdvancedDeviceInfo();
+        
+        if (!deviceInfo || !deviceInfo.fingerprint || deviceInfo.fingerprint === 'unknown') {
+          throw new Error('Device fingerprint collection failed');
+        }
+        
         registerData.deviceFingerprint = deviceInfo.fingerprint;
         registerData.deviceInfo = deviceInfo;
-        console.log('✅ Advanced device fingerprint collected (Canvas, WebGL, Audio, WebRTC, etc.)');
+        
+        console.log('✅ Advanced device fingerprint collected successfully');
+        console.log('   Fingerprint:', deviceInfo.fingerprint);
+        console.log('   Methods: Canvas, WebGL, Audio, WebRTC, Fonts, Battery, Media, etc.');
       } catch (fpError) {
-        console.error('Failed to collect device fingerprint:', fpError);
-        // Continue registration even if fingerprinting fails
-        registerData.deviceFingerprint = 'unknown';
+        console.error('❌ Failed to collect device fingerprint:', fpError);
+        setLoading(false);
+        toast.error('Device verification failed. Please disable any privacy extensions or ad blockers that might be blocking device fingerprinting, then try again.');
+        return; // STOP registration if fingerprinting fails
       }
       
       // All users are both buyers and sellers by default
       await registerUser(registerData);
       navigate('/');
     } catch (error) {
-      toast.error(error.message || 'Registration failed');
+      console.error('Registration error:', error);
+      
+      // Handle specific error codes
+      if (error.code === 'DEVICE_LIMIT_EXCEEDED') {
+        toast.error('This device has already been used to register an account. Only one account per device is allowed.');
+      } else if (error.code === 'IP_LIMIT_EXCEEDED') {
+        toast.error('Maximum number of accounts from this network reached. Only 2 accounts per network are allowed.');
+      } else if (error.code === 'FINGERPRINT_REQUIRED') {
+        toast.error('Device verification required. Please disable privacy extensions and try again.');
+      } else {
+        toast.error(error.message || 'Registration failed');
+      }
     } finally {
       setLoading(false);
     }

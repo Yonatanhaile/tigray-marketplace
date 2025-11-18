@@ -43,15 +43,30 @@ const register = async (req, res) => {
                       ipAddress.startsWith('10.') ||
                       ipAddress.startsWith('172.');
 
+    // BLOCK registration if fingerprint is missing or unknown (unless local dev)
+    if (!isLocalIP && (!deviceFingerprint || deviceFingerprint === 'unknown')) {
+      logger.error(`Registration blocked: Device fingerprint missing or unknown`);
+      logger.error(`IP: ${ipAddress}, Fingerprint: ${deviceFingerprint}`);
+      return res.status(403).json({
+        error: true,
+        message: 'Device verification failed. Please enable JavaScript and disable any privacy extensions that block device fingerprinting, then try again.',
+        code: 'FINGERPRINT_REQUIRED'
+      });
+    }
+
     if (!isLocalIP && deviceFingerprint && deviceFingerprint !== 'unknown') {
       // Check 1: Device fingerprint limit (GLOBAL - across entire platform)
       const deviceCount = await User.countDocuments({
         'registrationMetadata.deviceFingerprint': deviceFingerprint
       });
 
+      logger.info(`🔍 Device fingerprint check: ${deviceFingerprint} has ${deviceCount} existing registrations`);
+
       if (deviceCount >= MAX_USERS_PER_DEVICE) {
-        logger.error(`Registration blocked: Device fingerprint already used (${deviceCount} users)`);
-        logger.error(`Device: ${deviceFingerprint}, IP: ${ipAddress}`);
+        logger.error(`🚫 Registration BLOCKED: Device fingerprint already used (${deviceCount} users)`);
+        logger.error(`   Device: ${deviceFingerprint}`);
+        logger.error(`   IP: ${ipAddress}`);
+        logger.error(`   Attempted email: ${email}`);
         return res.status(403).json({
           error: true,
           message: 'This device has already been used to register an account. Only one account per device is allowed.',
@@ -64,9 +79,13 @@ const register = async (req, res) => {
         'registrationMetadata.ipAddress': ipAddress
       });
 
+      logger.info(`🔍 IP address check: ${ipAddress} has ${ipCount} existing registrations`);
+
       if (ipCount >= MAX_USERS_PER_IP) {
-        logger.error(`Registration blocked: IP address limit exceeded (${ipCount} users)`);
-        logger.error(`IP: ${ipAddress}, Device: ${deviceFingerprint}`);
+        logger.error(`🚫 Registration BLOCKED: IP address limit exceeded (${ipCount} users)`);
+        logger.error(`   IP: ${ipAddress}`);
+        logger.error(`   Device: ${deviceFingerprint}`);
+        logger.error(`   Attempted email: ${email}`);
         return res.status(403).json({
           error: true,
           message: 'Maximum number of accounts from this network has been reached. Only 2 accounts per network are allowed.',
@@ -74,9 +93,10 @@ const register = async (req, res) => {
         });
       }
 
-      logger.info(`✅ Device and IP limits check passed - Device: ${deviceCount}, IP: ${ipCount}`);
+      logger.info(`✅ Device and IP limits check PASSED - Device: ${deviceCount}/1, IP: ${ipCount}/2`);
     } else if (isLocalIP) {
-      logger.info(`⚠️ Local IP detected - skipping device/IP limits for development: ${ipAddress}`);
+      logger.warn(`⚠️ Local IP detected - skipping device/IP limits for development: ${ipAddress}`);
+      logger.warn(`   Fingerprint: ${deviceFingerprint}`);
     }
 
     // Hash password
