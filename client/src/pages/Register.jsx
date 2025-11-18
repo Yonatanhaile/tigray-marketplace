@@ -9,23 +9,25 @@ const Register = () => {
   const { register: registerUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
-  const referralCode = searchParams.get('ref');
+  const referralCodeFromUrl = searchParams.get('ref');
 
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm();
 
-  // Show toast if user came from referral link
+  // Pre-fill referral code if it comes from URL
   useEffect(() => {
-    if (referralCode) {
-      toast.success(`🎉 Registering with referral code: ${referralCode}`, {
+    if (referralCodeFromUrl) {
+      setValue('referralCode', referralCodeFromUrl);
+      toast.success(`🎉 Referral code applied: ${referralCodeFromUrl}`, {
         duration: 4000,
       });
     }
-  }, [referralCode]);
+  }, [referralCodeFromUrl, setValue]);
 
   const password = watch('password');
 
@@ -55,9 +57,11 @@ const Register = () => {
       // Normalize phone number to international format
       registerData.phone = normalizePhoneNumber(registerData.phone);
       
-      // Add referral code if present
-      if (referralCode) {
-        registerData.referralCode = referralCode;
+      // Add referral code if present (from form input)
+      if (registerData.referralCode && registerData.referralCode.trim()) {
+        registerData.referralCode = registerData.referralCode.trim().toUpperCase();
+      } else {
+        delete registerData.referralCode;
       }
       
       // All users are both buyers and sellers by default
@@ -178,6 +182,31 @@ const Register = () => {
               {errors.confirmPassword && (
                 <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
               )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Referral Code (Optional)
+              </label>
+              <input
+                type="text"
+                {...register('referralCode', {
+                  pattern: {
+                    value: /^[A-Z0-9]{8}$/i,
+                    message: 'Invalid referral code format (should be 8 characters)',
+                  },
+                })}
+                className="input uppercase"
+                placeholder="Enter referral code"
+                maxLength={8}
+                style={{ textTransform: 'uppercase' }}
+              />
+              {errors.referralCode && (
+                <p className="text-red-500 text-sm mt-1">{errors.referralCode.message}</p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                💡 Have a referral code? Enter it here to help your friend earn rewards!
+              </p>
             </div>
 
             <div className="bg-yellow-50 p-3 rounded text-xs text-gray-700">

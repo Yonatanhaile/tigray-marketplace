@@ -94,7 +94,6 @@ const createReferralProgram = async (req, res) => {
       error: false,
       referral: {
         referralCode: referral.referralCode,
-        referralLink: `${process.env.CLIENT_URL || 'http://localhost:5173'}/register?ref=${referral.referralCode}`,
         totalReferrals: referral.referredUsers.length,
         availableBalance: referral.availableBalance,
         totalEarnings: referral.totalEarnings,
@@ -190,7 +189,6 @@ const getReferralStats = async (req, res) => {
       error: false,
       stats: {
         referralCode: referral.referralCode,
-        referralLink: `${process.env.CLIENT_URL || 'http://localhost:5173'}/register?ref=${referral.referralCode}`,
         totalReferrals: referral.referredUsers.length,
         availableReferrals: availableReferrals.length,
         availableBalance: referral.availableBalance,

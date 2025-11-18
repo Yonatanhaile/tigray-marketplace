@@ -141,7 +141,7 @@ const ReferralDashboard = () => {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    toast.success(t('referral.linkCopied'));
+    toast.success(t('referral.codeCopied'));
   };
 
   if (loading) {
@@ -260,28 +260,35 @@ const ReferralDashboard = () => {
         )}
       </div>
 
-      {/* Referral Link */}
+      {/* Referral Code */}
       <div className="bg-white rounded-lg border border-slate-200 p-6 mb-8">
         <h2 className="text-xl font-semibold mb-4">
-          {t('referral.yourReferralLink')}
+          {t('referral.yourReferralCode')}
         </h2>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={referralData?.referralLink || ''}
-            readOnly
-            className="flex-1 px-4 py-2 border border-slate-300 rounded-lg bg-slate-50"
-          />
+        <div className="bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-orange-300 rounded-lg p-6 mb-4">
+          <p className="text-sm text-gray-600 mb-2 text-center">
+            {t('referral.yourCode')}
+          </p>
+          <p className="text-4xl font-bold text-center text-orange-600 tracking-widest mb-4">
+            {referralData?.referralCode || ''}
+          </p>
           <button
-            onClick={() => copyToClipboard(referralData?.referralLink)}
-            className="btn btn-primary"
+            onClick={() => copyToClipboard(referralData?.referralCode)}
+            className="btn btn-primary w-full"
           >
-            {t('referral.copy')}
+            {t('referral.copyCode')}
           </button>
         </div>
-        <p className="text-sm text-[color:var(--color-muted)] mt-2">
-          {t('referral.shareLink')}
-        </p>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <p className="text-sm text-blue-800 font-semibold mb-2">
+            📋 {t('referral.howToShare')}
+          </p>
+          <ol className="text-sm text-blue-700 space-y-1 ml-4">
+            <li>1. {t('referral.shareStep1')}</li>
+            <li>2. {t('referral.shareStep2')}</li>
+            <li>3. {t('referral.shareStep3')}</li>
+          </ol>
+        </div>
       </div>
 
       {/* Payment Method */}
