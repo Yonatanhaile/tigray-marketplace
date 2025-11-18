@@ -111,7 +111,7 @@ referralSchema.index({ 'withdrawalRequests.status': 1 });
 
 // Constants
 const WITHDRAWAL_THRESHOLD = 25; // Minimum referrals needed
-const EARNINGS_PER_REFERRAL = 5; // 5 birr per referral
+const EARNINGS_PER_REFERRAL = 10; // 10 birr per referral
 
 // Method to get available referrals for withdrawal (not yet withdrawn)
 referralSchema.methods.getAvailableReferrals = function() {
