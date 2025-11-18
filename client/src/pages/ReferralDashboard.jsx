@@ -303,7 +303,7 @@ const ReferralDashboard = () => {
           {t('referral.paymentMethod')}
         </h2>
         
-        {referralData?.paymentMethod ? (
+        {referralData?.paymentMethod?.type && referralData?.paymentMethod?.details ? (
           // Display saved payment method (read-only)
           <div>
             <div className="bg-gray-50 rounded-lg p-4 mb-4">
