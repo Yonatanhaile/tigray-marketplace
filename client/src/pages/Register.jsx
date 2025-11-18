@@ -95,7 +95,11 @@ const Register = () => {
       console.error('Registration error:', error);
       
       // Handle specific error codes
-      if (error.code === 'DEVICE_LIMIT_EXCEEDED') {
+      if (error.code === 'VPN_DETECTED') {
+        toast.error('Registration blocked: VPN or proxy detected. Please disable VPN and try again with your real Ethiopian IP address.');
+      } else if (error.code === 'NON_ETHIOPIAN_IP') {
+        toast.error('Registration is only available from Ethiopia. Your location has been detected as outside Ethiopia.');
+      } else if (error.code === 'DEVICE_LIMIT_EXCEEDED') {
         toast.error('This device has already been used to register an account. Only one account per device is allowed.');
       } else if (error.code === 'IP_LIMIT_EXCEEDED') {
         toast.error('Maximum number of accounts from this network reached. Only 2 accounts per network are allowed.');

@@ -3,6 +3,7 @@ const { generateToken } = require('../services/jwt');
 const { generateOTP, verifyOTP } = require('../services/otp');
 const { trackReferral } = require('./referralController');
 const logger = require('../services/logger');
+const geoip = require('geoip-lite');
 
 /**
  * Register new user
@@ -42,6 +43,43 @@ const register = async (req, res) => {
                       ipAddress.startsWith('192.168.') ||
                       ipAddress.startsWith('10.') ||
                       ipAddress.startsWith('172.');
+
+    // ETHIOPIA-ONLY REGISTRATION - IP GEOLOCATION CHECK
+    // Block ALL non-Ethiopian IPs and VPN/Proxy users
+    if (!isLocalIP) {
+      const geo = geoip.lookup(ipAddress);
+      
+      if (!geo) {
+        // IP lookup failed - likely VPN, proxy, or anonymizer
+        logger.error(`🚫 Registration BLOCKED: IP geolocation lookup failed (VPN/Proxy detected)`);
+        logger.error(`   IP: ${ipAddress}`);
+        logger.error(`   Email: ${email}`);
+        return res.status(403).json({
+          error: true,
+          message: 'Registration is only available from Ethiopia. VPN and proxy connections are not allowed.',
+          code: 'VPN_DETECTED'
+        });
+      }
+
+      // Check if IP is from Ethiopia
+      const isEthiopianIP = geo.country === 'ET'; // Ethiopia country code
+      
+      if (!isEthiopianIP) {
+        logger.error(`🚫 Registration BLOCKED: Non-Ethiopian IP detected`);
+        logger.error(`   IP: ${ipAddress}`);
+        logger.error(`   Country: ${geo.country} (${geo.region})`);
+        logger.error(`   Email: ${email}`);
+        return res.status(403).json({
+          error: true,
+          message: 'Registration is only available for users in Ethiopia. Your location has been detected as outside Ethiopia.',
+          code: 'NON_ETHIOPIAN_IP'
+        });
+      }
+
+      logger.info(`✅ IP Geolocation check PASSED - Ethiopian IP confirmed: ${geo.country} - ${geo.region} - ${geo.city}`);
+    } else {
+      logger.warn(`⚠️ Local IP detected - skipping geolocation check for development: ${ipAddress}`);
+    }
 
     // BLOCK registration if fingerprint is missing or unknown (unless local dev)
     if (!isLocalIP && (!deviceFingerprint || deviceFingerprint === 'unknown')) {
