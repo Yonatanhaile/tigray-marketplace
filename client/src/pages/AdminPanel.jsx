@@ -378,21 +378,21 @@ const AdminPanel = () => {
 
                   {/* Payment Method - Always Visible */}
                   <div className={`rounded-lg p-4 mb-4 border-2 ${
-                    program.paymentMethod 
+                    program.paymentMethod?.type
                       ? 'bg-blue-50 border-blue-200' 
                       : 'bg-yellow-50 border-yellow-300'
                   }`}>
                     <div className="flex items-start justify-between mb-2">
                       <p className="text-sm font-bold text-gray-900">💳 Payment Method</p>
                       <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                        program.paymentMethod 
+                        program.paymentMethod?.type
                           ? 'bg-green-100 text-green-700' 
                           : 'bg-red-100 text-red-700'
                       }`}>
-                        {program.paymentMethod ? 'Set' : 'Not Set'}
+                        {program.paymentMethod?.type ? 'Set' : 'Not Set'}
                       </span>
                     </div>
-                    {program.paymentMethod ? (
+                    {program.paymentMethod && program.paymentMethod.type ? (
                       <div className="space-y-1">
                         <p className="text-sm text-gray-900">
                           <span className="font-semibold">Type:</span>{' '}
@@ -401,7 +401,7 @@ const AdminPanel = () => {
                         <p className="text-sm text-gray-900">
                           <span className="font-semibold">Details:</span>{' '}
                           <span className="font-mono bg-white px-2 py-1 rounded">
-                            {program.paymentMethod.details}
+                            {program.paymentMethod.details || 'Not provided'}
                           </span>
                         </p>
                       </div>
