@@ -451,159 +451,43 @@ const ReferralDashboard = () => {
         )}
       </div>
 
-      {/* Anti-Fraud Rules - Prominent Warning */}
-      <div className="mt-8 bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-400 rounded-lg p-6 shadow-lg">
-        <div className="flex items-start gap-3 mb-4">
-          <div className="flex-shrink-0 text-3xl">⚠️</div>
-          <div>
-            <h3 className="font-bold text-red-900 text-xl mb-2">
-              ANTI-FRAUD RULES - READ CAREFULLY
-            </h3>
-            <p className="text-red-800 font-semibold text-base">
-              Violations will result in IMMEDIATE FORFEITURE of ALL earnings and PERMANENT BAN
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-white border-2 border-red-300 rounded-lg p-5 mb-4">
-          <h4 className="font-bold text-red-900 mb-3 flex items-center gap-2">
-            <span className="text-2xl">🚫</span>
-            ZERO TOLERANCE POLICY
-          </h4>
-          
-          <p className="text-sm text-gray-900 mb-3">
-            Any attempt to manipulate, abuse, or cheat the referral system is strictly forbidden. This includes but is not limited to:
+      {/* Simple Rules Section */}
+      <div className="mt-8 bg-gray-50 rounded-lg p-6 border border-gray-200">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900">
+          Program Rules
+        </h3>
+        
+        <div className="space-y-4 text-sm text-gray-700">
+          <p>
+            This referral program is designed to reward you for bringing real users to our platform. 
+            To keep it fair for everyone, please note:
           </p>
-          <ul className="space-y-2.5 text-sm">
-            <li className="flex items-start gap-2">
-              <span className="text-red-600 font-bold mt-0.5">✗</span>
-              <span className="text-gray-900">
-                Creating or using fake accounts to generate referrals
-              </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-red-600 font-bold mt-0.5">✗</span>
-              <span className="text-gray-900">
-                Referring yourself or registering multiple times
-              </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-red-600 font-bold mt-0.5">✗</span>
-              <span className="text-gray-900">
-                Using automated systems or tools to create accounts
-              </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-red-600 font-bold mt-0.5">✗</span>
-              <span className="text-gray-900">
-                Any other deceptive or fraudulent activity
-              </span>
-            </li>
+
+          <ul className="space-y-2 ml-4">
+            <li>• Only refer real people who will actually use the marketplace</li>
+            <li>• Don't create fake accounts or refer yourself</li>
+            <li>• Each referral must be a genuine, unique person</li>
           </ul>
-          <div className="mt-4 bg-red-50 border border-red-200 rounded p-3">
-            <p className="text-xs text-red-900 font-semibold">
-              ⚠️ We have advanced fraud detection systems in place. Don't try to outsmart the system - you will be caught and will lose everything.
-            </p>
-          </div>
-        </div>
 
-        <div className="bg-red-900 text-white rounded-lg p-5 mb-4">
-          <h4 className="font-bold text-lg mb-3 flex items-center gap-2">
-            <span className="text-2xl">💰</span>
-            CONSEQUENCES OF FRAUD
-          </h4>
-          <div className="space-y-2 text-sm">
-            <div className="flex items-start gap-2">
-              <span className="text-yellow-300 font-bold">1.</span>
-              <span>
-                <strong>IMMEDIATE ACCOUNT FLAGGING:</strong> Your account will be automatically flagged by our fraud detection system
-              </span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="text-yellow-300 font-bold">2.</span>
-              <span>
-                <strong>ALL EARNINGS FORFEITED:</strong> You will lose 100% of your referral earnings - every single Birr
-              </span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="text-yellow-300 font-bold">3.</span>
-              <span>
-                <strong>WITHDRAWAL BLOCKED:</strong> All withdrawal requests will be permanently rejected
-              </span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="text-yellow-300 font-bold">4.</span>
-              <span>
-                <strong>ACCOUNT SUSPENSION:</strong> Your entire marketplace account may be suspended or banned
-              </span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="text-yellow-300 font-bold">5.</span>
-              <span>
-                <strong>NO APPEALS:</strong> Fraudulent activity decisions are final and cannot be appealed
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4">
-          <h4 className="font-bold text-yellow-900 mb-2 flex items-center gap-2">
-            <span className="text-xl">🔍</span>
-            WE ARE WATCHING
-          </h4>
-          <p className="text-sm text-yellow-900 mb-2">
-            Our advanced fraud detection system monitors all referral activity in real-time using sophisticated technology that can identify suspicious patterns and fraudulent behavior.
-          </p>
-          <p className="text-xs text-yellow-900 font-semibold bg-yellow-100 rounded p-2">
-            ⚡ Our detection methods are constantly evolving. What worked yesterday won't work today. Save yourself the trouble - play fair.
+          <p className="text-xs text-gray-600 bg-gray-100 p-3 rounded">
+            <strong>Important:</strong> Attempts to abuse the system will result in loss of all earnings and 
+            account suspension. We monitor all referral activity to ensure fairness.
           </p>
         </div>
       </div>
 
       {/* How it Works */}
-      <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h3 className="font-semibold text-blue-900 mb-3">
+      <div className="mt-6 bg-white border border-gray-200 rounded-lg p-6">
+        <h3 className="font-semibold text-gray-900 mb-3">
           {t('referral.howItWorks')}
         </h3>
-        <ol className="space-y-2 text-sm text-blue-800">
+        <ol className="space-y-2 text-sm text-gray-700">
           <li>1. {t('referral.step1')}</li>
           <li>2. {t('referral.step2')}</li>
           <li>3. {t('referral.step3')}</li>
           <li>4. {t('referral.step4')}</li>
           <li>5. {t('referral.step5')}</li>
         </ol>
-      </div>
-
-      {/* Legitimate Use Agreement */}
-      <div className="mt-6 bg-green-50 border-2 border-green-400 rounded-lg p-5">
-        <h4 className="font-bold text-green-900 mb-3 flex items-center gap-2">
-          <span className="text-2xl">✅</span>
-          LEGITIMATE REFERRAL GUIDELINES
-        </h4>
-        <ul className="space-y-2 text-sm text-green-900">
-          <li className="flex items-start gap-2">
-            <span className="text-green-600 font-bold">✓</span>
-            <span>Share your code with real friends, family, and colleagues</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-green-600 font-bold">✓</span>
-            <span>Each referred person must be a unique, genuine individual</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-green-600 font-bold">✓</span>
-            <span>Referrals should be spread naturally over time, not all at once</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-green-600 font-bold">✓</span>
-            <span>If you have questions about what's allowed, contact support first</span>
-          </li>
-        </ul>
-        <div className="mt-4 bg-white border border-green-300 rounded p-3">
-          <p className="text-xs text-green-900">
-            <strong>By using this referral program, you agree to these terms.</strong> We want to reward genuine 
-            users who help us grow our community, not those who try to cheat the system. Play fair, earn rewards! 🎉
-          </p>
-        </div>
       </div>
     </div>
   );
