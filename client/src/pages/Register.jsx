@@ -3,7 +3,7 @@ import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
-import { getDeviceInfo } from '../utils/deviceFingerprint';
+import { getAdvancedDeviceInfo } from '../utils/advancedFingerprint';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -65,12 +65,12 @@ const Register = () => {
         delete registerData.referralCode;
       }
       
-      // Collect device fingerprint for fraud detection
+      // Collect ADVANCED device fingerprint for fraud detection (20+ methods)
       try {
-        const deviceInfo = await getDeviceInfo();
+        const deviceInfo = await getAdvancedDeviceInfo();
         registerData.deviceFingerprint = deviceInfo.fingerprint;
         registerData.deviceInfo = deviceInfo;
-        console.log('Device fingerprint collected for fraud detection');
+        console.log('✅ Advanced device fingerprint collected (Canvas, WebGL, Audio, WebRTC, etc.)');
       } catch (fpError) {
         console.error('Failed to collect device fingerprint:', fpError);
         // Continue registration even if fingerprinting fails
