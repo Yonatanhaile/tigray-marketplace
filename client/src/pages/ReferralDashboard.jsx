@@ -471,37 +471,6 @@ const ReferralDashboard = () => {
             ZERO TOLERANCE POLICY
           </h4>
           
-          {/* Ethiopia-Only Requirement */}
-          <div className="mb-4 bg-blue-50 border-2 border-blue-400 rounded-lg p-3">
-            <div className="flex items-start gap-2">
-              <span className="text-2xl">🇪🇹</span>
-              <div>
-                <p className="font-bold text-blue-900 mb-1">Ethiopia-Only Referral Program</p>
-                <p className="text-sm text-blue-800">
-                  Referrals are ONLY valid for users registering from Ethiopia. 
-                  Referrals from outside Ethiopia will be automatically rejected and will NOT earn you any money.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Strict Limits Warning */}
-          <div className="mb-4 bg-orange-50 border-2 border-orange-400 rounded-lg p-3">
-            <div className="flex items-start gap-2">
-              <span className="text-2xl">🔒</span>
-              <div>
-                <p className="font-bold text-orange-900 mb-1">Strict Account Limits</p>
-                <div className="text-sm text-orange-800 space-y-1">
-                  <p>• <strong>ONE account per device</strong> - Each device can only be used to register ONE account</p>
-                  <p>• <strong>TWO accounts per network</strong> - Maximum 2 accounts can register from the same internet connection</p>
-                  <p className="text-xs mt-2 text-orange-700">
-                    ⚠️ These limits are strictly enforced. Registration will be blocked if limits are exceeded.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <p className="text-sm text-gray-900 mb-3">
             Any attempt to manipulate, abuse, or cheat the referral system is strictly forbidden. This includes but is not limited to:
           </p>
@@ -522,12 +491,6 @@ const ReferralDashboard = () => {
               <span className="text-red-600 font-bold mt-0.5">✗</span>
               <span className="text-gray-900">
                 Using automated systems or tools to create accounts
-              </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-red-600 font-bold mt-0.5">✗</span>
-              <span className="text-gray-900">
-                Sharing your referral code outside of Ethiopia
               </span>
             </li>
             <li className="flex items-start gap-2">
@@ -620,15 +583,11 @@ const ReferralDashboard = () => {
         <ul className="space-y-2 text-sm text-green-900">
           <li className="flex items-start gap-2">
             <span className="text-green-600 font-bold">✓</span>
-            <span><strong>Only share with people in Ethiopia</strong> - referrals from other countries will be rejected</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-green-600 font-bold">✓</span>
             <span>Share your code with real friends, family, and colleagues</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-green-600 font-bold">✓</span>
-            <span>Each referred person must be a unique individual using their own device</span>
+            <span>Each referred person must be a unique, genuine individual</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-green-600 font-bold">✓</span>
@@ -642,7 +601,7 @@ const ReferralDashboard = () => {
         <div className="mt-4 bg-white border border-green-300 rounded p-3">
           <p className="text-xs text-green-900">
             <strong>By using this referral program, you agree to these terms.</strong> We want to reward genuine 
-            users who help us grow our community in Ethiopia, not those who try to cheat the system. Play fair, earn rewards! 🎉
+            users who help us grow our community, not those who try to cheat the system. Play fair, earn rewards! 🎉
           </p>
         </div>
       </div>
