@@ -167,97 +167,80 @@ const ReferralDashboard = () => {
 
       {/* Warning if flagged */}
       {referralData?.flagged && (
-        <div className="bg-red-50 border-2 border-red-500 rounded-lg p-6 mb-6 shadow-lg">
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 text-3xl">🚨</div>
-            <div className="flex-1">
-              <h3 className="font-bold text-red-900 text-lg mb-2">
-                {t('referral.accountFlagged')}
-              </h3>
-              <p className="text-sm text-red-800 mb-3">
-                Your referral account has been flagged due to suspicious activity. Withdrawals are blocked until this is resolved.
-              </p>
-              <div className="bg-red-100 rounded p-3 mb-3">
-                <p className="text-xs font-semibold text-red-900 mb-2">Fraud Detection Reasons:</p>
-                <ul className="text-sm text-red-800 space-y-1.5">
-                  {referralData.flagReasons.map((reason, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <span className="text-red-600">▪</span>
-                      <span>{reason}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="bg-yellow-50 border border-yellow-300 rounded p-3">
-                <p className="text-xs font-semibold text-yellow-900 mb-1">⚠️ What This Means:</p>
-                <ul className="text-xs text-yellow-800 space-y-1">
-                  <li>• You cannot request withdrawals while flagged</li>
-                  <li>• Your referrals are still counted but earnings are on hold</li>
-                  <li>• An admin will review your account</li>
-                  <li>• If this was a mistake, contact support</li>
-                </ul>
-              </div>
-            </div>
+        <div className="bg-red-50 border border-red-300 rounded-lg p-5 mb-6">
+          <h3 className="font-semibold text-red-900 mb-2">
+            Account Under Review
+          </h3>
+          <p className="text-sm text-red-800 mb-3">
+            Your account has been flagged for suspicious activity and is under review. Withdrawals are temporarily suspended.
+          </p>
+          <div className="text-sm text-red-700 space-y-1 mb-3">
+            {referralData.flagReasons.map((reason, i) => (
+              <p key={i}>• {reason}</p>
+            ))}
           </div>
+          <p className="text-xs text-red-600">
+            If you believe this is an error, please contact support.
+          </p>
         </div>
       )}
 
       {/* Stats Cards */}
       <div className="grid md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white rounded-lg border border-slate-200 p-6">
-          <p className="text-sm text-[color:var(--color-muted)] mb-1">
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <p className="text-sm text-gray-600 mb-1">
             {t('referral.totalReferrals')}
           </p>
-          <p className="text-3xl font-bold text-[color:var(--color-primary)]">
+          <p className="text-2xl font-semibold text-gray-900">
             {referralData?.totalReferrals || 0}
           </p>
         </div>
 
-        <div className="bg-white rounded-lg border border-slate-200 p-6">
-          <p className="text-sm text-[color:var(--color-muted)] mb-1">
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <p className="text-sm text-gray-600 mb-1">
             {t('referral.availableReferrals')}
           </p>
-          <p className="text-3xl font-bold text-orange-600">
+          <p className="text-2xl font-semibold text-gray-900">
             {referralData?.availableReferrals || 0}
           </p>
         </div>
 
-        <div className="bg-white rounded-lg border border-slate-200 p-6">
-          <p className="text-sm text-[color:var(--color-muted)] mb-1">
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <p className="text-sm text-gray-600 mb-1">
             {t('referral.availableBalance')}
           </p>
-          <p className="text-3xl font-bold text-green-600">
+          <p className="text-2xl font-semibold text-gray-900">
             {referralData?.availableBalance || 0} {t('referral.birr')}
           </p>
         </div>
 
-        <div className="bg-white rounded-lg border border-slate-200 p-6">
-          <p className="text-sm text-[color:var(--color-muted)] mb-1">
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <p className="text-sm text-gray-600 mb-1">
             {t('referral.totalWithdrawn')}
           </p>
-          <p className="text-3xl font-bold text-blue-600">
+          <p className="text-2xl font-semibold text-gray-900">
             {referralData?.totalWithdrawn || 0} {t('referral.birr')}
           </p>
         </div>
       </div>
 
       {/* Withdrawal Section */}
-      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200 p-6 mb-8">
+      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-xl font-semibold text-green-900">
+            <h2 className="text-lg font-semibold text-gray-900">
               {t('referral.withdrawalSection')}
             </h2>
-            <p className="text-sm text-green-700 mt-1">
+            <p className="text-sm text-gray-600 mt-1">
               {t('referral.minimumWithdrawal', { count: referralData?.withdrawalThreshold })}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-green-700">{t('referral.youCanWithdraw')}</p>
-            <p className="text-3xl font-bold text-green-800">
+            <p className="text-sm text-gray-600">{t('referral.youCanWithdraw')}</p>
+            <p className="text-2xl font-semibold text-gray-900">
               {withdrawableAmount} {t('referral.birr')}
             </p>
-            <p className="text-xs text-green-600">
+            <p className="text-xs text-gray-500">
               ({withdrawableReferrals} {t('referral.referrals')})
             </p>
           </div>
@@ -275,7 +258,7 @@ const ReferralDashboard = () => {
         </button>
 
         {!referralData?.canWithdraw && (
-          <p className="text-sm text-center text-green-700 mt-3">
+          <p className="text-sm text-center text-gray-600 mt-3">
             {t('referral.needMore', { 
               count: (referralData?.withdrawalThreshold || 25) - (referralData?.availableReferrals || 0)
             })}
@@ -284,29 +267,29 @@ const ReferralDashboard = () => {
       </div>
 
       {/* Referral Code */}
-      <div className="bg-white rounded-lg border border-slate-200 p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">
+      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+        <h2 className="text-lg font-semibold mb-4 text-gray-900">
           {t('referral.yourReferralCode')}
         </h2>
-        <div className="bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-orange-300 rounded-lg p-6 mb-4">
-          <p className="text-sm text-gray-600 mb-2 text-center">
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-4 text-center">
+          <p className="text-sm text-gray-600 mb-2">
             {t('referral.yourCode')}
           </p>
-          <p className="text-4xl font-bold text-center text-orange-600 tracking-widest mb-4">
+          <p className="text-3xl font-mono font-bold text-gray-900 tracking-wider mb-4">
             {referralData?.referralCode || ''}
           </p>
           <button
             onClick={() => copyToClipboard(referralData?.referralCode)}
-            className="btn btn-primary w-full"
+            className="btn btn-primary"
           >
             {t('referral.copyCode')}
           </button>
         </div>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm text-blue-800 font-semibold mb-2">
-            📋 {t('referral.howToShare')}
+        <div className="bg-gray-50 rounded-lg p-4">
+          <p className="text-sm text-gray-700 font-medium mb-2">
+            {t('referral.howToShare')}
           </p>
-          <ol className="text-sm text-blue-700 space-y-1 ml-4">
+          <ol className="text-sm text-gray-600 space-y-1 ml-4">
             <li>1. {t('referral.shareStep1')}</li>
             <li>2. {t('referral.shareStep2')}</li>
             <li>3. {t('referral.shareStep3')}</li>
@@ -315,8 +298,8 @@ const ReferralDashboard = () => {
       </div>
 
       {/* Payment Method */}
-      <div className="bg-white rounded-lg border border-slate-200 p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">
+      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+        <h2 className="text-lg font-semibold mb-4 text-gray-900">
           {t('referral.paymentMethod')}
         </h2>
         <form onSubmit={handleUpdatePayment} className="space-y-4">
@@ -374,15 +357,15 @@ const ReferralDashboard = () => {
 
       {/* Withdrawal History */}
       {referralData?.withdrawalHistory?.length > 0 && (
-        <div className="bg-white rounded-lg border border-slate-200 p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+          <h2 className="text-lg font-semibold mb-4 text-gray-900">
             {t('referral.withdrawalHistory')}
           </h2>
           <div className="space-y-3">
             {referralData.withdrawalHistory.map((withdrawal) => (
               <div
                 key={withdrawal.id}
-                className="flex items-center justify-between p-4 bg-slate-50 rounded-lg"
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
               >
                 <div>
                   <p className="font-medium">
@@ -399,12 +382,7 @@ const ReferralDashboard = () => {
                   )}
                 </div>
                 <div className="text-right">
-                  <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
-                    withdrawal.status === 'paid' ? 'bg-green-100 text-green-800' :
-                    withdrawal.status === 'approved' ? 'bg-blue-100 text-blue-800' :
-                    withdrawal.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                    'bg-yellow-100 text-yellow-800'
-                  }`}>
+                  <span className="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
                     {t(`referral.status.${withdrawal.status}`)}
                   </span>
                 </div>
@@ -415,8 +393,8 @@ const ReferralDashboard = () => {
       )}
 
       {/* Referral List */}
-      <div className="bg-white rounded-lg border border-slate-200 p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">
+      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+        <h2 className="text-lg font-semibold mb-4 text-gray-900">
           {t('referral.referredUsers')}
         </h2>
         
@@ -425,19 +403,19 @@ const ReferralDashboard = () => {
             {referralData.referredUsers.map((user, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
               >
                 <div>
-                  <p className="font-medium">{user.name}</p>
-                  <p className="text-sm text-[color:var(--color-muted)]">
+                  <p className="font-medium text-gray-900">{user.name}</p>
+                  <p className="text-sm text-gray-600">
                     {new Date(user.registeredAt).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-semibold text-green-600">
+                  <p className="text-sm font-semibold text-gray-900">
                     5 {t('referral.birr')}
                   </p>
-                  <p className="text-xs text-[color:var(--color-muted)]">
+                  <p className="text-xs text-gray-600">
                     {user.withdrawn ? t('referral.withdrawn') : t('referral.available')}
                   </p>
                 </div>
@@ -445,7 +423,7 @@ const ReferralDashboard = () => {
             ))}
           </div>
         ) : (
-          <p className="text-center text-[color:var(--color-muted)] py-8">
+          <p className="text-center text-gray-500 py-8">
             {t('referral.noReferrals')}
           </p>
         )}
