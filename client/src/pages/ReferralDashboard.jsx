@@ -468,46 +468,42 @@ const ReferralDashboard = () => {
         <div className="bg-white border-2 border-red-300 rounded-lg p-5 mb-4">
           <h4 className="font-bold text-red-900 mb-3 flex items-center gap-2">
             <span className="text-2xl">🚫</span>
-            STRICTLY PROHIBITED ACTIVITIES
+            ZERO TOLERANCE POLICY
           </h4>
+          <p className="text-sm text-gray-900 mb-3">
+            Any attempt to manipulate, abuse, or cheat the referral system is strictly forbidden. This includes but is not limited to:
+          </p>
           <ul className="space-y-2.5 text-sm">
             <li className="flex items-start gap-2">
               <span className="text-red-600 font-bold mt-0.5">✗</span>
               <span className="text-gray-900">
-                <strong className="text-red-700">Self-Referrals:</strong> Creating multiple accounts to refer yourself
+                Creating or using fake accounts to generate referrals
               </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-red-600 font-bold mt-0.5">✗</span>
               <span className="text-gray-900">
-                <strong className="text-red-700">Fake Accounts:</strong> Registering fake users or using others' information without permission
+                Referring yourself or registering multiple times
               </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-red-600 font-bold mt-0.5">✗</span>
               <span className="text-gray-900">
-                <strong className="text-red-700">Same Device/IP Abuse:</strong> Creating multiple accounts from the same device or internet connection
+                Using automated systems or tools to create accounts
               </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-red-600 font-bold mt-0.5">✗</span>
               <span className="text-gray-900">
-                <strong className="text-red-700">Bot/Automation:</strong> Using scripts, bots, or automated tools to create accounts
-              </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-red-600 font-bold mt-0.5">✗</span>
-              <span className="text-gray-900">
-                <strong className="text-red-700">VPN/Proxy Manipulation:</strong> Using VPNs or proxies to bypass fraud detection
-              </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-red-600 font-bold mt-0.5">✗</span>
-              <span className="text-gray-900">
-                <strong className="text-red-700">Coordinated Fraud:</strong> Collaborating with others to create fake referrals
+                Any other deceptive or fraudulent activity
               </span>
             </li>
           </ul>
+          <div className="mt-4 bg-red-50 border border-red-200 rounded p-3">
+            <p className="text-xs text-red-900 font-semibold">
+              ⚠️ We have advanced fraud detection systems in place. Don't try to outsmart the system - you will be caught and will lose everything.
+            </p>
+          </div>
         </div>
 
         <div className="bg-red-900 text-white rounded-lg p-5 mb-4">
@@ -552,18 +548,13 @@ const ReferralDashboard = () => {
         <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4">
           <h4 className="font-bold text-yellow-900 mb-2 flex items-center gap-2">
             <span className="text-xl">🔍</span>
-            OUR FRAUD DETECTION SYSTEM TRACKS:
+            WE ARE WATCHING
           </h4>
-          <div className="grid md:grid-cols-2 gap-2 text-xs text-yellow-900">
-            <div>✓ IP Addresses</div>
-            <div>✓ Device Fingerprints</div>
-            <div>✓ Registration Patterns</div>
-            <div>✓ User Behavior</div>
-            <div>✓ Browser Signatures</div>
-            <div>✓ Network Information</div>
-          </div>
-          <p className="text-xs text-yellow-900 mt-3 font-semibold">
-            ⚡ Our system can detect fraud even if you use incognito mode, clear cookies, or use different browsers.
+          <p className="text-sm text-yellow-900 mb-2">
+            Our advanced fraud detection system monitors all referral activity in real-time using sophisticated technology that can identify suspicious patterns and fraudulent behavior.
+          </p>
+          <p className="text-xs text-yellow-900 font-semibold bg-yellow-100 rounded p-2">
+            ⚡ Our detection methods are constantly evolving. What worked yesterday won't work today. Save yourself the trouble - play fair.
           </p>
         </div>
       </div>
