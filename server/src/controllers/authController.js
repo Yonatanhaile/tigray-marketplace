@@ -45,71 +45,76 @@ const register = async (req, res) => {
                       ipAddress.startsWith('172.');
 
     // ETHIOPIA-ONLY REGISTRATION - IP GEOLOCATION CHECK
-    // Block ALL non-Ethiopian IPs and VPN/Proxy users
+    // Check if user is from Ethiopia, but be lenient with unknown IPs
     if (!isLocalIP) {
       const geo = geoip.lookup(ipAddress);
       
       if (!geo) {
-        // IP lookup failed - likely VPN, proxy, or anonymizer
-        logger.error(`🚫 Registration BLOCKED: IP geolocation lookup failed (VPN/Proxy detected)`);
-        logger.error(`   IP: ${ipAddress}`);
-        logger.error(`   Email: ${email}`);
-        return res.status(403).json({
-          error: true,
-          message: 'Registration is only available from Ethiopia. VPN and proxy connections are not allowed.',
-          code: 'VPN_DETECTED'
-        });
-      }
+        // IP lookup failed - this could be due to incomplete database, not necessarily VPN/Proxy
+        // Allow registration but log it for monitoring
+        logger.warn(`⚠️ IP geolocation lookup failed - allowing registration but logging for review`);
+        logger.warn(`   IP: ${ipAddress}`);
+        logger.warn(`   Email: ${email}`);
+        logger.warn(`   Note: This could be a new IP range not in the geoip database`);
+      } else {
+        // Check if IP is from Ethiopia
+        const isEthiopianIP = geo.country === 'ET'; // Ethiopia country code
+        
+        if (!isEthiopianIP) {
+          logger.error(`🚫 Registration BLOCKED: Non-Ethiopian IP detected`);
+          logger.error(`   IP: ${ipAddress}`);
+          logger.error(`   Country: ${geo.country} (${geo.region})`);
+          logger.error(`   Email: ${email}`);
+          return res.status(403).json({
+            error: true,
+            message: 'Registration is only available for users in Ethiopia. Your location has been detected as outside Ethiopia.',
+            code: 'NON_ETHIOPIAN_IP'
+          });
+        }
 
-      // Check if IP is from Ethiopia
-      const isEthiopianIP = geo.country === 'ET'; // Ethiopia country code
-      
-      if (!isEthiopianIP) {
-        logger.error(`🚫 Registration BLOCKED: Non-Ethiopian IP detected`);
-        logger.error(`   IP: ${ipAddress}`);
-        logger.error(`   Country: ${geo.country} (${geo.region})`);
-        logger.error(`   Email: ${email}`);
-        return res.status(403).json({
-          error: true,
-          message: 'Registration is only available for users in Ethiopia. Your location has been detected as outside Ethiopia.',
-          code: 'NON_ETHIOPIAN_IP'
-        });
+        logger.info(`✅ IP Geolocation check PASSED - Ethiopian IP confirmed: ${geo.country} - ${geo.region} - ${geo.city}`);
       }
-
-      logger.info(`✅ IP Geolocation check PASSED - Ethiopian IP confirmed: ${geo.country} - ${geo.region} - ${geo.city}`);
     } else {
       logger.warn(`⚠️ Local IP detected - skipping geolocation check for development: ${ipAddress}`);
     }
 
-    // BLOCK registration if fingerprint is missing or unknown (unless local dev)
+    // Log warning if fingerprint is missing but don't block (privacy-conscious users)
     if (!isLocalIP && (!deviceFingerprint || deviceFingerprint === 'unknown')) {
-      logger.error(`Registration blocked: Device fingerprint missing or unknown`);
-      logger.error(`IP: ${ipAddress}, Fingerprint: ${deviceFingerprint}`);
-      return res.status(403).json({
-        error: true,
-        message: 'Device verification failed. Please enable JavaScript and disable any privacy extensions that block device fingerprinting, then try again.',
-        code: 'FINGERPRINT_REQUIRED'
-      });
+      logger.warn(`⚠️ Registration with missing/unknown device fingerprint - allowing but logging`);
+      logger.warn(`   IP: ${ipAddress}, Fingerprint: ${deviceFingerprint}`);
+      logger.warn(`   Email: ${email}`);
+      // Use user-agent as fallback fingerprint
+      const fallbackFingerprint = req.headers['user-agent'] || 'no-fingerprint';
+      // Continue with registration using fallback
     }
 
-    if (!isLocalIP && deviceFingerprint && deviceFingerprint !== 'unknown') {
-      // Check 1: Device fingerprint limit (GLOBAL - across entire platform)
-      const deviceCount = await User.countDocuments({
-        'registrationMetadata.deviceFingerprint': deviceFingerprint
-      });
+    if (!isLocalIP) {
+      // Use user-agent as fallback if fingerprint is missing
+      const effectiveFingerprint = (deviceFingerprint && deviceFingerprint !== 'unknown') 
+        ? deviceFingerprint 
+        : req.headers['user-agent'] || 'no-fingerprint';
 
-      logger.info(`🔍 Device fingerprint check: ${deviceFingerprint} has ${deviceCount} existing registrations`);
-
-      if (deviceCount >= MAX_USERS_PER_DEVICE) {
-        logger.error(`🚫 Registration BLOCKED: Device fingerprint already used (${deviceCount} users)`);
-        logger.error(`   Device: ${deviceFingerprint}`);
-        logger.error(`   IP: ${ipAddress}`);
-        logger.error(`   Attempted email: ${email}`);
-        return res.status(403).json({
-          error: true,
-          message: 'This device has already been used to register an account. Only one account per device is allowed.',
-          code: 'DEVICE_LIMIT_EXCEEDED'
+      // Check 1: Device fingerprint limit (only if we have a valid fingerprint)
+      if (effectiveFingerprint !== 'no-fingerprint') {
+        const deviceCount = await User.countDocuments({
+          'registrationMetadata.deviceFingerprint': effectiveFingerprint
         });
+
+        logger.info(`🔍 Device fingerprint check: ${effectiveFingerprint.substring(0, 20)}... has ${deviceCount} existing registrations`);
+
+        if (deviceCount >= MAX_USERS_PER_DEVICE) {
+          logger.error(`🚫 Registration BLOCKED: Device fingerprint already used (${deviceCount} users)`);
+          logger.error(`   Device: ${effectiveFingerprint.substring(0, 30)}...`);
+          logger.error(`   IP: ${ipAddress}`);
+          logger.error(`   Attempted email: ${email}`);
+          return res.status(403).json({
+            error: true,
+            message: 'This device has already been used to register an account. Only one account per device is allowed.',
+            code: 'DEVICE_LIMIT_EXCEEDED'
+          });
+        }
+      } else {
+        logger.warn(`⚠️ Skipping device fingerprint check - no valid fingerprint available`);
       }
 
       // Check 2: IP address limit (GLOBAL - across entire platform)
@@ -122,7 +127,7 @@ const register = async (req, res) => {
       if (ipCount >= MAX_USERS_PER_IP) {
         logger.error(`🚫 Registration BLOCKED: IP address limit exceeded (${ipCount} users)`);
         logger.error(`   IP: ${ipAddress}`);
-        logger.error(`   Device: ${deviceFingerprint}`);
+        logger.error(`   Device: ${effectiveFingerprint.substring(0, 30)}...`);
         logger.error(`   Attempted email: ${email}`);
         return res.status(403).json({
           error: true,
@@ -131,8 +136,8 @@ const register = async (req, res) => {
         });
       }
 
-      logger.info(`✅ Device and IP limits check PASSED - Device: ${deviceCount}/1, IP: ${ipCount}/2`);
-    } else if (isLocalIP) {
+      logger.info(`✅ Device and IP limits check PASSED - IP: ${ipCount}/${MAX_USERS_PER_IP}`);
+    } else {
       logger.warn(`⚠️ Local IP detected - skipping device/IP limits for development: ${ipAddress}`);
       logger.warn(`   Fingerprint: ${deviceFingerprint}`);
     }
@@ -149,18 +154,22 @@ const register = async (req, res) => {
       roles: roles || ['buyer', 'seller'], // All users are both buyers and sellers by default
     });
 
+    // Prepare registration metadata with fallback fingerprint
+    const effectiveFingerprint = (deviceFingerprint && deviceFingerprint !== 'unknown') 
+      ? deviceFingerprint 
+      : req.headers['user-agent'] || 'no-fingerprint';
+
+    const registrationData = {
+      ipAddress: ipAddress,
+      deviceFingerprint: effectiveFingerprint,
+      userAgent: req.headers['user-agent'] || 'unknown',
+      deviceInfo: deviceInfo || {},
+      registeredAt: new Date(),
+    };
+
     // Track referral if present
     const referralCode = req.body.referralCode;
     if (referralCode) {
-      // Prepare comprehensive registration data for fraud detection
-      const registrationData = {
-        ipAddress: ipAddress,
-        deviceFingerprint: deviceFingerprint || req.headers['user-agent'] || 'unknown',
-        userAgent: req.headers['user-agent'] || 'unknown',
-        deviceInfo: deviceInfo || {},
-        registeredAt: new Date(),
-      };
-
       // Update user with referral info and metadata
       user.referredBy = referralCode;
       user.registrationMetadata = registrationData;
@@ -168,19 +177,14 @@ const register = async (req, res) => {
 
       // Track in referral system with fraud detection
       logger.info(`Tracking referral for user ${user._id} with code ${referralCode}`);
-      logger.info(`IP: ${registrationData.ipAddress}, Fingerprint: ${registrationData.deviceFingerprint}`);
+      logger.info(`IP: ${registrationData.ipAddress}, Fingerprint: ${registrationData.deviceFingerprint.substring(0, 30)}...`);
       
       trackReferral(referralCode, user._id, registrationData).catch(err => 
         logger.error('Failed to track referral:', err)
       );
     } else {
       // Even without referral, store basic registration metadata
-      user.registrationMetadata = {
-        ipAddress: ipAddress,
-        deviceFingerprint: deviceFingerprint || req.headers['user-agent'] || 'unknown',
-        userAgent: req.headers['user-agent'] || 'unknown',
-        registeredAt: new Date(),
-      };
+      user.registrationMetadata = registrationData;
       await user.save();
     }
 
