@@ -1,12 +1,13 @@
 // Service Worker for PWA with auto-update support
-// Change this version number when deploying updates to force cache refresh
-const CACHE_VERSION = 'v2.2.0';
+// Version is now auto-generated during build - check version.json
+const CACHE_VERSION = 'v3.0.0-' + Date.now();
 const CACHE_NAME = `yohatrade-${CACHE_VERSION}`;
 
 // Assets to cache (minimal list - let network handle most)
 const urlsToCache = [
   '/',
   '/index.html',
+  '/version.json'
 ];
 
 // Install event - cache essential files and force immediate activation
@@ -62,12 +63,33 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   
+  // ALWAYS use network-first for version.json (never cache it)
+  if (url.pathname.includes('version.json')) {
+    event.respondWith(
+      fetch(event.request, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      }).catch(() => {
+        // Return a default version if network fails
+        return new Response(JSON.stringify({ version: CACHE_VERSION }), {
+          headers: { 'Content-Type': 'application/json' }
+        });
+      })
+    );
+    return;
+  }
+  
   // Network-first strategy for HTML and API calls
   if (event.request.mode === 'navigate' || 
       url.pathname.endsWith('.html') || 
       url.pathname.includes('/api/')) {
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request, {
+        cache: 'no-cache'
+      })
         .then((response) => {
           // Clone and cache the response
           const responseToCache = response.clone();
@@ -92,10 +114,12 @@ self.addEventListener('fetch', (event) => {
         })
     );
   }
-  // Network-first for everything else (JS, CSS)
+  // Network-first for JS and CSS to always get latest
   else {
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request, {
+        cache: 'no-cache'
+      })
         .then((response) => {
           return response;
         })
