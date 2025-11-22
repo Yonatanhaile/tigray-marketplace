@@ -554,42 +554,37 @@ const AdminPanel = () => {
             </div>
           )}
 
-          {/* Summary Stats - Enhanced */}
+          {/* Summary Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
             <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <p className="text-xs sm:text-sm text-gray-600 font-medium">Total Programs</p>
+              <p className="text-xs sm:text-sm text-gray-600">Total Programs</p>
               <p className="text-xl sm:text-2xl font-semibold text-gray-900">
                 {referralPrograms?.programs?.length || 0}
               </p>
-              <p className="text-xs text-gray-500 mt-1">Active referral programs</p>
             </div>
-            <div className="bg-blue-50 rounded-lg border-2 border-blue-300 p-4">
-              <p className="text-xs sm:text-sm text-blue-800 font-semibold">📊 Total Available</p>
-              <p className="text-xl sm:text-2xl font-bold text-blue-700">
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <p className="text-xs sm:text-sm text-gray-600">Total Available</p>
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">
                 {referralPrograms?.programs?.reduce((sum, p) => sum + (p.availableBalance || 0), 0) || 0} Birr
               </p>
-              <p className="text-xs text-blue-600 mt-1">Not yet paid to users</p>
             </div>
-            <div className="bg-green-50 rounded-lg border-2 border-green-300 p-4">
-              <p className="text-xs sm:text-sm text-green-800 font-semibold">💰 Total Paid</p>
-              <p className="text-xl sm:text-2xl font-bold text-green-700">
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <p className="text-xs sm:text-sm text-gray-600">Total Paid</p>
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">
                 {referralPrograms?.programs?.reduce((sum, p) => sum + (p.totalWithdrawn || 0), 0) || 0} Birr
               </p>
-              <p className="text-xs text-green-600 mt-1">Already paid out</p>
             </div>
-            <div className="bg-orange-50 rounded-lg border-2 border-orange-300 p-4">
-              <p className="text-xs sm:text-sm text-orange-800 font-semibold">🏦 Pending Requests</p>
-              <p className="text-xl sm:text-2xl font-bold text-orange-700">
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <p className="text-xs sm:text-sm text-gray-600">Pending Requests</p>
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">
                 {withdrawalRequests?.withdrawals?.filter(w => w.withdrawal.status === 'pending').length || 0}
               </p>
-              <p className="text-xs text-orange-600 mt-1">Need approval/payment</p>
             </div>
-            <div className="bg-red-50 rounded-lg border-2 border-red-300 p-4">
-              <p className="text-xs sm:text-sm text-red-800 font-semibold">🚨 Flagged</p>
-              <p className="text-xl sm:text-2xl font-bold text-red-700">
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <p className="text-xs sm:text-sm text-gray-600">Flagged</p>
+              <p className="text-xl sm:text-2xl font-semibold text-red-600">
                 {referralPrograms?.programs?.filter(p => p.suspiciousActivity?.flagged).length || 0}
               </p>
-              <p className="text-xs text-red-600 mt-1">Suspicious accounts</p>
             </div>
           </div>
 
@@ -625,32 +620,29 @@ const AdminPanel = () => {
                     )}
                   </div>
 
-                  {/* Stats Grid - Enhanced */}
+                  {/* Stats Grid */}
                   <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
                     <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                      <p className="text-xs text-gray-600 font-medium">Total Referrals</p>
-                      <p className="text-xl font-bold text-gray-900">{program.totalReferrals}</p>
-                      <p className="text-xs text-gray-500 mt-1">All referred users</p>
+                      <p className="text-xs text-gray-600">Total Referrals</p>
+                      <p className="text-lg font-semibold text-gray-900">{program.totalReferrals}</p>
                     </div>
-                    <div className="bg-blue-50 rounded-lg p-3 border-2 border-blue-300">
-                      <p className="text-xs text-blue-800 font-semibold">📊 Available Balance</p>
-                      <p className="text-xl font-bold text-blue-700">{program.availableBalance} Birr</p>
-                      <p className="text-xs text-blue-600 mt-1">{program.availableReferrals} not withdrawn</p>
+                    <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                      <p className="text-xs text-gray-600">Available Balance</p>
+                      <p className="text-lg font-semibold text-gray-900">{program.availableBalance} Birr</p>
+                      <p className="text-xs text-gray-500 mt-1">{program.availableReferrals} refs</p>
                     </div>
-                    <div className="bg-green-50 rounded-lg p-3 border-2 border-green-300">
-                      <p className="text-xs text-green-800 font-semibold">💰 Total Received</p>
-                      <p className="text-xl font-bold text-green-700">{program.totalWithdrawn} Birr</p>
-                      <p className="text-xs text-green-600 mt-1">Already paid out</p>
+                    <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                      <p className="text-xs text-gray-600">Total Received</p>
+                      <p className="text-lg font-semibold text-gray-900">{program.totalWithdrawn} Birr</p>
                     </div>
-                    <div className="bg-purple-50 rounded-lg p-3 border-2 border-purple-300">
-                      <p className="text-xs text-purple-800 font-semibold">💎 Total Earnings</p>
-                      <p className="text-xl font-bold text-purple-700">{(program.totalWithdrawn + program.availableBalance)} Birr</p>
-                      <p className="text-xs text-purple-600 mt-1">Received + Available</p>
+                    <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                      <p className="text-xs text-gray-600">Total Earnings</p>
+                      <p className="text-lg font-semibold text-gray-900">{(program.totalWithdrawn + program.availableBalance)} Birr</p>
                     </div>
-                    <div className="bg-orange-50 rounded-lg p-3 border-2 border-orange-300">
-                      <p className="text-xs text-orange-800 font-semibold">🏦 Can Withdraw</p>
-                      <p className="text-xl font-bold text-orange-700">{Math.floor(program.availableReferrals / 25) * 25 * 10} Birr</p>
-                      <p className="text-xs text-orange-600 mt-1">{Math.floor(program.availableReferrals / 25) * 25} refs × 10</p>
+                    <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                      <p className="text-xs text-gray-600">Can Withdraw</p>
+                      <p className="text-lg font-semibold text-gray-900">{Math.floor(program.availableReferrals / 25) * 25 * 10} Birr</p>
+                      <p className="text-xs text-gray-500 mt-1">{Math.floor(program.availableReferrals / 25) * 25} refs</p>
                     </div>
                   </div>
 
@@ -824,14 +816,14 @@ const AdminPanel = () => {
                         {program.paymentHistory?.length > 0 && (
                           <div className="mt-4">
                             <h4 className="text-sm font-semibold text-gray-900 mb-2">
-                              💰 Payment History ({program.paymentHistory.length})
+                              Payment History ({program.paymentHistory.length})
                             </h4>
                             <div className="space-y-2 max-h-60 overflow-y-auto">
                               {program.paymentHistory.map((payment, idx) => (
-                                <div key={idx} className="bg-green-50 rounded p-3 text-xs border border-green-200">
+                                <div key={idx} className="bg-gray-50 rounded p-3 text-xs border border-gray-200">
                                   <div className="flex justify-between items-start">
                                     <div>
-                                      <p className="font-bold text-green-900">{payment.amount} Birr Paid</p>
+                                      <p className="font-semibold text-gray-900">{payment.amount} Birr Paid</p>
                                       <p className="text-gray-600">
                                         Paid: {new Date(payment.paidAt).toLocaleDateString()}
                                       </p>
@@ -840,11 +832,11 @@ const AdminPanel = () => {
                                         <p className="text-gray-600">TX ID: {payment.transactionId}</p>
                                       )}
                                       {payment.notes && (
-                                        <p className="text-gray-700 mt-1 italic">Note: {payment.notes}</p>
+                                        <p className="text-gray-600 mt-1">{payment.notes}</p>
                                       )}
                                     </div>
-                                    <span className="px-2 py-1 rounded text-xs bg-green-100 text-green-700">
-                                      ✓ Paid
+                                    <span className="px-2 py-1 rounded text-xs bg-gray-100 text-gray-700">
+                                      Paid
                                     </span>
                                   </div>
                                 </div>
@@ -854,9 +846,9 @@ const AdminPanel = () => {
                         )}
 
                         {/* Record Manual Payment Button */}
-                        <div className="mt-4 bg-blue-50 rounded-lg p-4 border border-blue-200">
+                        <div className="mt-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
                           <div className="text-xs text-gray-700 mb-3">
-                            <p className="font-semibold text-blue-900 mb-2">💡 Current Status:</p>
+                            <p className="font-semibold text-gray-900 mb-2">Current Status:</p>
                             <ul className="space-y-1 ml-3">
                               <li>• Available Balance: <strong>{program.availableBalance} Birr</strong></li>
                               <li>• Available Referrals: <strong>{program.availableReferrals}</strong></li>
