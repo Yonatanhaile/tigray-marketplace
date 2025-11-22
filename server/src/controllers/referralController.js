@@ -301,6 +301,14 @@ const getReferralStats = async (req, res) => {
           processedAt: w.processedAt,
           rejectionReason: w.rejectionReason,
         })),
+        paymentHistory: referral.paymentHistory.map(p => ({
+          amount: p.amount,
+          paidAt: p.paidAt,
+          paymentMethod: p.paymentMethod,
+          transactionId: p.transactionId,
+          notes: p.notes,
+        })),
+        totalReceived: referral.totalWithdrawn,
         flagged: referral.suspiciousActivity?.flagged || false,
         flagReasons: referral.suspiciousActivity?.reasons || [],
       },
@@ -331,11 +339,12 @@ const requestWithdrawal = async (req, res) => {
       });
     }
 
-    // Check if account is flagged
-    if (referral.suspiciousActivity?.flagged) {
+    // Check if account is flagged (must be explicitly true)
+    if (referral.suspiciousActivity?.flagged === true) {
       return res.status(403).json({
         error: true,
         message: 'Your account is flagged for suspicious activity. Withdrawals are not allowed.',
+        flagReasons: referral.suspiciousActivity?.reasons || []
       });
     }
 
@@ -702,6 +711,7 @@ const getAllReferralPrograms = async (req, res) => {
         suspiciousActivity: ref.suspiciousActivity,
         referredUsers: ref.referredUsers,
         withdrawalRequests: ref.withdrawalRequests,
+        paymentHistory: ref.paymentHistory || [],
         createdAt: ref.createdAt,
       };
     });
@@ -716,6 +726,68 @@ const getAllReferralPrograms = async (req, res) => {
     res.status(500).json({
       error: 'Failed to fetch referral programs',
       message: error.message,
+    });
+  }
+};
+
+/**
+ * Admin: Manually record a payment to a referral user
+ */
+const recordManualPayment = async (req, res) => {
+  try {
+    const { referralId } = req.params;
+    const { amount, paymentMethod, transactionId, notes } = req.body;
+    const adminId = req.userId;
+
+    if (!amount || amount <= 0) {
+      return res.status(400).json({
+        error: true,
+        message: 'Invalid payment amount',
+      });
+    }
+
+    const referral = await Referral.findById(referralId);
+    
+    if (!referral) {
+      return res.status(404).json({
+        error: true,
+        message: 'Referral program not found',
+      });
+    }
+
+    // Add payment to history
+    referral.paymentHistory.push({
+      amount: amount,
+      paidAt: new Date(),
+      paidBy: adminId,
+      paymentMethod: paymentMethod || referral.paymentMethod?.type || 'manual',
+      transactionId: transactionId || '',
+      notes: notes || '',
+    });
+
+    // Update total withdrawn
+    referral.totalWithdrawn += amount;
+
+    // Recalculate available balance
+    referral.calculateAvailableBalance();
+
+    await referral.save();
+
+    logger.info(`Manual payment recorded by admin ${adminId}: ${amount} Birr to referral ${referralId}`);
+
+    res.status(200).json({
+      error: false,
+      message: 'Payment recorded successfully',
+      payment: referral.paymentHistory[referral.paymentHistory.length - 1],
+      totalWithdrawn: referral.totalWithdrawn,
+      availableBalance: referral.availableBalance,
+    });
+  } catch (error) {
+    logger.error('Record manual payment error:', error);
+    res.status(500).json({
+      error: true,
+      message: 'Failed to record payment',
+      details: error.message,
     });
   }
 };
@@ -775,5 +847,6 @@ module.exports = {
   processWithdrawal,
   getAllReferralPrograms,
   updateReferralFlag,
+  recordManualPayment,
 };
 

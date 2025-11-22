@@ -216,10 +216,13 @@ const ReferralDashboard = () => {
 
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <p className="text-sm text-gray-600 mb-1">
-            {t('referral.totalWithdrawn')}
+            💰 Total Received
           </p>
-          <p className="text-2xl font-semibold text-gray-900">
-            {referralData?.totalWithdrawn || 0} {t('referral.birr')}
+          <p className="text-2xl font-semibold text-green-600">
+            {referralData?.totalReceived || referralData?.totalWithdrawn || 0} {t('referral.birr')}
+          </p>
+          <p className="text-xs text-gray-500 mt-1">
+            Total payments received
           </p>
         </div>
       </div>
@@ -395,7 +398,59 @@ const ReferralDashboard = () => {
         )}
       </div>
 
-      {/* Withdrawal History */}
+      {/* Payment History - Money You've Received */}
+      {referralData?.paymentHistory?.length > 0 && (
+        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border-2 border-green-200 p-6 mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-2xl">💰</span>
+            <h2 className="text-lg font-bold text-green-900">
+              Payment History - Money Received
+            </h2>
+          </div>
+          <div className="space-y-3">
+            {referralData.paymentHistory.map((payment, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm border border-green-200"
+              >
+                <div>
+                  <p className="font-bold text-green-700 text-lg">
+                    ✓ {payment.amount} {t('referral.birr')}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {new Date(payment.paidAt).toLocaleDateString()} • {payment.paymentMethod}
+                  </p>
+                  {payment.transactionId && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      TX: {payment.transactionId}
+                    </p>
+                  )}
+                  {payment.notes && (
+                    <p className="text-xs text-gray-700 mt-1 italic">
+                      Note: {payment.notes}
+                    </p>
+                  )}
+                </div>
+                <div className="text-right">
+                  <span className="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                    PAID ✓
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 bg-white rounded-lg p-4 border border-green-200">
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-semibold text-gray-700">Total Received:</span>
+              <span className="text-xl font-bold text-green-600">
+                {referralData.totalReceived || 0} {t('referral.birr')}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Withdrawal History - Pending/Requested */}
       {referralData?.withdrawalHistory?.length > 0 && (
         <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
           <h2 className="text-lg font-semibold mb-4 text-gray-900">

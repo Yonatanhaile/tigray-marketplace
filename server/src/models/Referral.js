@@ -86,6 +86,24 @@ const referralSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  // Manual payment history (admin recorded payments)
+  paymentHistory: [{
+    amount: {
+      type: Number,
+      required: true,
+    },
+    paidAt: {
+      type: Date,
+      default: Date.now,
+    },
+    paidBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    paymentMethod: String,
+    transactionId: String,
+    notes: String,
+  }],
   // Fraud detection metadata
   suspiciousActivity: {
     flagged: {

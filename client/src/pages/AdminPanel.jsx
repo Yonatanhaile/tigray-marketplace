@@ -121,6 +121,29 @@ const AdminPanel = () => {
     },
   });
 
+  const recordPaymentMutation = useMutation({
+    mutationFn: async ({ referralId, amount, paymentMethod, transactionId, notes }) => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/referrals/admin/programs/${referralId}/payment`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ amount, paymentMethod, transactionId, notes }),
+      });
+      if (!response.ok) throw new Error('Failed to record payment');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['admin', 'referrals']);
+      toast.success('Payment recorded successfully');
+    },
+    onError: (error) => {
+      toast.error(error?.message || 'Failed to record payment');
+    },
+  });
+
   // Pending listings moderation
   const { data: pendingListings, isLoading: loadingPending } = useQuery({
     queryKey: ['admin', 'pending-listings'],
@@ -775,6 +798,66 @@ const AdminPanel = () => {
                             </div>
                           </div>
                         )}
+
+                        {/* Payment History */}
+                        {program.paymentHistory?.length > 0 && (
+                          <div className="mt-4">
+                            <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                              💰 Payment History ({program.paymentHistory.length})
+                            </h4>
+                            <div className="space-y-2 max-h-60 overflow-y-auto">
+                              {program.paymentHistory.map((payment, idx) => (
+                                <div key={idx} className="bg-green-50 rounded p-3 text-xs border border-green-200">
+                                  <div className="flex justify-between items-start">
+                                    <div>
+                                      <p className="font-bold text-green-900">{payment.amount} Birr Paid</p>
+                                      <p className="text-gray-600">
+                                        Paid: {new Date(payment.paidAt).toLocaleDateString()}
+                                      </p>
+                                      <p className="text-gray-600">Method: {payment.paymentMethod}</p>
+                                      {payment.transactionId && (
+                                        <p className="text-gray-600">TX ID: {payment.transactionId}</p>
+                                      )}
+                                      {payment.notes && (
+                                        <p className="text-gray-700 mt-1 italic">Note: {payment.notes}</p>
+                                      )}
+                                    </div>
+                                    <span className="px-2 py-1 rounded text-xs bg-green-100 text-green-700">
+                                      ✓ Paid
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Record Manual Payment Button */}
+                        <div className="mt-4">
+                          <button
+                            onClick={() => {
+                              const amount = prompt('Enter payment amount in Birr:');
+                              if (!amount || isNaN(amount) || Number(amount) <= 0) {
+                                toast.error('Please enter a valid amount');
+                                return;
+                              }
+                              const paymentMethod = prompt('Payment method (e.g., Bank Transfer, TeleBirr):');
+                              const transactionId = prompt('Transaction ID (optional):') || '';
+                              const notes = prompt('Notes (optional):') || '';
+                              
+                              recordPaymentMutation.mutate({
+                                referralId: program._id,
+                                amount: Number(amount),
+                                paymentMethod: paymentMethod || 'manual',
+                                transactionId,
+                                notes
+                              });
+                            }}
+                            className="btn btn-success btn-sm text-xs w-full"
+                          >
+                            💸 Record Manual Payment
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
