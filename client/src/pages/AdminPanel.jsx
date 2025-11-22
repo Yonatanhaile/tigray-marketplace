@@ -135,9 +135,10 @@ const AdminPanel = () => {
       if (!response.ok) throw new Error('Failed to record payment');
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries(['admin', 'referrals']);
-      toast.success('Payment recorded successfully');
+      queryClient.invalidateQueries(['admin', 'stats']);
+      toast.success(`✅ Payment recorded! ${data.referralsMarked} referrals marked as paid. Available balance updated: ${data.availableBalance} Birr`);
     },
     onError: (error) => {
       toast.error(error?.message || 'Failed to record payment');
@@ -853,14 +854,30 @@ const AdminPanel = () => {
                         )}
 
                         {/* Record Manual Payment Button */}
-                        <div className="mt-4">
+                        <div className="mt-4 bg-blue-50 rounded-lg p-4 border border-blue-200">
+                          <div className="text-xs text-gray-700 mb-3">
+                            <p className="font-semibold text-blue-900 mb-2">💡 Current Status:</p>
+                            <ul className="space-y-1 ml-3">
+                              <li>• Available Balance: <strong>{program.availableBalance} Birr</strong></li>
+                              <li>• Available Referrals: <strong>{program.availableReferrals}</strong></li>
+                              <li>• Total Received: <strong>{program.totalWithdrawn} Birr</strong></li>
+                            </ul>
+                          </div>
                           <button
                             onClick={() => {
-                              const amount = prompt('Enter payment amount in Birr:');
+                              const amount = prompt(`💰 Enter payment amount in Birr:\n\nThis user has ${program.availableReferrals} available referrals (${program.availableBalance} Birr).\nYou can pay any amount, and the system will mark referrals accordingly.\n\nAmount:`);
                               if (!amount || isNaN(amount) || Number(amount) <= 0) {
                                 toast.error('Please enter a valid amount');
                                 return;
                               }
+                              
+                              const referralsToMark = Math.floor(Number(amount) / 10);
+                              const confirmMsg = `📋 Payment Summary:\n\nAmount: ${amount} Birr\nReferrals to mark: ${referralsToMark}\nAvailable referrals: ${program.availableReferrals}\n\nNew available balance will be: ${program.availableBalance - (referralsToMark * 10)} Birr\nNew total received will be: ${program.totalWithdrawn + Number(amount)} Birr\n\nProceed?`;
+                              
+                              if (!confirm(confirmMsg)) {
+                                return;
+                              }
+                              
                               const paymentMethod = prompt('Payment method (e.g., Bank Transfer, TeleBirr):');
                               const transactionId = prompt('Transaction ID (optional):') || '';
                               const notes = prompt('Notes (optional):') || '';
@@ -874,8 +891,9 @@ const AdminPanel = () => {
                               });
                             }}
                             className="btn btn-success btn-sm text-xs w-full"
+                            disabled={recordPaymentMutation.isLoading}
                           >
-                            💸 Record Manual Payment
+                            {recordPaymentMutation.isLoading ? 'Recording...' : '💸 Record Manual Payment'}
                           </button>
                         </div>
                       </div>

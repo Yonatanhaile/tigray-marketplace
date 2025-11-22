@@ -755,32 +755,58 @@ const recordManualPayment = async (req, res) => {
       });
     }
 
+    // Calculate how many referrals this payment represents (10 Birr per referral)
+    const EARNINGS_PER_REFERRAL = 10;
+    const referralsCount = Math.floor(amount / EARNINGS_PER_REFERRAL);
+
+    // Get available referrals to mark as withdrawn
+    const availableReferrals = referral.referredUsers.filter(r => !r.includeInWithdrawal);
+
+    if (referralsCount > availableReferrals.length) {
+      logger.warn(`Payment amount (${amount} Birr) represents ${referralsCount} referrals, but only ${availableReferrals.length} available`);
+      // Continue anyway - admin might be paying bonus or making adjustment
+    }
+
     // Add payment to history
-    referral.paymentHistory.push({
+    const paymentRecord = {
       amount: amount,
       paidAt: new Date(),
       paidBy: adminId,
       paymentMethod: paymentMethod || referral.paymentMethod?.type || 'manual',
       transactionId: transactionId || '',
       notes: notes || '',
-    });
+    };
+    referral.paymentHistory.push(paymentRecord);
+
+    // Mark referrals as withdrawn (use the payment record _id as the withdrawal marker)
+    const paymentId = referral.paymentHistory[referral.paymentHistory.length - 1]._id;
+    const referralsToMark = Math.min(referralsCount, availableReferrals.length);
+    
+    for (let i = 0; i < referralsToMark; i++) {
+      availableReferrals[i].includeInWithdrawal = paymentId;
+    }
 
     // Update total withdrawn
     referral.totalWithdrawn += amount;
+
+    // Update total earnings
+    referral.totalEarnings += amount;
 
     // Recalculate available balance
     referral.calculateAvailableBalance();
 
     await referral.save();
 
-    logger.info(`Manual payment recorded by admin ${adminId}: ${amount} Birr to referral ${referralId}`);
+    logger.info(`Manual payment recorded by admin ${adminId}: ${amount} Birr (${referralsToMark} referrals marked) to referral ${referralId}`);
+    logger.info(`Updated stats - Available: ${referral.availableBalance} Birr, Total Withdrawn: ${referral.totalWithdrawn} Birr`);
 
     res.status(200).json({
       error: false,
       message: 'Payment recorded successfully',
-      payment: referral.paymentHistory[referral.paymentHistory.length - 1],
+      payment: paymentRecord,
       totalWithdrawn: referral.totalWithdrawn,
       availableBalance: referral.availableBalance,
+      referralsMarked: referralsToMark,
     });
   } catch (error) {
     logger.error('Record manual payment error:', error);
