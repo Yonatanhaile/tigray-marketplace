@@ -135,9 +135,15 @@ const AdminPanel = () => {
       if (!response.ok) throw new Error('Failed to record payment');
       return response.json();
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries(['admin', 'referrals']);
-      queryClient.invalidateQueries(['admin', 'stats']);
+    onSuccess: async (data) => {
+      // Invalidate and immediately refetch all related queries
+      await queryClient.invalidateQueries(['admin', 'referrals']);
+      await queryClient.invalidateQueries(['admin', 'stats']);
+      await queryClient.invalidateQueries(['admin', 'withdrawals']);
+      
+      // Force refetch to ensure data is updated
+      await queryClient.refetchQueries(['admin', 'referrals']);
+      
       toast.success(`✅ Payment recorded! ${data.referralsMarked} referrals marked as paid. Available balance updated: ${data.availableBalance} Birr`);
     },
     onError: (error) => {

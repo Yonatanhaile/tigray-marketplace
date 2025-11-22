@@ -12,11 +12,19 @@ const ReferralDashboard = () => {
   const [paymentDetails, setPaymentDetails] = useState('');
   const [updating, setUpdating] = useState(false);
   const [withdrawing, setWithdrawing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
     fetchReferralData();
+    
+    // Auto-refresh every 30 seconds to detect admin payments
+    const interval = setInterval(() => {
+      fetchReferralData();
+    }, 30000); // 30 seconds
+    
+    return () => clearInterval(interval);
   }, []);
 
   const fetchReferralData = async () => {
@@ -47,6 +55,7 @@ const ReferralDashboard = () => {
 
       const data = await statsResponse.json();
       setReferralData(data.stats);
+      setLastUpdated(new Date());
       
       if (data.stats.paymentMethod) {
         setPaymentType(data.stats.paymentMethod.type);
@@ -160,10 +169,27 @@ const ReferralDashboard = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-2">{t('referral.title')}</h1>
-      <p className="text-[color:var(--color-muted)] mb-8">
+      <div className="flex items-center justify-between mb-2">
+        <h1 className="text-3xl font-bold">{t('referral.title')}</h1>
+        <button
+          onClick={() => {
+            setLoading(true);
+            fetchReferralData();
+          }}
+          disabled={loading}
+          className="btn btn-secondary btn-sm"
+        >
+          {loading ? 'Refreshing...' : '🔄 Refresh'}
+        </button>
+      </div>
+      <p className="text-[color:var(--color-muted)] mb-2">
         {t('referral.subtitle')}
       </p>
+      {lastUpdated && (
+        <p className="text-xs text-gray-500 mb-6">
+          Last updated: {lastUpdated.toLocaleTimeString()} • Auto-refreshes every 30 seconds
+        </p>
+      )}
 
       {/* Warning if flagged */}
       {referralData?.flagged && (
