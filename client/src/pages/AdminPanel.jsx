@@ -553,31 +553,42 @@ const AdminPanel = () => {
             </div>
           )}
 
-          {/* Summary Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          {/* Summary Stats - Enhanced */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
             <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <p className="text-xs sm:text-sm text-gray-600">Total Programs</p>
+              <p className="text-xs sm:text-sm text-gray-600 font-medium">Total Programs</p>
               <p className="text-xl sm:text-2xl font-semibold text-gray-900">
                 {referralPrograms?.programs?.length || 0}
               </p>
+              <p className="text-xs text-gray-500 mt-1">Active referral programs</p>
             </div>
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <p className="text-xs sm:text-sm text-gray-600">Flagged Accounts</p>
-              <p className="text-xl sm:text-2xl font-semibold text-red-600">
-                {referralPrograms?.programs?.filter(p => p.suspiciousActivity?.flagged).length || 0}
+            <div className="bg-blue-50 rounded-lg border-2 border-blue-300 p-4">
+              <p className="text-xs sm:text-sm text-blue-800 font-semibold">📊 Total Available</p>
+              <p className="text-xl sm:text-2xl font-bold text-blue-700">
+                {referralPrograms?.programs?.reduce((sum, p) => sum + (p.availableBalance || 0), 0) || 0} Birr
               </p>
+              <p className="text-xs text-blue-600 mt-1">Not yet paid to users</p>
             </div>
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <p className="text-xs sm:text-sm text-gray-600">Pending Withdrawals</p>
-              <p className="text-xl sm:text-2xl font-semibold text-orange-600">
-                {withdrawalRequests?.withdrawals?.filter(w => w.withdrawal.status === 'pending').length || 0}
-              </p>
-            </div>
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <p className="text-xs sm:text-sm text-gray-600">Total Withdrawn</p>
-              <p className="text-xl sm:text-2xl font-semibold text-green-600">
+            <div className="bg-green-50 rounded-lg border-2 border-green-300 p-4">
+              <p className="text-xs sm:text-sm text-green-800 font-semibold">💰 Total Paid</p>
+              <p className="text-xl sm:text-2xl font-bold text-green-700">
                 {referralPrograms?.programs?.reduce((sum, p) => sum + (p.totalWithdrawn || 0), 0) || 0} Birr
               </p>
+              <p className="text-xs text-green-600 mt-1">Already paid out</p>
+            </div>
+            <div className="bg-orange-50 rounded-lg border-2 border-orange-300 p-4">
+              <p className="text-xs sm:text-sm text-orange-800 font-semibold">🏦 Pending Requests</p>
+              <p className="text-xl sm:text-2xl font-bold text-orange-700">
+                {withdrawalRequests?.withdrawals?.filter(w => w.withdrawal.status === 'pending').length || 0}
+              </p>
+              <p className="text-xs text-orange-600 mt-1">Need approval/payment</p>
+            </div>
+            <div className="bg-red-50 rounded-lg border-2 border-red-300 p-4">
+              <p className="text-xs sm:text-sm text-red-800 font-semibold">🚨 Flagged</p>
+              <p className="text-xl sm:text-2xl font-bold text-red-700">
+                {referralPrograms?.programs?.filter(p => p.suspiciousActivity?.flagged).length || 0}
+              </p>
+              <p className="text-xs text-red-600 mt-1">Suspicious accounts</p>
             </div>
           </div>
 
@@ -613,23 +624,32 @@ const AdminPanel = () => {
                     )}
                   </div>
 
-                  {/* Stats Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-                    <div>
-                      <p className="text-xs text-gray-600">Total Referrals</p>
-                      <p className="text-lg font-semibold text-gray-900">{program.totalReferrals}</p>
+                  {/* Stats Grid - Enhanced */}
+                  <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
+                    <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                      <p className="text-xs text-gray-600 font-medium">Total Referrals</p>
+                      <p className="text-xl font-bold text-gray-900">{program.totalReferrals}</p>
+                      <p className="text-xs text-gray-500 mt-1">All referred users</p>
                     </div>
-                    <div>
-                      <p className="text-xs text-gray-600">Available</p>
-                      <p className="text-lg font-semibold text-gray-900">{program.availableReferrals}</p>
+                    <div className="bg-blue-50 rounded-lg p-3 border-2 border-blue-300">
+                      <p className="text-xs text-blue-800 font-semibold">📊 Available Balance</p>
+                      <p className="text-xl font-bold text-blue-700">{program.availableBalance} Birr</p>
+                      <p className="text-xs text-blue-600 mt-1">{program.availableReferrals} not withdrawn</p>
                     </div>
-                    <div>
-                      <p className="text-xs text-gray-600">Balance</p>
-                      <p className="text-lg font-semibold text-green-600">{program.availableBalance} Birr</p>
+                    <div className="bg-green-50 rounded-lg p-3 border-2 border-green-300">
+                      <p className="text-xs text-green-800 font-semibold">💰 Total Received</p>
+                      <p className="text-xl font-bold text-green-700">{program.totalWithdrawn} Birr</p>
+                      <p className="text-xs text-green-600 mt-1">Already paid out</p>
                     </div>
-                    <div>
-                      <p className="text-xs text-gray-600">Withdrawn</p>
-                      <p className="text-lg font-semibold text-gray-900">{program.totalWithdrawn} Birr</p>
+                    <div className="bg-purple-50 rounded-lg p-3 border-2 border-purple-300">
+                      <p className="text-xs text-purple-800 font-semibold">💎 Total Earnings</p>
+                      <p className="text-xl font-bold text-purple-700">{(program.totalWithdrawn + program.availableBalance)} Birr</p>
+                      <p className="text-xs text-purple-600 mt-1">Received + Available</p>
+                    </div>
+                    <div className="bg-orange-50 rounded-lg p-3 border-2 border-orange-300">
+                      <p className="text-xs text-orange-800 font-semibold">🏦 Can Withdraw</p>
+                      <p className="text-xl font-bold text-orange-700">{Math.floor(program.availableReferrals / 25) * 25 * 10} Birr</p>
+                      <p className="text-xs text-orange-600 mt-1">{Math.floor(program.availableReferrals / 25) * 25} refs × 10</p>
                     </div>
                   </div>
 

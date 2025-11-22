@@ -186,7 +186,7 @@ const ReferralDashboard = () => {
       )}
 
       {/* Stats Cards */}
-      <div className="grid md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <p className="text-sm text-gray-600 mb-1">
             {t('referral.totalReferrals')}
@@ -194,57 +194,69 @@ const ReferralDashboard = () => {
           <p className="text-2xl font-semibold text-gray-900">
             {referralData?.totalReferrals || 0}
           </p>
-        </div>
-
-        <div className="bg-white rounded-lg border border-gray-200 p-5">
-          <p className="text-sm text-gray-600 mb-1">
-            {t('referral.availableReferrals')}
-          </p>
-          <p className="text-2xl font-semibold text-gray-900">
-            {referralData?.availableReferrals || 0}
+          <p className="text-xs text-gray-500 mt-1">
+            Total people referred
           </p>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-5">
-          <p className="text-sm text-gray-600 mb-1">
-            {t('referral.availableBalance')}
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border-2 border-blue-300 p-5">
+          <p className="text-sm font-semibold text-blue-900 mb-1">
+            📊 Available Balance
           </p>
-          <p className="text-2xl font-semibold text-gray-900">
+          <p className="text-3xl font-bold text-blue-700">
             {referralData?.availableBalance || 0} {t('referral.birr')}
           </p>
+          <p className="text-xs text-blue-600 mt-1">
+            {referralData?.availableReferrals || 0} referrals not withdrawn yet
+          </p>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-5">
-          <p className="text-sm text-gray-600 mb-1">
+        <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-lg border-2 border-green-300 p-5">
+          <p className="text-sm font-semibold text-green-900 mb-1">
             💰 Total Received
           </p>
-          <p className="text-2xl font-semibold text-green-600">
+          <p className="text-3xl font-bold text-green-700">
             {referralData?.totalReceived || referralData?.totalWithdrawn || 0} {t('referral.birr')}
           </p>
-          <p className="text-xs text-gray-500 mt-1">
-            Total payments received
+          <p className="text-xs text-green-600 mt-1">
+            Total payments you've received
+          </p>
+        </div>
+
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border-2 border-purple-300 p-5">
+          <p className="text-sm font-semibold text-purple-900 mb-1">
+            💎 Total Earnings
+          </p>
+          <p className="text-3xl font-bold text-purple-700">
+            {((referralData?.totalReceived || 0) + (referralData?.availableBalance || 0))} {t('referral.birr')}
+          </p>
+          <p className="text-xs text-purple-600 mt-1">
+            Total earned (received + available)
           </p>
         </div>
       </div>
 
       {/* Withdrawal Section */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+      <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-lg border-2 border-orange-300 p-6 mb-8">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">
-              {t('referral.withdrawalSection')}
+            <h2 className="text-xl font-bold text-orange-900">
+              🏦 {t('referral.withdrawalSection')}
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-700 mt-1">
               {t('referral.minimumWithdrawal', { count: referralData?.withdrawalThreshold })}
             </p>
           </div>
-          <div className="text-right">
-            <p className="text-sm text-gray-600">{t('referral.youCanWithdraw')}</p>
-            <p className="text-2xl font-semibold text-gray-900">
-              {withdrawableAmount} {t('referral.birr')}
+          <div className="text-right bg-white rounded-lg p-4 border-2 border-orange-400 shadow-lg">
+            <p className="text-sm font-semibold text-gray-700">{t('referral.youCanWithdraw')}</p>
+            <p className="text-4xl font-bold text-orange-600">
+              {withdrawableAmount}
             </p>
-            <p className="text-xs text-gray-500">
-              ({withdrawableReferrals} {t('referral.referrals')})
+            <p className="text-sm font-semibold text-gray-600">
+              {t('referral.birr')}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              ({withdrawableReferrals} {t('referral.referrals')} × {referralData?.earningsPerReferral || 10} Birr)
             </p>
           </div>
         </div>
