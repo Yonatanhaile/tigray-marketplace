@@ -33,7 +33,7 @@ const register = async (req, res) => {
 
     // STRICT DEVICE AND IP LIMIT CHECKS
     // Only allow registration if limits are not exceeded
-    const MAX_USERS_PER_IP = 2;
+    const MAX_USERS_PER_IP = 1; // Changed to 1 - only ONE account per IP address
     const MAX_USERS_PER_DEVICE = 1;
 
     // Skip these checks for local/development IPs
@@ -131,12 +131,12 @@ const register = async (req, res) => {
         logger.error(`   Attempted email: ${email}`);
         return res.status(403).json({
           error: true,
-          message: 'Maximum number of accounts from this network has been reached. Only 2 accounts per network are allowed.',
+          message: 'An account has already been registered from this network. Only one account per network is allowed.',
           code: 'IP_LIMIT_EXCEEDED'
         });
       }
 
-      logger.info(`✅ Device and IP limits check PASSED - IP: ${ipCount}/${MAX_USERS_PER_IP}`);
+      logger.info(`✅ Device and IP limits check PASSED - This is the first account from this IP address`);
     } else {
       logger.warn(`⚠️ Local IP detected - skipping device/IP limits for development: ${ipAddress}`);
       logger.warn(`   Fingerprint: ${deviceFingerprint}`);
@@ -320,14 +320,52 @@ const verifyOTPHandler = async (req, res) => {
     let user = await User.findOne({ phone });
 
     if (!user) {
+      // IP-based registration limit for OTP registration too
+      const ipAddress = req.headers['x-forwarded-for']?.split(',')[0].trim() || 
+                       req.headers['x-real-ip'] || 
+                       req.ip || 
+                       req.connection.remoteAddress || 
+                       'unknown';
+
+      // Skip check for local/development IPs
+      const isLocalIP = ipAddress.includes('127.0.0.1') || 
+                        ipAddress.includes('localhost') || 
+                        ipAddress.includes('::1') ||
+                        ipAddress.startsWith('192.168.') ||
+                        ipAddress.startsWith('10.') ||
+                        ipAddress.startsWith('172.');
+
+      if (!isLocalIP) {
+        const ipCount = await User.countDocuments({
+          'registrationMetadata.ipAddress': ipAddress
+        });
+
+        if (ipCount >= 1) {
+          logger.error(`🚫 OTP Registration BLOCKED: IP address already has an account`);
+          logger.error(`   IP: ${ipAddress}`);
+          logger.error(`   Attempted phone: ${phone}`);
+          return res.status(403).json({
+            error: true,
+            message: 'An account has already been registered from this network. Only one account per network is allowed.',
+            code: 'IP_LIMIT_EXCEEDED'
+          });
+        }
+      }
+
       // Auto-register user with phone number
       user = await User.create({
         phone,
         name: `User ${phone.slice(-4)}`,
         email: `${phone}@temp.local`, // Temporary email
         roles: ['buyer'],
+        registrationMetadata: {
+          ipAddress: ipAddress,
+          deviceFingerprint: req.headers['user-agent'] || 'no-fingerprint',
+          userAgent: req.headers['user-agent'] || 'unknown',
+          registeredAt: new Date(),
+        }
       });
-      logger.info(`New user auto-registered via OTP: ${phone}`);
+      logger.info(`New user auto-registered via OTP: ${phone} from IP: ${ipAddress}`);
     }
 
     // Check if user is active
