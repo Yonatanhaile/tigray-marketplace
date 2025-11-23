@@ -10,8 +10,12 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: [true, 'Email is required'],
+    required: function() {
+      // Email required for local auth, optional for OAuth
+      return this.authProvider === 'local';
+    },
     unique: true,
+    sparse: true, // Allows multiple null values
     lowercase: true,
     trim: true,
     index: true,
@@ -19,8 +23,12 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    required: [true, 'Phone number is required'],
+    required: function() {
+      // Phone required for local auth, optional for OAuth
+      return this.authProvider === 'local';
+    },
     unique: true,
+    sparse: true, // Allows multiple null values
     trim: true,
     index: true,
     // Accept E.164 (international) or 10-digit local numbers (e.g., 0912345678)
@@ -33,6 +41,20 @@ const userSchema = new mongoose.Schema({
   passwordHash: {
     type: String,
     select: false, // Don't include by default in queries
+  },
+  emailVerified: {
+    type: Boolean,
+    default: false,
+  },
+  googleId: {
+    type: String,
+    sparse: true, // Allows null values and creates index for non-null
+    unique: true,
+  },
+  authProvider: {
+    type: String,
+    enum: ['local', 'google'],
+    default: 'local',
   },
   roles: {
     type: [String],
@@ -87,6 +109,7 @@ const userSchema = new mongoose.Schema({
 // Indexes for performance
 userSchema.index({ email: 1 });
 userSchema.index({ phone: 1 });
+userSchema.index({ googleId: 1 });
 userSchema.index({ 'kyc.status': 1 });
 
 // Virtual for full profile
@@ -100,6 +123,8 @@ userSchema.virtual('profile').get(function() {
     roles: this.roles,
     badges: this.badges,
     kyc: this.kyc,
+    emailVerified: this.emailVerified,
+    authProvider: this.authProvider,
   };
 });
 

@@ -20,6 +20,7 @@ import AdminPanel from './pages/AdminPanel';
 import Search from './pages/Search';
 import NotFound from './pages/NotFound';
 import ReferralDashboard from './pages/ReferralDashboard';
+import OAuthCallback from './pages/OAuthCallback';
 
 // Protected route wrapper
 const ProtectedRoute = ({ children, requireAdmin = false, requireSeller = false }) => {
@@ -55,6 +56,7 @@ function App() {
         <Route index element={<Home />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
+        <Route path="oauth/callback" element={<OAuthCallback />} />
         <Route path="search" element={<Search />} />
         <Route path="listings/:id" element={<ListingDetail />} />
         <Route path="sellers/:sellerId" element={<SellerProfile />} />

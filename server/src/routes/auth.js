@@ -7,6 +7,8 @@ const {
   verifyOTPHandler,
   getProfile,
   updateProfile,
+  sendEmailOTP,
+  verifyEmailOTPAndRegister,
 } = require('../controllers/authController');
 const {
   registerValidation,
@@ -22,6 +24,10 @@ router.post('/register', authLimiter, registerValidation, register);
 router.post('/login', authLimiter, loginValidation, login);
 router.post('/otp/send', otpLimiter, otpSendValidation, sendOTP);
 router.post('/otp/verify', authLimiter, otpVerifyValidation, verifyOTPHandler);
+
+// Email OTP routes for email verification
+router.post('/email-otp/send', otpLimiter, sendEmailOTP);
+router.post('/email-otp/verify', authLimiter, verifyEmailOTPAndRegister);
 
 // Protected routes
 router.get('/profile', authenticateJWT, getProfile);

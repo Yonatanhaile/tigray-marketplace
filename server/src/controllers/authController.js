@@ -1,6 +1,7 @@
 const { User } = require('../models');
 const { generateToken } = require('../services/jwt');
 const { generateOTP, verifyOTP } = require('../services/otp');
+const { generateEmailOTP, verifyEmailOTP } = require('../services/emailOtp');
 const { trackReferral } = require('./referralController');
 const logger = require('../services/logger');
 const geoip = require('geoip-lite');
@@ -492,6 +493,221 @@ const updateProfile = async (req, res) => {
   }
 };
 
+/**
+ * Send email OTP for verification during registration
+ */
+const sendEmailOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(400).json({
+        error: true,
+        message: 'An account with this email already exists.',
+      });
+    }
+
+    // Generate and send OTP
+    const result = await generateEmailOTP(email);
+
+    res.status(200).json({
+      error: false,
+      message: result.message,
+      expiresAt: result.expiresAt,
+      // Include OTP in development mode
+      ...(process.env.NODE_ENV === 'development' && result.otp && { otp: result.otp }),
+    });
+  } catch (error) {
+    logger.error('Send email OTP error:', error);
+    res.status(500).json({
+      error: true,
+      message: error.message || 'Failed to send verification code',
+      details: error.message,
+    });
+  }
+};
+
+/**
+ * Verify email OTP and complete registration
+ */
+const verifyEmailOTPAndRegister = async (req, res) => {
+  try {
+    const { email, otp, name, phone, password, referralCode, deviceFingerprint, deviceInfo } = req.body;
+
+    // Verify OTP first
+    const verificationResult = await verifyEmailOTP(email, otp);
+
+    if (!verificationResult.success) {
+      return res.status(400).json({
+        error: true,
+        message: verificationResult.message,
+        attemptsRemaining: verificationResult.attemptsRemaining,
+      });
+    }
+
+    // OTP verified - proceed with registration
+    // Check if user already exists (double-check)
+    const existingUser = await User.findOne({
+      $or: [{ email: email.toLowerCase() }, { phone }],
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        error: true,
+        message: 'User with this email or phone already exists.',
+      });
+    }
+
+    // Capture IP address
+    const ipAddress = req.headers['x-forwarded-for']?.split(',')[0].trim() || 
+                     req.headers['x-real-ip'] || 
+                     req.ip || 
+                     req.connection.remoteAddress || 
+                     'unknown';
+
+    // Device and IP limit checks (same as original register)
+    const MAX_USERS_PER_IP = 1;
+    const MAX_USERS_PER_DEVICE = 1;
+
+    const isLocalIP = ipAddress.includes('127.0.0.1') || 
+                      ipAddress.includes('localhost') || 
+                      ipAddress.includes('::1') ||
+                      ipAddress.startsWith('192.168.') ||
+                      ipAddress.startsWith('10.') ||
+                      ipAddress.startsWith('172.');
+
+    // Ethiopia-only registration check
+    if (!isLocalIP) {
+      const geo = geoip.lookup(ipAddress);
+      
+      if (!geo) {
+        logger.warn(`⚠️ IP geolocation lookup failed - allowing registration but logging for review`);
+        logger.warn(`   IP: ${ipAddress}`);
+        logger.warn(`   Email: ${email}`);
+      } else {
+        const isEthiopianIP = geo.country === 'ET';
+        
+        if (!isEthiopianIP) {
+          logger.error(`🚫 Registration BLOCKED: Non-Ethiopian IP detected`);
+          logger.error(`   IP: ${ipAddress}`);
+          logger.error(`   Country: ${geo.country}`);
+          logger.error(`   Email: ${email}`);
+          return res.status(403).json({
+            error: true,
+            message: 'Registration is only available for users in Ethiopia.',
+            code: 'NON_ETHIOPIAN_IP'
+          });
+        }
+
+        logger.info(`✅ IP Geolocation check PASSED - Ethiopian IP confirmed`);
+      }
+    }
+
+    // Device and IP limit checks
+    if (!isLocalIP) {
+      const effectiveFingerprint = (deviceFingerprint && deviceFingerprint !== 'unknown') 
+        ? deviceFingerprint 
+        : req.headers['user-agent'] || 'no-fingerprint';
+
+      if (effectiveFingerprint !== 'no-fingerprint') {
+        const deviceCount = await User.countDocuments({
+          'registrationMetadata.deviceFingerprint': effectiveFingerprint
+        });
+
+        if (deviceCount >= MAX_USERS_PER_DEVICE) {
+          logger.error(`🚫 Registration BLOCKED: Device fingerprint already used`);
+          return res.status(403).json({
+            error: true,
+            message: 'This device has already been used to register an account.',
+            code: 'DEVICE_LIMIT_EXCEEDED'
+          });
+        }
+      }
+
+      const ipCount = await User.countDocuments({
+        'registrationMetadata.ipAddress': ipAddress
+      });
+
+      if (ipCount >= MAX_USERS_PER_IP) {
+        logger.error(`🚫 Registration BLOCKED: IP address limit exceeded`);
+        return res.status(403).json({
+          error: true,
+          message: 'An account has already been registered from this network.',
+          code: 'IP_LIMIT_EXCEEDED'
+        });
+      }
+    }
+
+    // Hash password
+    const passwordHash = await User.hashPassword(password);
+
+    // Create user with verified email
+    const user = await User.create({
+      name,
+      email: email.toLowerCase(),
+      phone,
+      passwordHash,
+      emailVerified: true, // Email is verified via OTP
+      authProvider: 'local',
+      roles: ['buyer', 'seller'],
+    });
+
+    // Registration metadata
+    const effectiveFingerprint = (deviceFingerprint && deviceFingerprint !== 'unknown') 
+      ? deviceFingerprint 
+      : req.headers['user-agent'] || 'no-fingerprint';
+
+    const registrationData = {
+      ipAddress: ipAddress,
+      deviceFingerprint: effectiveFingerprint,
+      userAgent: req.headers['user-agent'] || 'unknown',
+      deviceInfo: deviceInfo || {},
+      registeredAt: new Date(),
+    };
+
+    // Track referral if present
+    if (referralCode) {
+      user.referredBy = referralCode;
+      user.registrationMetadata = registrationData;
+      await user.save();
+
+      logger.info(`Tracking referral for user ${user._id} with code ${referralCode}`);
+      
+      trackReferral(referralCode, user._id, registrationData).catch(err => 
+        logger.error('Failed to track referral:', err)
+      );
+    } else {
+      user.registrationMetadata = registrationData;
+      await user.save();
+    }
+
+    // Generate token
+    const token = generateToken(user._id);
+
+    // Update last login
+    user.lastLogin = new Date();
+    await user.save();
+
+    logger.info(`✅ User registered with verified email: ${user.email} from IP: ${ipAddress}`);
+
+    res.status(201).json({
+      error: false,
+      message: 'User registered successfully',
+      user: user.profile,
+      token,
+    });
+  } catch (error) {
+    logger.error('Registration error:', error);
+    res.status(500).json({
+      error: true,
+      message: 'Registration failed',
+      details: error.message,
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -499,5 +715,7 @@ module.exports = {
   verifyOTPHandler,
   getProfile,
   updateProfile,
+  sendEmailOTP,
+  verifyEmailOTPAndRegister,
 };
 

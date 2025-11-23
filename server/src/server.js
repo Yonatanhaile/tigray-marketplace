@@ -16,16 +16,19 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
+const session = require('express-session');
 // const { createAdapter } = require('@socket.io/redis-adapter');
 const { Server } = require('socket.io');
 // const Redis = require('ioredis');
 
 const logger = require('./services/logger');
+const passport = require('./config/passport');
 const { errorHandler } = require('./middleware/errorHandler');
 const { initializeQueues } = require('./queues');
 
 // Import routes
 const authRoutes = require('./routes/auth');
+const oauthRoutes = require('./routes/oauth');
 const listingRoutes = require('./routes/listings');
 const orderRoutes = require('./routes/orders');
 const messageRoutes = require('./routes/messages');
@@ -95,6 +98,23 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Sanitize data to prevent MongoDB operator injection
 app.use(mongoSanitize());
 
+// Session configuration for OAuth (needed for passport)
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key-change-this-in-production',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
+  })
+);
+
+// Initialize passport
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Request logging (development)
 if (process.env.NODE_ENV === 'development') {
   app.use((req, res, next) => {
@@ -115,6 +135,7 @@ app.get('/health', (req, res) => {
 
 // ============ API Routes ============
 app.use('/api/auth', authRoutes);
+app.use('/api/oauth', oauthRoutes);
 app.use('/api/listings', listingRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/messages', messageRoutes);
