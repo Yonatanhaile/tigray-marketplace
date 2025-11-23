@@ -49,9 +49,9 @@ const sendOtpEmail = async (email, otpCode) => {
 
   try {
     const mailOptions = {
-      from: process.env.SMTP_FROM || '"Tigray Market" <noreply@tigraymarket.com>',
+      from: process.env.SMTP_FROM || '"YohaTrade" <noreply@yohatrade.com>',
       to: email,
-      subject: 'Verify Your Email - Tigray Market',
+      subject: 'Verify Your Email - YohaTrade',
       html: `
         <!DOCTYPE html>
         <html>
@@ -70,12 +70,12 @@ const sendOtpEmail = async (email, otpCode) => {
         <body>
           <div class="container">
             <div class="header">
-              <h1 style="margin: 0;">🛒 Tigray Market</h1>
+              <h1 style="margin: 0;">🛒 YohaTrade</h1>
               <p style="margin: 10px 0 0 0;">Email Verification</p>
             </div>
             <div class="content">
               <h2>Verify Your Email Address</h2>
-              <p>Thank you for signing up with Tigray Market! To complete your registration, please use the following verification code:</p>
+              <p>Thank you for signing up with YohaTrade! To complete your registration, please use the following verification code:</p>
               
               <div class="otp-box">
                 <p style="margin: 0; font-size: 14px; color: #666;">Your Verification Code</p>
@@ -87,7 +87,7 @@ const sendOtpEmail = async (email, otpCode) => {
                 <strong>⚠️ Security Notice:</strong>
                 <ul style="margin: 10px 0 0 0; padding-left: 20px;">
                   <li>Never share this code with anyone</li>
-                  <li>Tigray Market staff will never ask for your verification code</li>
+                  <li>YohaTrade staff will never ask for your verification code</li>
                   <li>If you didn't request this code, please ignore this email</li>
                 </ul>
               </div>
@@ -96,7 +96,7 @@ const sendOtpEmail = async (email, otpCode) => {
               
               <div class="footer">
                 <p>This is an automated email. Please do not reply to this message.</p>
-                <p>&copy; ${new Date().getFullYear()} Tigray Market. All rights reserved.</p>
+                <p>&copy; ${new Date().getFullYear()} YohaTrade. All rights reserved.</p>
               </div>
             </div>
           </div>
@@ -104,7 +104,7 @@ const sendOtpEmail = async (email, otpCode) => {
         </html>
       `,
       text: `
-        Verify Your Email - Tigray Market
+        Verify Your Email - YohaTrade
         
         Your verification code is: ${otpCode}
         
@@ -112,7 +112,7 @@ const sendOtpEmail = async (email, otpCode) => {
         
         Never share this code with anyone. If you didn't request this code, please ignore this email.
         
-        © ${new Date().getFullYear()} Tigray Market
+        © ${new Date().getFullYear()} YohaTrade
       `,
     };
 
