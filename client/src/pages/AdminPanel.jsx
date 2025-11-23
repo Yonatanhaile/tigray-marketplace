@@ -600,7 +600,9 @@ const AdminPanel = () => {
             <div className="space-y-4">
               <h2 className="text-lg font-semibold text-gray-900">Referral Programs</h2>
               
-              {referralPrograms?.programs?.map((program) => (
+              {referralPrograms?.programs
+                ?.sort((a, b) => b.totalReferrals - a.totalReferrals) // Sort by highest referrals first
+                ?.map((program) => (
                 <div key={program._id} className="bg-white rounded-lg border border-gray-200 p-4 sm:p-5">
                   {/* User Info Header */}
                   <div className="flex flex-col sm:flex-row justify-between gap-3 mb-4 pb-4 border-b">
@@ -930,7 +932,7 @@ const AdminPanel = () => {
                     )}
                   </div>
                 </div>
-              ))}
+                ))}
 
               {referralPrograms?.programs?.length === 0 && (
                 <p className="text-center text-gray-500 py-8">No referral programs yet</p>
