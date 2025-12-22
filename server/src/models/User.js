@@ -23,6 +23,8 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
+    unique: true,   // Keeps phone numbers unique for local users
+    sparse: true,   // CRITICAL: Allows multiple 'null' values for OAuth users
     required: function() {
       // Phone required for local auth, optional for OAuth
       return this.authProvider === 'local';
